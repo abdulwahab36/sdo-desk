@@ -930,5 +930,6 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.s
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 prune();render();loadTexts();dailyNotify();checkSoon();setInterval(checkSoon,300000);setTimeout(fileGC,4000);
 </script>
+<script src="drive.js"></script>
 </body>
 </html>
