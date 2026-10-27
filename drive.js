@@ -40,7 +40,7 @@
     const h = new URLSearchParams(hash.slice(1));
     let sv = null;
     try { sv = JSON.parse(sessionStorage.getItem('sdodesk.oauth') || 'null'); sessionStorage.removeItem('sdodesk.oauth'); } catch (e) { /* ignore */ }
-    history.replaceState(null, '', location.pathname + location.search + ((sv && sv.back) || '#home'));
+    history.replaceState({ root: 1 }, '', location.pathname + location.search + ((sv && sv.back) || '#home'));
     if (!sv || sv.st !== h.get('state')) return { error: 'state_mismatch' };
     if (h.get('error') || !h.get('access_token')) return { error: h.get('error') || 'no_token', after: sv.after, interactive: sv.interactive };
     tok = { v: h.get('access_token'), exp: Date.now() + (Number(h.get('expires_in') || 3600) - 120) * 1000 };
