@@ -29,6 +29,10 @@ nav.bot svg{width:22px;height:22px}
 .fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:16px;border:0;background:var(--acc);color:#fff;font-size:28px;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:6}
 .drawer{position:fixed;top:0;bottom:0;left:0;width:min(82vw,320px);background:var(--bg);z-index:41;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 0 24px;box-shadow:4px 0 18px rgba(0,0,0,.2)}
 .drawer .dh{padding:0 18px 10px;font-weight:700;font-size:18px}
+.drawer .dp{display:flex;justify-content:space-between;align-items:center;padding:13px 18px;font-weight:600;font-size:15px;cursor:pointer;border-top:1px solid var(--line)}
+.drawer .dp em{font-style:normal;color:var(--mute);font-weight:400;font-size:13px}
+.drawer .dc a{padding-left:34px}
+.prog{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:6px}.prog i{display:block;height:100%;background:var(--ok)}
 .drawer .dg{padding:12px 18px 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
 .drawer a{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;color:var(--ink);text-decoration:none;font-size:15px}
 .drawer a.on{background:var(--accs);color:var(--acc);font-weight:600}
@@ -283,7 +287,7 @@ function fieldHTML(f,val){const id='f_'+f.k;let inp;
  switch(f.t){
   case 'textarea':inp=`<textarea id="${id}" rows="${f.k==='body'?9:3}">${esc(val)}</textarea>`;break;
   case 'sel':inp=`<select id="${id}">${f.o.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select>`;break;
-  case 'person':inp=`<select id="${id}"><option value="">—</option>${peopleOpts(val)}</select>`;break;
+  case 'person':{const pp=person(val);inp=`<input type="hidden" id="${id}" value="${esc(val||'')}"><button type="button" class="btn wide" style="text-align:left" id="${id}_b" onclick="A.pickPerson('${id}')">${pp?esc(pp.name)+' <span class="meta">'+esc(pp.designation)+'</span>':'<span class="meta">Tap to choose a person…</span>'}</button>`;break}
   case 'num':inp=`<input id="${id}" type="number" inputmode="decimal" value="${esc(val)}">`;break;
   case 'list':inp=`<input id="${id}" list="${f.o}" value="${esc(val)}" autocomplete="off">`;break;
   default:inp=`<input id="${id}" type="${f.t}" value="${esc(val)}">`}
@@ -303,13 +307,19 @@ let tT;function toast(msg,u){const t=$('#toast');t.innerHTML=esc(msg)+(u&&UNDO?'
 const backHome='';
 
 /* ================= drawer ================= */
-const MENU=[['Overview',[['home','Dashboard'],['today','Today'],['cal','Calendar'],['inbox','Inbox']]],
- ['Work',[['list/task','Follow-ups'],['list/complaint','Complaints'],['list/estimate','Estimates'],['offences','Offence register'],['list/pmiu','PMIU wires'],['list/court','Court cases'],['list/inquiry','Inquiries'],['list/letter','Correspondence'],['list/wire','Canal wires'],['insp','Inspections']]],
- ['Records',[['people','People'],['list/place','Places'],['list/resource','Resources'],['list/template','Templates'],['vehicle','Vehicle & POL'],['log','Daily log'],['settings','Settings & backup']]]];
+const MTOP=[['home','Home'],['cal','Calendar'],['inbox','Inbox']];
+const MENU=[['Office work',[['list/task','Follow-ups'],['list/letter','Correspondence'],['list/wire','Canal wires'],['list/complaint','Complaints'],['list/court','Court cases'],['list/inquiry','Inquiries']]],
+ ['Revenue',[['offences','Offence register'],['list/pmiu','PMIU wires']]],
+ ['Technical',[['list/estimate','Estimates'],['insp','Inspections']]],
+ ['Records & files',[['people','People'],['list/place','Places'],['list/resource','Resources'],['list/template','Templates']]],
+ ['Admin',[['vehicle','Vehicle & POL'],['log','Daily log'],['settings','Settings & backup']]]];
+let DOPEN={};
 function openDrawer(){const t=today();const cur=location.hash.slice(1)||'home';
  const cnt=h=>{if(h.startsWith('list/')){const ty=h.slice(5);const o=S.items.filter(it=>it.type===ty&&inScope(it));if(LIB.includes(ty)||ty==='wire')return {n:o.length};if(ty==='letter')return {n:o.length,r:o.filter(it=>isOpen(it)&&it.replyDue<t).length};const op=o.filter(isOpen);return {n:op.length,r:op.filter(it=>{const k=keyDate(it);return k&&k<t}).length}}
   if(h==='inbox')return {n:S.inbox.filter(inScope).length};if(h==='offences'){const as=scopeSubs().map(offA).filter(Boolean);return as.length?{r:as.reduce((s,a)=>s+a.noFir.length+a.noAction.length,0)}:{}}if(h==='people')return {n:S.people.filter(pScope).length};return {}};
- const html=`<div class="scrim" onclick="closeDrawer()"></div><div class="drawer"><div class="dh">SDO Desk</div>${MENU.map(([g,ls])=>`<div class="dg">${g}</div>${ls.map(([h,l])=>{const c=cnt(h);return `<a href="#${h}" class="${cur===h?'on':''}" onclick="closeDrawer()">${l}${c.r?`<span class="r">${c.r}</span>`:c.n!=null?`<span>${c.n}</span>`:''}</a>`}).join('')}`).join('')}</div>`;
+ const link=([h,l])=>{const c=cnt(h);return `<a href="#${h}" class="${cur===h||(h==='home'&&cur==='today')?'on':''}" onclick="closeDrawer()">${l}${c.r?`<span class="r">${c.r}</span>`:c.n!=null?`<span>${c.n}</span>`:''}</a>`};
+ MENU.forEach(([g,ls],i)=>{if(ls.some(([h])=>cur===h||cur.startsWith(h+'/')))DOPEN[i]=true});
+ const html=`<div class="scrim" onclick="closeDrawer()"></div><div class="drawer"><div class="dh">SDO Desk</div>${MTOP.map(link).join('')}${MENU.map(([g,ls],i)=>{const red=ls.reduce((x,l)=>x+(cnt(l[0]).r||0),0);return `<div class="dp" onclick="DOPEN[${i}]=!DOPEN[${i}];closeDrawer();openDrawer()"><span>${g}</span><em>${red?`<span class="badge" style="position:static;margin-right:8px">${red}</span>`:''}${DOPEN[i]?'▾':'▸'}</em></div>${DOPEN[i]?`<div class="dc">${ls.map(link).join('')}</div>`:''}`}).join('')}</div>`;
  const d=document.createElement('div');d.id='drawer';d.innerHTML=html;document.body.appendChild(d)}
 function closeDrawer(){const d=$('#drawer');if(d)d.remove()}
 
@@ -317,8 +327,8 @@ function closeDrawer(){const d=$('#drawer');if(d)d.remove()}
 function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.items.filter(inScope);const open=its.filter(isOpen);
  const ov=it=>{const k=keyDate(it);return k&&k<t};
  const over=open.filter(ov).length,dueT=open.filter(it=>keyDate(it)===t).length,n7=open.filter(it=>{const k=keyDate(it);return k&&k>t&&k<=wk}).length;
- const lag=lagging();const stuck=open.filter(isStuck).length;
- const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const rd=S.routineDone[t]||{};const g=buckets();const act=g.over.length+g.today.length+g.soon.length+g.fu.length;
+ const lag=lagging();const stuck=open.filter(isStuck).length;const g=buckets();
+ const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const rd=S.routineDone[t]||{};const act=g.over.length+g.today.length+g.soon.length+g.fu.length;
  const by=ty=>open.filter(it=>it.type===ty);const R=(n,txt)=>n?`<span class="rd">${n} ${txt}</span>`:'';
  const nextOf=(arr,f)=>{const x=arr.map(it=>({it,d:f(it)})).filter(x=>x.d&&x.d>=t).sort((a,b)=>a.d.localeCompare(b.d))[0];return x?fmtD(x.d)+' · '+esc(x.it.title.slice(0,32)):''};
  const tile=(h,title,main,rows,cls)=>`<a class="dtile ${cls||''}" href="#${h}"><div class="hd"><b>${title}</b><em>${main}</em></div>${rows.filter(Boolean).map(r=>`<div class="dl">${r}</div>`).join('')}</a>`;
@@ -334,10 +344,13 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const staff={};open.forEach(it=>{if(!it.owner||!person(it.owner))return;const s=staff[it.owner]=staff[it.owner]||{n:0,o:0};s.n++;if(ov(it))s.o++});
  const staffL=Object.entries(staff).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
  const lb=S.settings.lastBackup;
+ const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
  let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>
- <div class="stats s4 mt"><a href="#lagging" class="rd"><b>${over}</b><span>overdue</span></a><a href="#today" class="am"><b>${dueT}</b><span>due today</span><span>routine ${rs.filter(r=>rd[r.id]).length}/${rs.length}</span></a><a href="#cal"><b>${n7}</b><span>next 7 days</span></a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b><span>stuck</span></a></div>
+ <div class="card mt"><div class="row between"><b>Today: ${doneT} done · ${leftT} left</b><span class="meta">${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>
+ <div class="stats s4"><a href="#lagging" class="rd"><b>${over}</b><span>overdue</span></a><div class="am"><b>${dueT}</b><span>due today</span></div><a href="#cal"><b>${n7}</b><span>next 7 days</span></a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b><span>stuck</span></a></div>
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
- h+=`<h2>Lagging (${lag.length})</h2>`+(lag.length?`<div class="card pad0">${lag.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag.length>7?`<a class="lrow center" href="#lagging">See all ${lag.length}</a>`:''}</div>`:'<div class="card meta">Nothing overdue or stuck.</div>');
+ h+=todayBody(g);const lag2=lag.filter(x=>!x.od);
+ h+=`<h2>Stuck or untouched (${lag2.length})</h2>`+(lag2.length?`<div class="card pad0">${lag2.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag2.length>7?`<a class="lrow center" href="#lagging">See all</a>`:''}</div>`:'<div class="card meta">Nothing stuck or untouched.</div>');
  h+=`<h2>All areas</h2><div class="dgrid">`+[
   tile('list/complaint','Complaints',cp.length,[R(cp.filter(ov).length,'overdue'),`WRIMS ${cp.filter(it=>/^WRIMS/.test(it.source)).length} · Ombudsman ${cp.filter(it=>/^Ombud/.test(it.source)).length}`,nextOf(cp,it=>it.due)&&'Next due '+nextOf(cp,it=>it.due)]),
   tile('list/court','Court cases',ct.length,[R(ct.filter(ov).length,'hearing date passed'),nextOf(ct,it=>it.hearing)?'Next '+nextOf(ct,it=>it.hearing):'No hearing fixed']),
@@ -355,8 +368,8 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
 
 function vLagging(){const l=lagging();return `<a class="back" href="javascript:history.back()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
 
-function vToday(){const t=today();const g=buckets();let h='';
- h+=`<div class="hello"><div class="big">Today</div><div class="meta">${g.over.length} overdue · ${g.today.length} due today · ${g.soon.length} in next 2 days</div></div>`;
+function vToday(){return vHome()}
+function todayBody(g){let h='';
  const ib=S.inbox.filter(inScope).length;if(ib)h+=`<div class="card note mt" onclick="go('#inbox')">${ib} note${ib>1?'s':''} in Inbox waiting to become tasks.</div>`;
  if([5,6,0].includes(new Date().getDay()))h+=inspCards(true);
  h+=routinesBlock();
@@ -515,7 +528,7 @@ function peopleList(){const q=PQ.toLowerCase().split(/\s+/).filter(Boolean);
  if(!l.length)return '<p class="empty">No people found. Add one, or import your staff file from Settings or the button above.</p>';
  let h='',sec=null;l.forEach(p=>{if(p.section!==sec){sec=p.section;h+=`<h2>${esc(sec||'No section')}</h2>`}h+=personCard(p)});return h}
 function vPeople(){const secs=[...new Set(S.people.filter(pScope).map(p=>p.section).filter(Boolean))].sort();
- return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden accept=".json,.csv" onchange="A.pImp(this)"></label></div>
+ return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden onchange="A.pImp(this)"></label></div>
  <input type="search" placeholder="Search name, designation, section, phone" value="${esc(PQ)}" oninput="PQ=this.value;$('#pres').innerHTML=peopleList()" style="margin-bottom:8px">
  <div class="fchips">${[['all','All']].concat(secs.map(s=>[s,s])).map(([v,l])=>`<button class="${PSEC===v?'on':''}" onclick="PSEC=this.dataset.v;render()" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div><div id="pres">${peopleList()}</div>`}
 function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#people">‹ People</a><p class="empty">Not found.</p>';
@@ -580,7 +593,7 @@ function notifState(){if(!('Notification' in window))return 'This browser does n
 function vSettings(){const lb=S.settings.lastBackup;
  setTimeout(async()=>{try{const all=await fAll();const sz=all.reduce((s,r)=>s+(r.size||0),0);const e=$('#stInfo');if(e)e.textContent=`${S.items.length} items · ${S.people.length} people · ${all.length} files (${fsize(sz)}) · ${S.log.length} log entries`}catch(x){}},0);
  return `${backHome}<h1 class="pt">Settings & backup</h1>
- <h2>Backup</h2><div class="card"><p class="meta" style="margin-top:0">Last backup: ${lb?fmtD(lb):'never'}. Everything (including uploaded files) is stored on this device only. Back up daily: tap Back up now, choose Drive. On a laptop or new phone, open the app and restore the latest file.</p><div class="acts"><button class="btn p" onclick="A.exp()">Back up now</button><label class="btn">Restore from file<input type="file" hidden accept=".json,application/json" onchange="A.imp(this)"></label></div></div>
+ <h2>Backup</h2><div class="card"><p class="meta" style="margin-top:0">Last backup: ${lb?fmtD(lb):'never'}. Everything (including uploaded files) is stored on this device only. Back up daily: tap Back up now, choose Drive. On a laptop or new phone, open the app and restore the latest file.</p><div class="acts"><button class="btn p" onclick="A.exp()">Back up now</button><label class="btn">Restore from file<input type="file" hidden onchange="A.imp(this)"></label></div></div>
  <h2>Notifications</h2><div class="card"><p class="meta" style="margin-top:0">${notifState()}</p><button class="btn" onclick="A.notif()">Enable notifications</button></div>
  <h2>Subdivisions</h2><div class="card"><label class="fld"><span>Regular charge</span><input id="snK" value="${esc(S.settings.subs.K)}"></label><label class="fld"><span>Additional charge</span><input id="snI" value="${esc(S.settings.subs.I)}"></label><button class="btn" onclick="A.subNames()">Save names</button></div>
  <h2>Stored on this device</h2><div class="card meta" id="stInfo">…</div>`}
@@ -818,7 +831,7 @@ function vOffences(){const subs=scopeSubs();let h='<h1 class="pt">Offence regist
  if(subs.length>1)return h+subs.map(s=>{const a=offA(s);return `<div class="card" onclick="setSub('${s}');go('#offences')"><div class="ct">${esc(subName(s))}</div><div class="meta">${a?`${a.n} offences · <span class="rd">${a.noFir.length} FIR pending · ${a.noAction.length} no action</span> · imported ${fmtD(a.sh.importedAt)}`:'No sheet imported yet'}</div></div>`}).join('')+'<p class="meta">Pick a subdivision at the top to work its register.</p>';
  const sub=subs[0];const a=offA(sub);const sh=(S.offSheets||{})[sub];const link=(S.settings.sheetLinks||{})[sub]||'';const t=today();
  h+=`<div class="card"><div class="row between"><div><div class="ct">${sh?esc(sh.file):'No sheet imported'}</div><div class="meta">${sh?`Imported ${fmtD(sh.importedAt)}${diffDays(t,sh.importedAt)>=7?` <span class="rd">· ${diffDays(t,sh.importedAt)} days old, import the latest</span>`:''} · ${a.n} offences${(S.psMaps||{})[sub]&&(S.psMaps||{})[sub].length?' · police list '+S.psMaps[sub].length+' rows':''}`:'Download the sheet from Drive as .xlsx and import it.'}</div></div></div>
- <div class="acts"><label class="btn s p">Import latest sheet (.xlsx)<input type="file" hidden accept=".xlsx" onchange="A.offImp('${sub}',this)"></label>${isUrl(link)?`<a class="btn s" href="${esc(link)}" target="_blank" rel="noopener">Open master sheet</a>`:''}<button class="btn s" onclick="A.sheetLink('${sub}')">${link?'Change':'Save'} sheet link</button></div></div>`;
+ <div class="acts"><label class="btn s p">Import latest sheet (.xlsx)<input type="file" hidden accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream" onchange="A.offImp('${sub}',this)"></label>${isUrl(link)?`<a class="btn s" href="${esc(link)}" target="_blank" rel="noopener">Open master sheet</a>`:''}<button class="btn s" onclick="A.sheetLink('${sub}')">${link?'Change':'Save'} sheet link</button></div></div>`;
  if(!a)return h;
  h+=`<div class="stats"><div><b>${a.n}</b><span>offences</span></div><div class="rd"><b>${a.noFir.length}</b><span>robkar, FIR pending</span></div><div class="rd"><b>${a.noAction.length}</b><span>no fine / robkar 15d+</span></div><div><b>${a.robkar} / ${a.fir}</b><span>robkars / FIRs</span></div><div><b>${a.fine}</b><span>fines (${a.fineNoAmt.length} no amount)</span></div><div><b>Rs ${num(a.tawanRs)}</b><span>tawan decided (${a.n-a.noTawan.length})</span></div></div>`;
  h+=`<div class="fchips">${OFF_FILTERS.map(([k,l,fn])=>`<button class="${OF.filter===k?'on':''}" onclick="OF.filter='${k}';render()">${l}${fn?' '+fn(a).length:' '+a.repeats.length}</button>`).join('')}</div>`;
@@ -890,6 +903,15 @@ A.tplBulk=async inp=>{const files=[...inp.files];inp.value='';let n=0;toast('Add
   try{await fPut({id:fid,name:f.name,type:f.type,size:f.size,blob:f,ts:Date.now(),text})}catch(e){continue}if(text)TEXTS[fid]=text;
   const base=f.name.replace(/\.[^.]+$/,'').replace(/[_]+/g,' ').trim();S.items.push({id:uid(),type:'template',sub:'B',title:base,cat:tplCat(base),body:'',details:'',createdAt:Date.now(),stages:[],notes:[],links:[{fileId:fid,label:base,name:f.name,size:f.size}]});n++}
  log('Added '+n+' template(s)',{});save();render();toast(n+' template(s) added. Tap one to rename or set category.',1)};
+let PPK=null;
+A.pickPerson=fid=>{PPK=fid;sheet(`<div class="ct">Choose a person</div><input id="ppq" type="search" class="mt" placeholder="Search name, designation, section" oninput="$('#ppr').innerHTML=ppList()"><div id="ppr" class="mt">${ppList()}</div>
+ <div class="card mt"><div class="ct">Not in the list? Add</div><div class="grid2 mt"><input id="ppn" placeholder="Name"><input id="ppd" list="desigs" placeholder="Designation"></div><div class="acts"><button class="btn p" onclick="A.ppNew()">Add &amp; select</button>${$('#'+fid).value?`<button class="btn" onclick="A.ppSet('')">Clear</button>`:''}</div></div>`);setTimeout(()=>{const e=$('#ppq');if(e)e.focus()},60)};
+function ppList(){const e=$('#ppq');const q=(e?e.value:'').toLowerCase().split(/\s+/).filter(Boolean);
+ const l=S.people.filter(p=>!q.length||q.every(w=>[p.name,p.designation,p.section,p.posting].join(' ').toLowerCase().includes(w))).sort((a,b)=>(pScope(b)-pScope(a))||dIdx(a)-dIdx(b)||a.name.localeCompare(b.name)).slice(0,60);
+ if(!S.people.length)return '<p class="meta">No people saved yet. Add one below, or import your staff file from ☰ → Records & files → People.</p>';
+ return l.map(p=>`<div class="lrow" onclick="A.ppSet('${p.id}')"><b>${esc(p.name)}</b> <span class="meta">${esc([p.designation,p.section].filter(Boolean).join(' · '))}</span></div>`).join('')||'<p class="empty">No match.</p>'}
+A.ppSet=id=>{const f=$('#'+PPK),b=$('#'+PPK+'_b');if(f)f.value=id;const p=person(id);if(b)b.innerHTML=p?esc(p.name)+' <span class="meta">'+esc(p.designation)+'</span>':'<span class="meta">Tap to choose a person…</span>';closeSheet()};
+A.ppNew=()=>{const n=$('#ppn').value.trim();if(!n)return toast('Enter a name');const p={id:uid(),name:n,designation:$('#ppd').value.trim()||'Other',sub:SUB==='A'?'K':SUB,section:'',posting:'',phone:'',cnic:'',notes:''};S.people.push(p);log('Added person: '+n,{sub:p.sub});save();A.ppSet(p.id);toast('Added '+n)};
 A.renLink=(id,i)=>{const it=get(id);const l=it.links[i];const v=prompt('New name for this document',l.label||l.name||'');if(v===null||!v.trim())return;snap();l.label=v.trim();save();render()};
 
 /* ================= reminders ================= */
