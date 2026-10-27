@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f5c63">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>SDO Desk</title>
+<style>
+:root{--bg:#f4f5f2;--card:#fff;--ink:#1c2321;--mute:#66706c;--line:#dde1dc;--acc:#0f5c63;--accs:#e2efef;--red:#b3261e;--reds:#fbe9e7;--amb:#9a6400;--ambs:#fdf3dc;--ok:#2e7d32;--oks:#e6f2e6}
+@media (prefers-color-scheme:dark){:root{--bg:#111514;--card:#1b201f;--ink:#e7ebe9;--mute:#97a19d;--line:#2c3331;--acc:#5fb3b9;--accs:#1d3335;--red:#ef8a80;--reds:#3a2120;--amb:#e7b45a;--ambs:#352a15;--ok:#7fc683;--oks:#1d2e1e}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top));border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+header h1{font-size:17px;margin:0;font-weight:650;white-space:nowrap;flex:1}
+.ham{border:0;background:none;color:var(--ink);padding:6px;margin-left:-4px;display:flex}
+.ham svg{width:24px;height:24px}
+.seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:2px;flex:none}
+.seg button{border:0;background:none;color:var(--mute);padding:6px 9px;border-radius:8px;font:inherit;font-size:13px}
+.seg button.on{background:var(--acc);color:#fff}
+main{max-width:720px;margin:0 auto;padding:12px 14px 110px}
+nav.bot{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav.bot a{flex:1;text-align:center;color:var(--mute);text-decoration:none;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav.bot a.on{color:var(--acc);font-weight:600}
+nav.bot svg{width:22px;height:22px}
+.badge{position:absolute;top:-3px;left:calc(50% + 6px);background:var(--red);color:#fff;border-radius:9px;font-size:10px;padding:0 5px;line-height:16px;font-weight:600}
+.fab{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:16px;border:0;background:var(--acc);color:#fff;font-size:28px;line-height:1;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:6}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(82vw,320px);background:var(--bg);z-index:41;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 0 24px;box-shadow:4px 0 18px rgba(0,0,0,.2)}
+.drawer .dh{padding:0 18px 10px;font-weight:700;font-size:18px}
+.drawer .dg{padding:12px 18px 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.drawer a{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;color:var(--ink);text-decoration:none;font-size:15px}
+.drawer a.on{background:var(--accs);color:var(--acc);font-weight:600}
+.drawer a span{font-size:12px;color:var(--mute)}
+.drawer a span.r{color:#fff;background:var(--red);border-radius:9px;padding:0 6px;line-height:18px}
+h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);margin:18px 0 8px;font-weight:600}
+.pt{font-size:21px;margin:6px 0 10px;line-height:1.25}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px}
+.card.over{border-left:4px solid var(--red)}
+.card.today{border-left:4px solid var(--amb)}
+.card.warn{background:var(--ambs);border-color:transparent}
+.card.note{background:var(--accs);border-color:transparent}
+.pad0{padding:0;overflow:hidden}
+.ct{font-weight:600}
+.meta{color:var(--mute);font-size:13px;margin-top:2px}
+.tags{margin-bottom:4px}
+.chip{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:6px;background:var(--accs);color:var(--acc);margin:0 4px 2px 0}
+.chip.r{background:var(--reds);color:var(--red)}
+.chip.a{background:var(--ambs);color:var(--amb)}
+.chip.g{background:var(--oks);color:var(--ok)}
+.acts{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:9px;padding:8px 12px;font:inherit;font-size:14px;text-decoration:none;display:inline-block;text-align:center;cursor:pointer}
+.btn.p{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.d{color:var(--red)}
+.btn.s{padding:6px 10px;font-size:13px}
+.wide{width:100%;display:block}
+.mt{margin-top:10px}
+.fld{display:block;margin-bottom:10px}
+.fld span{display:block;font-size:12.5px;color:var(--mute);margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;font-size:15px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink)}
+textarea{resize:vertical}
+.row{display:flex;gap:8px;align-items:center}
+.between{justify-content:space-between}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.back{color:var(--acc);text-decoration:none;font-size:14px;display:inline-block;padding:4px 0}
+.chk{display:flex;gap:10px;align-items:center;padding:11px 12px;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:0}
+.chk input{width:20px;height:20px;flex:none;margin:0}
+.strike{text-decoration:line-through;color:var(--mute)}
+.lrow{padding:9px 12px;border-bottom:1px solid var(--line);display:block;color:var(--ink);text-decoration:none}
+.lrow:last-child{border-bottom:0}
+.card .lrow{padding:8px 0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:14px;margin:0}
+.kv dt{color:var(--mute)}
+.kv dd{margin:0;word-break:break-word}
+.det{margin:10px 0 0}
+.stg{margin:0;padding:0;list-style:none}
+.stg li{padding:4px 0;color:var(--mute);font-size:14px}
+.stg li.d{color:var(--ink)}
+.stg li.c{font-weight:650;color:var(--acc)}
+.tl{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.cal.head div{text-align:center;font-size:11.5px;color:var(--mute)}
+.cd{background:var(--card);border:1px solid var(--line);border-radius:9px;min-height:46px;padding:4px 5px;position:relative;font-size:13px}
+.cd.td{border-color:var(--acc);font-weight:700}
+.cd.sel{background:var(--accs)}
+.cd i{position:absolute;bottom:4px;right:4px;font-style:normal;font-size:10.5px;background:var(--acc);color:#fff;border-radius:8px;padding:0 5px;line-height:15px}
+.cd i.r{background:var(--red)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.stats.s4{grid-template-columns:repeat(4,1fr)}
+.stats div,.stats a{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 4px;text-align:center;text-decoration:none;color:var(--ink)}
+.stats b{display:block;font-size:19px}
+.stats span{display:block}
+.dtile.full{grid-column:1/-1}
+.stats span{font-size:11.5px;color:var(--mute)}
+.stats .rd b{color:var(--red)}
+.stats .am b{color:var(--amb)}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (min-width:640px){.dgrid{grid-template-columns:1fr 1fr 1fr}}
+.dtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-decoration:none;color:var(--ink);display:block}
+.dtile .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.dtile .hd b{font-size:14.5px}
+.dtile .hd em{font-style:normal;font-size:20px;font-weight:700}
+.dl{font-size:12.5px;color:var(--mute);line-height:1.45}
+.rd{color:var(--red)!important;font-weight:600}
+.am{color:var(--amb)}
+.srch{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--mute);margin-bottom:12px;text-decoration:none}
+.srch svg{width:18px;height:18px;flex:none}
+.fchips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;scrollbar-width:none}
+.fchips button{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:5px 11px;font:inherit;font-size:13px}
+.fchips button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.center{text-align:center}
+.empty{color:var(--mute);text-align:center;padding:22px 0}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(88px + env(safe-area-inset-bottom));background:#222;color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;max-width:92vw}
+#toast.on{opacity:1;pointer-events:auto}
+#toast button{background:none;border:0;color:#7fd3d9;font:inherit;font-weight:700;margin-left:10px;padding:0}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:40}
+.sheetbox{position:fixed;left:0;right:0;bottom:0;max-height:86vh;overflow:auto;background:var(--bg);border-radius:16px 16px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom));z-index:41;max-width:720px;margin:0 auto}
+a{color:var(--acc)}
+.hello .big{font-size:20px;font-weight:650}
+</style>
+</head>
+<body>
+<header><button class="ham" onclick="openDrawer()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1 onclick="go('#home')" style="cursor:pointer">SDO Desk</h1><button class="ham" onclick="go('#search')" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><div class="seg" id="seg"></div></header>
+<main id="main"></main>
+<button class="fab" onclick="A.fab()" aria-label="Add">+</button>
+<div id="toast"></div>
+<datalist id="desigs"></datalist>
+<script src="fflate.js"></script>
+<script>
+'use strict';
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>ymd(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymd(d)};
+const diffDays=(a,b)=>Math.round((new Date(a+'T00:00:00')-new Date(b+'T00:00:00'))/864e5);
+const fmtD=s=>{if(!s)return '';const d=new Date(s+'T00:00:00');if(isNaN(d))return s;const o={day:'2-digit',month:'short'};if(d.getFullYear()!==new Date().getFullYear())o.year='numeric';return d.toLocaleDateString('en-GB',o)};
+const fmtTs=ts=>new Date(ts).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+const rel=s=>{const n=diffDays(s,today());return n<0?(-n)+'d overdue':n===0?'today':n===1?'tomorrow':'in '+n+' days'};
+const num=x=>{const n=Number(x);return isNaN(n)?String(x):(Math.round(n*10)/10).toLocaleString('en-PK')};
+const go=h=>{location.hash=h.replace(/^#/,'')};
+const isUrl=u=>/^https?:\/\//i.test(u||'');
+const wa=ph=>{let d=String(ph||'').replace(/\D/g,'');if(d.startsWith('0'))d='92'+d.slice(1);return d};
+const fsize=b=>b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+
+/* ================= data ================= */
+const KEY='sdodesk.v1';
+function DEF(){const r=[];['K','I'].forEach(s=>['Check gauge proforma','Check eFOES','Check SEN activity on WhatsApp group'].forEach(t=>r.push({id:uid(),sub:s,title:t})));
+ return {v:2,offSheets:{},psMaps:{},items:[],people:[],vehicle:[],inbox:[],visits:[],canals:[],log:[],inspNotes:{},routineDone:{},routines:r,settings:{subs:{K:'Kundian',I:'Isakhel'},lastBackup:null,lastNotify:null}}}
+let S=null;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!Array.isArray(S.items))S=DEF();
+function fillDefaults(){const d=DEF();for(const k in d)if(S[k]===undefined)S[k]=d[k];if(!S.settings.subs)S.settings.subs=d.settings.subs}
+fillDefaults();
+let SUB='A';try{SUB=localStorage.getItem('sdodesk.sub')||'A'}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save. Storage blocked or full.')}}
+let UNDO=null;
+function snap(){UNDO=JSON.stringify(S)}
+function undo(){if(!UNDO)return;S=JSON.parse(UNDO);UNDO=null;save();render();toast('Undone')}
+function log(text,o){S.log.push({ts:Date.now(),date:today(),sub:o&&o.sub&&o.sub!=='B'?o.sub:'',text,id:o&&o.id&&o.type?o.id:null});if(S.log.length>6000)S.log.splice(0,S.log.length-6000)}
+function prune(){const cut=addDays(today(),-200);for(const k in S.routineDone)if(k<cut)delete S.routineDone[k]}
+
+/* ---------- file store (IndexedDB) ---------- */
+let _db=null;
+function idb(){return _db||(_db=new Promise((res,rej)=>{const r=indexedDB.open('sdodesk-files',1);r.onupgradeneeded=()=>r.result.createObjectStore('files',{keyPath:'id'});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}))}
+function fTx(mode,fn){return idb().then(db=>new Promise((res,rej)=>{const tx=db.transaction('files',mode);const st=tx.objectStore('files');let out;const r=fn(st);if(r)r.onsuccess=()=>{out=r.result};tx.oncomplete=()=>res(out);tx.onerror=()=>rej(tx.error)}))}
+const fPut=rec=>fTx('readwrite',st=>st.put(rec));
+const fGet=id=>fTx('readonly',st=>st.get(id));
+const fAll=()=>fTx('readonly',st=>st.getAll());
+const fDel=id=>fTx('readwrite',st=>st.delete(id));
+const blobToB64=b=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(b)});
+async function fileGC(){try{const used=new Set();S.items.forEach(it=>(it.links||[]).forEach(l=>{if(l.fileId)used.add(l.fileId)}));const all=await fAll();for(const r of all)if(!used.has(r.id))await fDel(r.id)}catch(e){}}
+
+/* ---------- model ---------- */
+const DESIGS=['XEN','SE','Chief Engineer','SDO','Sub Engineer (SEN)','Sub Divisional Clerk (SDC)','Sub Divisional Reader (SDR)','SDR / Zilladar','Zilladar','Canal Patwari','Signaller','Mate','Mistry','Earthwork Mistry','Gauge Reader','Regular Beldar','Beldar','Artificer','Telephone Attendant','Naib Qasid','Dak Runner','Chowkidar','Chowkidar cum Cook','Cook','Sweeper','Drawing Branch','NESPAK','AAG / Law Officer','Police (SHO)','Other'];
+const dIdx=p=>{const i=DESIGS.indexOf(p.designation);return i<0?99:i};
+const F=(k,l,t,o)=>({k,l,t:t||'text',o});
+const T={
+ task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('owner','Assigned to','person'),F('due','Deadline','date'),F('details','Details','textarea')]},
+ complaint:{n:'Complaint',pl:'Complaints',daily:1,f:[F('source','Source','sel',['WRIMS (PMIU)','Ombudsman Punjab','Other']),F('refNo','Complaint No'),F('title','Subject'),F('received','Received on','date'),F('due','Reply due (WRIMS: auto 3 days if left blank)','date'),F('side','Side','sel',['Technical','Revenue']),F('owner','Report from','person'),F('details','Details','textarea')]},
+ estimate:{n:'Estimate',pl:'Estimates',daily:0,f:[F('title','Name of work'),F('estNo','Estimate No'),F('estDate','Estimate date','date'),F('amount','Amount (Rs)','num'),F('authority','Sanctioning authority','sel',['XEN','SE','Chief Engineer']),F('owner','Sub Engineer','person'),F('canal','Canal / channel','list','canals'),F('due','Target date','date'),F('details','Details','textarea')]},
+ theft:{n:'Water theft',pl:'Water theft',daily:1,f:[F('title','Location (canal / RD / outlet)'),F('canal','Canal / channel','list','canals'),F('reportedOn','Reported on','date'),F('owner','Reported by (SEN)','person'),F('zildar','Zilladar','person'),F('culprits','Culprits (Fard-e-Qasran)','textarea'),F('hearing','Hearing date','date'),F('decision','Decision','sel',['Pending','Fine','Robkar / FIR']),F('fineAmount','Fine (Rs)','num'),F('receiptNo','Receipt No'),F('robkarNo','Robkar No / date'),F('policeStation','Police station'),F('firNo','FIR No'),F('tawanStatus','Tawan case','sel',['Not started','Case submitted by Zilladar','Notice issued (SDR)','Decided']),F('tawanHearing','Tawan hearing date','date'),F('tawanAmount','Tawan (Rs)','num'),F('details','Details','textarea')]},
+ court:{n:'Court case',pl:'Court cases',daily:0,f:[F('title','Case title'),F('refNo','Case No'),F('court','Court','sel',['Civil Court','Lahore High Court','Other']),F('courtName','Court / bench'),F('hearing','Next hearing','date'),F('attendTime','Attend time','time'),F('attendWhere','Attend at (e.g. AAG office)'),F('owner','Handled by','person'),F('details','Details','textarea')]},
+ inquiry:{n:'Inquiry',pl:'Inquiries',daily:0,f:[F('title','Subject of inquiry'),F('accusedId','Accused (pick from People)','person'),F('accused','or type name (if not in People)'),F('accusedDesig','Designation (auto when picked)','sel',['Sub Engineer (SEN)','Mate','Mistry','Gauge Reader','Signaller','Beldar','Other']),F('io','Inquiry Officer (when you are DR)'),F('chargeDate','Charge sheet date','date'),F('hearing','Next date','date'),F('details','Details','textarea')]},
+ wire:{n:'Canal wire',pl:'Canal wires',daily:0,f:[F('dir','Wire','sel',['Received','Issued']),F('refNo','Wire No'),F('wireDate','Date','date'),F('wireTime','Time','time'),F('party','From / To','list','parties'),F('owner','Signaller','person'),F('title','Subject'),F('action','Action','sel',['Information only','Needs action']),F('assign','Action by (person)','person'),F('due','Action deadline','date'),F('details','Details','textarea')]},
+ letter:{n:'Letter',pl:'Correspondence',daily:0,f:[F('dir','Letter','sel',['Issued','Received']),F('letterNo','Letter No'),F('letterDate','Letter date','date'),F('party','To / From (office or department)','list','parties'),F('title','Subject'),F('canal','Canal / channel','list','canals'),F('rd','RD / outlet / site'),F('replyDue','Reply expected by (leave blank if none)','date'),F('details','Gist / keywords','textarea')]},
+ event:{n:'Event',pl:'Meetings & events',daily:0,f:[F('title','Title'),F('due','Date','date'),F('time','Time','time'),F('place','Place'),F('details','Details','textarea')]},
+ resource:{n:'Resource',pl:'Resources',daily:0,f:[F('title','Title'),F('cat','Category','sel',['Department manuals','Canal details','Notifications & orders','Rules & SOPs','Proformas & forms','Sheets & data','Maps & L-sections','Police jurisdiction','Staff lists','Other']),F('details','Notes / keywords','textarea')]},
+ pmiu:{n:'PMIU wire',pl:'PMIU wires',daily:0,f:[F('refNo','PMIU canal wire No'),F('wireDate','Inspection / wire date','date'),F('canal','Canal(s) visited','list','canals'),F('title','Subject (auto if blank)'),F('meetingDate','SE meeting date','date'),F('details','Notes','textarea')]},
+ template:{n:'Template',pl:'Templates',daily:0,f:[F('title','Template name'),F('cat','Category','sel',['Letter','Canal wire','Robkar / notice','Inspection note','Reply / report','Proforma','Other']),F('body','Text with blanks (optional): {canal} {rd} {date} {sen} {no} {subject} {party} {subdivision} {ps}','textarea'),F('details','Keywords','textarea')]},
+ place:{n:'Place',pl:'Places',daily:0,f:[F('title','Name'),F('cat','Category','sel',['Rest house','Office (AC / DC / XEN / SE)','Police station','Head / regulator / gauge','Canal site / outlet','Court','Hospital','Other']),F('address','Address / landmark'),F('lat','Latitude'),F('lng','Longitude'),F('mapUrl','Google Maps link (optional)'),F('contact','Contact person'),F('phone','Phone','tel'),F('details','Notes','textarea')]}
+};
+const DEFV={pmiu:['wireDate'],complaint:['received'],estimate:['estDate'],theft:['reportedOn'],wire:['wireDate'],event:['due'],letter:['letterDate']};
+const STG={
+ complaint:()=>['Received','Sent to staff for report','Report received','Reply submitted'],
+ estimate:it=>{const a=['Prepared by SEN','Numbered by SDC','Signed by SDO','Checked by Division Drawing Branch','Signed by XEN'];
+  if(it.authority==='SE'||it.authority==='Chief Engineer')a.push('Checked by Circle Drawing Branch','Signed by SE');
+  if(it.authority==='Chief Engineer')a.push('Checked by Chief Office Branch','Signed by Chief Engineer');
+  a.push('Sanctioned','NESPAK pre-check','Work in progress (MB)','SDO 35% MB check','NESPAK post-check','Bill submitted to Drawing Branch','Bill passed');return a},
+ theft:it=>{const a=['Reported by SEN','Site checked by SDO','Confirmation canal wire issued','Repair canal wire (SEN)','Repair confirmed','Zilladar directed for Fard-e-Qasran','Fard-e-Qasran received','Hearing notice issued (SDR)','Hearing held'];
+  if(it.decision==='Fine')a.push('Fine imposed','Receipt issued');else if(it.decision==='Robkar / FIR')a.push('Robkar sent to SHO','FIR registered');else a.push('Decision: fine or robkar');return a}
+};
+const FIRST={complaint:['Received','received'],estimate:['Prepared by SEN','estDate'],theft:['Reported by SEN','reportedOn']};
+const FINAL=['Reply submitted','Bill passed','Receipt issued','FIR registered'];
+const STUCKT={complaint:2,theft:7,estimate:20};const stuckLim=it=>STUCKT[it.type]||15;const isStuck=it=>{const d=stuckDays(it);return d>0&&d>=stuckLim(it)};
+const UNTOUCHED=7;
+function lastAct(it){let m=it.createdAt?ymd(new Date(it.createdAt)):'';const up=d=>{if(d&&d>m)m=d};up(it.doneOn);(it.notes||[]).forEach(n=>up(ymd(new Date(n.ts))));(it.stages||[]).forEach(x=>up(x.date));return m||today()}
+const untouched=it=>isOpen(it)&&!keyDate(it)&&!(it.followUp&&it.followUp>today())?diffDays(today(),lastAct(it)):0;
+
+const subName=k=>k==='B'?'Both':(S.settings.subs[k]||k);
+const inScope=x=>SUB==='A'||x.sub===SUB||x.sub==='B';
+const pScope=p=>SUB==='A'||p.sub===SUB||p.sub==='B';
+const scopeSubs=()=>SUB==='A'?['K','I']:[SUB];
+const get=id=>S.items.find(x=>x.id===id);
+const LIB=['resource','place','template'],REG={letter:'letterDate',wire:'wireDate'};
+const isOpen=it=>{if(it.resolved||LIB.includes(it.type)||it.type==='wire')return false;if(it.type==='letter')return !!it.replyDue;if(it.type==='event')return !(it.due&&it.due<today());return true};
+const person=id=>S.people.find(p=>p.id===id);
+const pShort=id=>{const p=person(id);return p?p.name:''};
+const mapLink=it=>{const la=parseFloat(it.lat),ln=parseFloat(it.lng);if(!isNaN(la)&&!isNaN(ln))return 'https://www.google.com/maps/search/?api=1&query='+la+','+ln;if(isUrl(it.mapUrl))return it.mapUrl;if(it.address)return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.title+' '+it.address);return ''};
+const dirLink=it=>{const la=parseFloat(it.lat),ln=parseFloat(it.lng);if(!isNaN(la)&&!isNaN(ln))return 'https://www.google.com/maps/dir/?api=1&destination='+la+','+ln;if(it.address)return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(it.title+' '+it.address);return ''};
+const pLong=id=>{const p=person(id);return p?p.name+' ('+p.designation+(p.section?', '+p.section:'')+')':''};
+function datesOf(it){const r=[];const p=(d,l)=>{if(d)r.push({d,l})};
+ switch(it.type){case 'theft':p(it.hearing,'Hearing');p(it.tawanHearing,'Tawan hearing');break;
+  case 'court':p(it.hearing,'Hearing'+(it.attendTime?' '+it.attendTime:''));break;
+  case 'inquiry':p(it.hearing,'Inquiry date');break;
+  case 'complaint':p(it.due,'Reply due');break;
+  case 'letter':p(it.replyDue,'Reply due');break;
+  case 'resource':case 'place':case 'wire':case 'template':break;
+  case 'pmiu':p(it.meetingDate,'SE meeting');break;
+  case 'event':p(it.due,'Event'+(it.time?' '+it.time:''));break;
+  default:p(it.due,it.type==='estimate'?'Target':'Deadline')}
+ return r}
+const keyDate=it=>datesOf(it).map(x=>x.d).sort()[0]||null;
+const stageOf=it=>STG[it.type]?(it.stages&&it.stages.length?it.stages[it.stages.length-1].name:'Not started'):'';
+function stuckDays(it){if(!STG[it.type]||!isOpen(it)||!it.stages||!it.stages.length)return 0;const l=it.stages[it.stages.length-1];if(FINAL.includes(l.name))return 0;return diffDays(today(),l.date)}
+const isDR=it=>it.accusedDesig==='Sub Engineer (SEN)'||(!!it.accusedId&&/sub engineer/i.test((person(it.accusedId)||{}).designation||''));
+const roleText=it=>isDR(it)?'Your role: Departmental Representative (DR). Inquiry Officer: '+(it.io||'another XEN (add name in Edit)')+'.':'Your role: Inquiry Officer.';
+const itemDate=it=>it.letterDate||it.received||it.reportedOn||it.estDate||it.wireDate||it.chargeDate||it.due||it.hearing||ymd(new Date(it.createdAt||Date.now()));
+function summ(it){switch(it.type){
+ case 'complaint':return [it.source,it.refNo&&'No '+it.refNo,it.side].filter(Boolean).join(' · ');
+ case 'estimate':return [it.estNo&&'No '+it.estNo,it.amount&&'Rs '+num(it.amount),it.authority&&it.authority+' power'].filter(Boolean).join(' · ');
+ case 'court':return [it.court,it.courtName].filter(Boolean).join(', ');
+ case 'wire':return [it.dir,it.refNo&&'No '+it.refNo,fmtD(it.wireDate)+(it.wireTime?' '+it.wireTime:''),it.party,it.action==='Needs action'?'action → follow-up':''].filter(Boolean).join(' · ');
+ case 'place':return [it.cat,it.address,it.phone].filter(Boolean).join(' · ');
+ case 'pmiu':return [it.refNo&&'No '+it.refNo,fmtD(it.wireDate),it.canal,(it.pmOff||[]).length+' offences'].filter(Boolean).join(' · ');
+ case 'template':return [it.cat,it.body?'text with blanks':'',(it.links||[]).length?(it.links.length+' file'):''].filter(Boolean).join(' · ');
+ case 'letter':return [it.dir,it.letterNo&&'No '+it.letterNo,fmtD(it.letterDate),it.party,it.canal,it.rd].filter(Boolean).join(' · ');
+ case 'resource':return [it.cat,(it.links||[]).length+' file(s)'].filter(Boolean).join(' · ');
+ case 'event':return [it.time,it.place].filter(Boolean).join(', ');
+ case 'inquiry':return isDR(it)?'You are DR':'You are Inquiry Officer';
+ case 'task':return it.source||'';
+ default:return ''}}
+
+/* ---------- today / lagging ---------- */
+function buckets(all){const t=today(),soon=addDays(t,2);const g={over:[],today:[],soon:[],fu:[],later:0};
+ S.items.forEach(it=>{if(!(all||inScope(it))||!isOpen(it)||it.doneOn===t)return;const kd=keyDate(it);
+  if(it.type==='event'){if(kd===t)g.today.push(it);return}
+  const upcoming=kd&&kd>=t&&kd<=soon;
+  if(it.followUp&&it.followUp>t&&!upcoming){g.later++;return}
+  if(kd&&kd<t)g.over.push(it);else if(kd===t)g.today.push(it);else if(upcoming)g.soon.push(it);
+  else if(it.followUp&&it.followUp<=t)g.fu.push(it);else if(kd&&kd>soon)g.later++;else if(T[it.type].daily)g.fu.push(it);else g.later++});
+ const so=(a,b)=>((keyDate(a)||'9')+a.createdAt).localeCompare((keyDate(b)||'9')+b.createdAt);
+ ['over','today','soon','fu'].forEach(k=>g[k].sort(so));return g}
+const counts=all=>{const g=buckets(all);return {over:g.over.length,today:g.today.length}};
+function lagging(){const t=today();return S.items.filter(it=>inScope(it)&&isOpen(it)&&it.type!=='event').map(it=>{const k=keyDate(it);const od=k&&k<t?diffDays(t,k):0;const sd=isStuck(it)?stuckDays(it):0;const ud=untouched(it);return {it,od,sd,ud:ud>=UNTOUCHED?ud:0}}).filter(x=>x.od||x.sd||x.ud).sort((a,b)=>(b.od*2+b.sd+b.ud)-(a.od*2+a.sd+a.ud))}
+function weekStart(t){const d=new Date(t+'T00:00:00');return addDays(t,-((d.getDay()+6)%7))}
+
+/* ================= UI parts ================= */
+const subOpts=(v,both)=>[['K',subName('K')],['I',subName('I')]].concat(both?[['B','Both']]:[]).map(([k,l])=>`<option value="${k}" ${k===v?'selected':''}>${esc(l)}</option>`).join('');
+const subFld=(v,both)=>SUB!=='A'&&!both?`<input type="hidden" id="f_sub" value="${v}">`:`<label class="fld"><span>Subdivision</span><select id="f_sub">${subOpts(v,both)}</select></label>`;
+const subInline=id=>`<select id="${id}" style="width:auto;flex:none">${subOpts(SUB==='A'?'K':SUB)}</select>`;
+function peopleOpts(val){const groups={};S.people.slice().sort((a,b)=>dIdx(a)-dIdx(b)||a.name.localeCompare(b.name)).forEach(p=>{(groups[p.designation]=groups[p.designation]||[]).push(p)});
+ return Object.entries(groups).map(([d,ps])=>`<optgroup label="${esc(d)}">${ps.map(p=>`<option value="${p.id}" ${p.id===val?'selected':''}>${esc(p.name)}${p.section?' — '+esc(p.section):''}</option>`).join('')}</optgroup>`).join('')}
+function dataLists(){const uniq=a=>[...new Set(a.filter(Boolean).map(x=>String(x).trim()))].sort();
+ const parties=uniq(S.items.map(it=>it.party).concat(['XEN Mianwali Canal Division','XEN Kalabagh Headworks Division','SE Circle','Chief Engineer','Forest Department','Revenue Department (AC / Tehsildar)','Police (SHO)','PMIU','Ombudsman Punjab','District Administration','WAPDA']));
+ const offRows=Object.values(S.offSheets||{}).flatMap(sh=>sh.rows||[]);const canals=uniq(S.canals.map(c=>c.name).concat(S.items.map(it=>it.canal)).concat(offRows.map(o=>String(o.channel||''))));const otypes=uniq(offRows.map(o=>String(o.offence||'')));
+ return `<datalist id="parties">${parties.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><datalist id="canals">${canals.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><datalist id="offtypes">${otypes.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><datalist id="sections">${uniq(S.people.map(p=>p.section)).map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`}
+function fieldHTML(f,val){const id='f_'+f.k;let inp;
+ switch(f.t){
+  case 'textarea':inp=`<textarea id="${id}" rows="${f.k==='body'?9:3}">${esc(val)}</textarea>`;break;
+  case 'sel':inp=`<select id="${id}">${f.o.map(o=>`<option ${o===val?'selected':''}>${esc(o)}</option>`).join('')}</select>`;break;
+  case 'person':inp=`<select id="${id}"><option value="">—</option>${peopleOpts(val)}</select>`;break;
+  case 'num':inp=`<input id="${id}" type="number" inputmode="decimal" value="${esc(val)}">`;break;
+  case 'list':inp=`<input id="${id}" list="${f.o}" value="${esc(val)}" autocomplete="off">`;break;
+  default:inp=`<input id="${id}" type="${f.t}" value="${esc(val)}">`}
+ return `<label class="fld"><span>${esc(f.l)}</span>${inp}</label>`}
+function dispVal(f,v){if(f.t==='date')return fmtD(v);if(f.t==='person')return pLong(v)||'—';if(f.t==='num')return (f.l.includes('Rs')?'Rs ':'')+num(v);return v}
+function card(it,acts){const t=today();const kd=keyDate(it);let cls='',dchip='';
+ if(kd&&isOpen(it)){const n=diffDays(kd,t);if(n<0){cls='over';dchip=`<span class="chip r">${-n}d overdue</span>`}else if(n===0){cls='today';dchip='<span class="chip a">Today</span>'}else dchip=`<span class="chip">${esc(rel(kd))}</span>`}
+ if(it.resolved)dchip=`<span class="chip">Closed ${fmtD(it.resolvedOn)}</span>`;
+ if(isStuck(it))dchip+=`<span class="chip r">${stuckDays(it)}d at stage</span>`;const ud=untouched(it);if(ud>=UNTOUCHED)dchip+=`<span class="chip r">untouched ${ud}d</span>`;
+ const lbl=kd?(datesOf(it).find(x=>x.d===kd)||{}).l:'';
+ const meta=[kd&&it.type!=='letter'?lbl+' '+fmtD(kd):'',stageOf(it),pShort(it.owner),summ(it),it.followUp&&isOpen(it)?'Follow-up '+fmtD(it.followUp):''].filter(Boolean).map(esc).join(' · ');
+ return `<div class="card ${cls}"><div onclick="go('#item/${it.id}')"><div class="tags"><span class="chip g">${T[it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(it.sub))}</span>`:''}${dchip}</div><div class="ct">${esc(it.title)}</div>${meta?`<div class="meta">${meta}</div>`:''}</div>${acts&&isOpen(it)?`<div class="acts"><button class="btn s p" onclick="A.done('${it.id}')">✓ Followed up</button><button class="btn s" onclick="A.fu('${it.id}')">Follow-up date</button><button class="btn s" onclick="A.resolve('${it.id}')">Resolve</button></div>`:''}${!acts&&(it.links||[]).length&&['letter','resource','wire','template'].includes(it.type)?`<div class="acts"><button class="btn s p" onclick="A.openDoc('${it.id}',0)">Open ${esc((it.links[0].label||'document').slice(0,30))}</button></div>`:''}${!acts&&it.type==='place'?placeBtns(it,true):''}</div>`}
+function placeBtns(it,small){const s=small?' s':'';const ml=mapLink(it),dl=dirLink(it);return `<div class="acts">${ml?`<a class="btn${s} p" href="${esc(ml)}" target="_blank" rel="noopener">Map</a>`:''}${dl?`<a class="btn${s}" href="${esc(dl)}" target="_blank" rel="noopener">Directions</a>`:''}<button class="btn${s}" onclick="A.sharePlace('${it.id}')">Share</button>${it.phone?`<a class="btn${s}" href="tel:${esc(it.phone)}">Call</a>`:''}</div>`}
+function sheet(html){closeSheet();const d=document.createElement('div');d.id='sheet';d.innerHTML=`<div class="scrim" onclick="closeSheet()"></div><div class="sheetbox">${html}</div>`;document.body.appendChild(d)}
+function closeSheet(){const d=$('#sheet');if(d)d.remove()}
+let tT;function toast(msg,u){const t=$('#toast');t.innerHTML=esc(msg)+(u&&UNDO?'<button onclick="undo()">Undo</button>':'');t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),5000)}
+const backHome='';
+
+/* ================= drawer ================= */
+const MENU=[['Overview',[['home','Dashboard'],['today','Today'],['cal','Calendar'],['inbox','Inbox']]],
+ ['Work',[['list/task','Follow-ups'],['list/complaint','Complaints'],['list/estimate','Estimates'],['offences','Offence register'],['list/pmiu','PMIU wires'],['list/court','Court cases'],['list/inquiry','Inquiries'],['list/letter','Correspondence'],['list/wire','Canal wires'],['insp','Inspections']]],
+ ['Records',[['people','People'],['list/place','Places'],['list/resource','Resources'],['list/template','Templates'],['vehicle','Vehicle & POL'],['log','Daily log'],['settings','Settings & backup']]]];
+function openDrawer(){const t=today();const cur=location.hash.slice(1)||'home';
+ const cnt=h=>{if(h.startsWith('list/')){const ty=h.slice(5);const o=S.items.filter(it=>it.type===ty&&inScope(it));if(LIB.includes(ty)||ty==='wire')return {n:o.length};if(ty==='letter')return {n:o.length,r:o.filter(it=>isOpen(it)&&it.replyDue<t).length};const op=o.filter(isOpen);return {n:op.length,r:op.filter(it=>{const k=keyDate(it);return k&&k<t}).length}}
+  if(h==='inbox')return {n:S.inbox.filter(inScope).length};if(h==='offences'){const as=scopeSubs().map(offA).filter(Boolean);return as.length?{r:as.reduce((s,a)=>s+a.noFir.length+a.noAction.length,0)}:{}}if(h==='people')return {n:S.people.filter(pScope).length};return {}};
+ const html=`<div class="scrim" onclick="closeDrawer()"></div><div class="drawer"><div class="dh">SDO Desk</div>${MENU.map(([g,ls])=>`<div class="dg">${g}</div>${ls.map(([h,l])=>{const c=cnt(h);return `<a href="#${h}" class="${cur===h?'on':''}" onclick="closeDrawer()">${l}${c.r?`<span class="r">${c.r}</span>`:c.n!=null?`<span>${c.n}</span>`:''}</a>`}).join('')}`).join('')}</div>`;
+ const d=document.createElement('div');d.id='drawer';d.innerHTML=html;document.body.appendChild(d)}
+function closeDrawer(){const d=$('#drawer');if(d)d.remove()}
+
+/* ================= views ================= */
+function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.items.filter(inScope);const open=its.filter(isOpen);
+ const ov=it=>{const k=keyDate(it);return k&&k<t};
+ const over=open.filter(ov).length,dueT=open.filter(it=>keyDate(it)===t).length,n7=open.filter(it=>{const k=keyDate(it);return k&&k>t&&k<=wk}).length;
+ const lag=lagging();const stuck=open.filter(isStuck).length;
+ const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const rd=S.routineDone[t]||{};const g=buckets();const act=g.over.length+g.today.length+g.soon.length+g.fu.length;
+ const by=ty=>open.filter(it=>it.type===ty);const R=(n,txt)=>n?`<span class="rd">${n} ${txt}</span>`:'';
+ const nextOf=(arr,f)=>{const x=arr.map(it=>({it,d:f(it)})).filter(x=>x.d&&x.d>=t).sort((a,b)=>a.d.localeCompare(b.d))[0];return x?fmtD(x.d)+' · '+esc(x.it.title.slice(0,32)):''};
+ const tile=(h,title,main,rows,cls)=>`<a class="dtile ${cls||''}" href="#${h}"><div class="hd"><b>${title}</b><em>${main}</em></div>${rows.filter(Boolean).map(r=>`<div class="dl">${r}</div>`).join('')}</a>`;
+ const cp=by('complaint'),ct=by('court'),es=by('estimate'),th=by('theft'),iq=by('inquiry'),tk=by('task');
+ const estIdx=it=>{const a=STG.estimate(it),c=a.indexOf(stageOf(it));return c<a.indexOf('Sanctioned')?0:c<a.indexOf('Bill submitted to Drawing Branch')?1:2};
+ const stDate=(it,n)=>{const s=(it.stages||[]).find(x=>x.name===n);return s?s.date:''};
+ const thAll=its.filter(it=>it.type==='theft');const fineMo=thAll.filter(it=>it.decision==='Fine'&&(stDate(it,'Receipt issued')||stDate(it,'Fine imposed')).startsWith(mo)).reduce((s,it)=>s+(+it.fineAmount||0),0);
+ const robMo=thAll.filter(it=>stDate(it,'Robkar sent to SHO').startsWith(mo)).length;
+ const lt=its.filter(it=>it.type==='letter');const ltMo=lt.filter(it=>(it.letterDate||'').startsWith(mo));const ltAw=lt.filter(isOpen);
+ const oa=scopeSubs().map(offA).filter(Boolean);const pmw=by('pmiu');const pmMiss=pmw.reduce((x,it)=>x+(it.pmOff||[]).filter(r=>['late','none'].includes(pmMatch(it,r).st)).length,0);
+ const ws=weekStart(t);const insp=scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=addDays(ws,6)).length;const dn=S.inspNotes[s+'|'+ws];return `${esc(subName(s))}: ${n}/3 · ${dn?'note sent':(t===addDays(ws,6)?'<span class="rd">note due today</span>':'note due Sun')}`});
+ const vh=S.vehicle.filter(v=>(v.date||'').startsWith(mo));let km=0,L=0,Rs=0;vh.forEach(v=>{const d=(+v.close||0)-(+v.open||0);if(v.open&&v.close&&d>0)km+=d;L+=+v.polL||0;Rs+=+v.polRs||0});
+ const staff={};open.forEach(it=>{if(!it.owner||!person(it.owner))return;const s=staff[it.owner]=staff[it.owner]||{n:0,o:0};s.n++;if(ov(it))s.o++});
+ const staffL=Object.entries(staff).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
+ const lb=S.settings.lastBackup;
+ let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>
+ <div class="stats s4 mt"><a href="#lagging" class="rd"><b>${over}</b><span>overdue</span></a><a href="#today" class="am"><b>${dueT}</b><span>due today</span><span>routine ${rs.filter(r=>rd[r.id]).length}/${rs.length}</span></a><a href="#cal"><b>${n7}</b><span>next 7 days</span></a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b><span>stuck</span></a></div>
+ ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
+ h+=`<h2>Lagging (${lag.length})</h2>`+(lag.length?`<div class="card pad0">${lag.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag.length>7?`<a class="lrow center" href="#lagging">See all ${lag.length}</a>`:''}</div>`:'<div class="card meta">Nothing overdue or stuck.</div>');
+ h+=`<h2>All areas</h2><div class="dgrid">`+[
+  tile('list/complaint','Complaints',cp.length,[R(cp.filter(ov).length,'overdue'),`WRIMS ${cp.filter(it=>/^WRIMS/.test(it.source)).length} · Ombudsman ${cp.filter(it=>/^Ombud/.test(it.source)).length}`,nextOf(cp,it=>it.due)&&'Next due '+nextOf(cp,it=>it.due)]),
+  tile('list/court','Court cases',ct.length,[R(ct.filter(ov).length,'hearing date passed'),nextOf(ct,it=>it.hearing)?'Next '+nextOf(ct,it=>it.hearing):'No hearing fixed']),
+  tile('list/estimate','Estimates',es.length,[`Sanction ${es.filter(it=>estIdx(it)===0).length} · Execution ${es.filter(it=>estIdx(it)===1).length} · Bills ${es.filter(it=>estIdx(it)===2).length}`,R(es.filter(isStuck).length,'stuck'),es.length?'Rs '+num(es.reduce((s,it)=>s+(+it.amount||0),0))+' total':'']),
+  tile('offences','Offence register',oa.reduce((x,a)=>x+a.n,0)||'–',oa.length?[R(oa.reduce((x,a)=>x+a.noFir.length,0),'robkars without FIR'),R(oa.reduce((x,a)=>x+a.noAction.length,0),'no fine / robkar'),...scopeSubs().map(s2=>{const sh=(S.offSheets||{})[s2];return sh?(diffDays(t,sh.importedAt)>=7?`<span class="rd">${esc(subName(s2))} sheet ${diffDays(t,sh.importedAt)}d old</span>`:`${esc(subName(s2))} imported ${fmtD(sh.importedAt)}`):''})]:['Import your offence sheet']),
+  tile('list/pmiu','PMIU wires',pmw.length,[R(pmMiss,'SEN misses'),nextOf(pmw,it=>it.meetingDate)?'SE meeting '+nextOf(pmw,it=>it.meetingDate):'No meeting fixed']),
+  tile('list/inquiry','Inquiries',iq.length,[`As DR ${iq.filter(isDR).length} · As IO ${iq.filter(it=>!isDR(it)).length}`,nextOf(iq,it=>it.hearing)&&'Next '+nextOf(iq,it=>it.hearing),R(iq.filter(ov).length,'date passed')]),
+  tile('list/task','Follow-ups',tk.length,[R(tk.filter(ov).length,'overdue'),`Due this week ${tk.filter(it=>it.due&&it.due>=t&&it.due<=wk).length}`,`From XEN ${tk.filter(it=>it.source==='XEN direction').length}`]),
+  tile('list/letter','Correspondence',lt.length,[`This month ${ltMo.length} (issued ${ltMo.filter(it=>it.dir==='Issued').length}, received ${ltMo.filter(it=>it.dir==='Received').length})`,`Awaiting reply ${ltAw.length}`,R(ltAw.filter(ov).length,'reply overdue'),`Canal wires this week ${its.filter(it=>it.type==='wire'&&(it.wireDate||'')>=ws).length}`]),
+  tile('insp','Inspections',' ',insp),
+  tile('vehicle','Vehicle & POL',num(km),['km this month',`POL ${num(L)} L · Rs ${num(Rs)}`],'full')
+ ].join('')+'</div>';
+ if(staffL.length)h+=`<h2>Pending with staff</h2><div class="card pad0">${staffL.map(([id,s])=>`<a class="lrow" style="display:flex;justify-content:space-between;gap:10px" href="#person/${id}"><span>${esc(pShort(id))} <span class="meta">${esc(person(id).designation)}</span></span><span>${s.o?`<span class="rd">${s.o} overdue</span> · `:''}${s.n} open</span></a>`).join('')}</div>`;
+ return h}
+
+function vLagging(){const l=lagging();return `<a class="back" href="javascript:history.back()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
+
+function vToday(){const t=today();const g=buckets();let h='';
+ h+=`<div class="hello"><div class="big">Today</div><div class="meta">${g.over.length} overdue · ${g.today.length} due today · ${g.soon.length} in next 2 days</div></div>`;
+ const ib=S.inbox.filter(inScope).length;if(ib)h+=`<div class="card note mt" onclick="go('#inbox')">${ib} note${ib>1?'s':''} in Inbox waiting to become tasks.</div>`;
+ if([5,6,0].includes(new Date().getDay()))h+=inspCards(true);
+ h+=routinesBlock();
+ const sec=(k,title)=>g[k].length?`<h2>${title} (${g[k].length})</h2>`+g[k].map(it=>card(it,true)).join(''):'';
+ h+=sec('over','Overdue')+sec('today','Due today')+sec('soon','Next 2 days')+sec('fu','Follow up');
+ if(!g.over.length&&!g.today.length&&!g.soon.length&&!g.fu.length)h+='<p class="empty">Nothing pending for today.</p>';
+ if(g.later)h+=`<p class="meta center">${g.later} open item${g.later>1?'s are':' is'} waiting for a later date.</p>`;
+ return h}
+function inspCards(pendingOnly){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
+ return scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=sun).length;const done=S.inspNotes[s+'|'+ws];if(pendingOnly&&done)return '';
+  const cls=done?'':(t===sun?'over':(n<3?'today':''));
+  return `<div class="card ${cls} mt" onclick="go('#insp')"><div class="ct">Weekly inspection — ${esc(subName(s))}</div><div class="meta">${n}/3 canals inspected · note ${done?'submitted '+fmtD(done):'due Sunday '+fmtD(sun)}</div></div>`}).join('')}
+let RTED=false;
+function routinesBlock(){const t=today();const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const dn=S.routineDone[t]||{};const dc=rs.filter(r=>dn[r.id]).length;
+ const hd=`<h2 class="row between"><span>Daily routine (${dc}/${rs.length})</span><a href="#" onclick="RTED=!RTED;render();return false" style="text-transform:none;letter-spacing:0;font-weight:500">${RTED?'Done':'Edit'}</a></h2>`;
+ if(RTED)return hd+`<div class="card">${rs.map(r=>`<div class="row between lrow"><span>${esc(r.title)}${SUB==='A'?` <span class="chip">${esc(subName(r.sub))}</span>`:''}</span><button class="btn s d" onclick="A.rtDel('${r.id}')">✕</button></div>`).join('')}<div class="row mt"><input id="rtN" placeholder="New routine item">${SUB==='A'?subInline('rtS'):''}<button class="btn" onclick="A.rtAdd()">Add</button></div></div>`;
+ if(!rs.length)return hd+'<div class="card meta">No routine items. Tap Edit to add.</div>';
+ return hd+`<div class="card pad0">${rs.map(r=>`<label class="chk"><input type="checkbox" ${dn[r.id]?'checked':''} onchange="A.rt('${r.id}')"><span class="${dn[r.id]?'strike':''}">${esc(r.title)}${SUB==='A'?` <span class="chip">${esc(subName(r.sub))}</span>`:''}</span></label>`).join('')}</div>`}
+
+/* ---------- search ---------- */
+let SQ={q:'',type:'all',time:'any'};
+function itemText(it){const ty=T[it.type];return [ty.n,ty.pl,it.title,...ty.f.map(f=>f.t==='person'?pShort(it[f.k]):it[f.k]),...(it.pmOff||[]).map(r=>r.canal+' '+r.rd+' '+(r.type||'')),...(it.links||[]).map(l=>l.fileId?TEXTS[l.fileId]||'':''),...(it.notes||[]).map(n=>n.text),...(it.stages||[]).map(s=>s.name+' '+(s.note||'')),...(it.links||[]).map(l=>(l.label||'')+' '+(l.name||'')),subName(it.sub)].filter(Boolean).join(' ').toLowerCase()}
+function searchResults(){const words=SQ.q.toLowerCase().split(/\s+/).filter(Boolean);const t=today();
+ const since={any:null,'1m':addDays(t,-35),'3m':addDays(t,-100),'6m':addDays(t,-190),'1y':addDays(t,-370)}[SQ.time];
+ if(!words.length&&SQ.type==='all'&&!since)return null;
+ const m=txt=>words.every(w=>txt.includes(w));const res=[];
+ S.items.forEach(it=>{if(!inScope(it))return;const cat=REG[it.type]?'letters':it.type==='resource'?'resources':it.type==='template'?'templates':it.type==='place'?'places':'cases';if(SQ.type!=='all'&&SQ.type!==cat)return;const d=itemDate(it);if(since&&d<since)return;if(words.length&&!m(itemText(it)))return;res.push({k:'i',it,d})});
+ if((SQ.type==='all'||SQ.type==='people')&&!since)S.people.filter(pScope).forEach(p=>{if(!words.length||m([p.name,p.parentage,p.designation,p.section,p.posting,p.phone,p.cnic,p.notes].join(' ').toLowerCase()))res.push({k:'p',p,d:''})});
+ if(SQ.type==='all'||SQ.type==='cases')S.visits.filter(v=>SUB==='A'||v.sub===SUB).forEach(v=>{if(since&&v.date<since)return;if(words.length&&!m(('inspection '+canalLabel(v)+' '+(v.remarks||'')).toLowerCase()))return;res.push({k:'v',v,d:v.date})});
+ if(SQ.type==='all'||SQ.type==='cases')scopeSubs().forEach(sb=>{const a=offA(sb);if(!a)return;a.rows.forEach(x=>{if(since&&(x.d.senCwDate||'')<since)return;if(words.length&&!m(('offence '+Object.values(x.o).join(' ')+' '+x.psL).toLowerCase()))return;res.push({k:'o',sub:sb,x,d:x.d.senCwDate||''})})});
+ if(SQ.type==='all')S.inbox.filter(inScope).forEach(x=>{if(words.length&&m(x.text.toLowerCase()))res.push({k:'n',x,d:ymd(new Date(x.ts))})});
+ res.sort((a,b)=>(b.d||'').localeCompare(a.d||''));return res}
+function searchHTML(){const r=searchResults();
+ if(r===null){const rec=S.items.filter(it=>inScope(it)&&it.type==='letter').sort((a,b)=>(b.letterDate||'').localeCompare(a.letterDate||'')).slice(0,5);
+  return `<p class="meta">Type any words you remember: department, canal, RD, outlet, letter no, person, place, subject. All words must match.</p>${rec.length?'<h2>Recent letters</h2>'+rec.map(it=>card(it,false)).join(''):''}`}
+ const lim=r.slice(0,80);
+ return `<div class="meta" style="margin-bottom:8px">${r.length} result${r.length===1?'':'s'}${r.length>80?' (showing 80)':''}</div>`+lim.map(x=>{
+  if(x.k==='i')return card(x.it,false);
+  if(x.k==='p')return personCard(x.p);
+  if(x.k==='o')return offRow(x.sub,x.x);
+  if(x.k==='v')return `<div class="card" onclick="go('#editvisit/${x.v.id}')"><div class="tags"><span class="chip g">Inspection</span><span class="chip">${fmtD(x.v.date)}</span></div><div class="ct">${esc(canalLabel(x.v))}</div>${x.v.remarks?`<div class="meta">${esc(x.v.remarks)}</div>`:''}</div>`;
+  return `<div class="card" onclick="go('#inbox')"><div class="tags"><span class="chip g">Inbox note</span></div><div>${esc(x.x.text)}</div></div>`}).join('')||'<p class="empty">Nothing found. Try fewer words.</p>'}
+function vSearch(){const ch=(k,arr)=>`<div class="fchips">${arr.map(([v,l])=>`<button class="${SQ[k]===v?'on':''}" onclick="SQ.${k}='${v}';render()">${l}</button>`).join('')}</div>`;
+ return `<h1 class="pt">Search</h1><input id="sq" type="search" placeholder="e.g. forest Paikhel outlet" value="${esc(SQ.q)}" oninput="SQ.q=this.value;$('#sres').innerHTML=searchHTML()" style="margin-bottom:10px">
+ ${ch('type',[['all','All'],['letters','Letters & wires'],['cases','Cases'],['people','People'],['places','Places'],['resources','Resources'],['templates','Templates']])}${ch('time',[['any','Any time'],['1m','Last month'],['3m','3 months'],['6m','6 months'],['1y','1 year']])}<div id="sres">${searchHTML()}</div>`}
+
+/* ---------- calendar ---------- */
+let CAL=null;
+function calEvents(){const m={};const add=(d,o)=>{(m[d]=m[d]||[]).push(o)};
+ S.items.filter(it=>inScope(it)&&!it.resolved).forEach(it=>{datesOf(it).forEach(x=>add(x.d,{l:x.l,it}));if(it.followUp)add(it.followUp,{l:'Follow-up',it})});return m}
+function vCal(){const t=today();if(!CAL){const d=new Date();CAL={y:d.getFullYear(),m:d.getMonth(),sel:t}}
+ const ev=calEvents();const first=new Date(CAL.y,CAL.m,1);const lead=(first.getDay()+6)%7;const dim=new Date(CAL.y,CAL.m+1,0).getDate();
+ let cells='';for(let i=0;i<lead;i++)cells+='<div></div>';
+ for(let d=1;d<=dim;d++){const ds=CAL.y+'-'+pad(CAL.m+1)+'-'+pad(d);const n=(ev[ds]||[]).length;cells+=`<div class="cd ${ds===t?'td':''} ${ds===CAL.sel?'sel':''}" onclick="A.calSel('${ds}')">${d}${n?`<i class="${ds<t?'r':''}">${n}</i>`:''}</div>`}
+ const list=ev[CAL.sel]||[];const isSun=new Date(CAL.sel+'T00:00:00').getDay()===0;
+ return `<div class="row between"><button class="btn" onclick="A.calM(-1)">‹</button><b>${first.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</b><button class="btn" onclick="A.calM(1)">›</button></div>
+ <div class="cal head mt">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div>${x}</div>`).join('')}</div><div class="cal">${cells}</div>
+ <h2>${new Date(CAL.sel+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}${CAL.sel===t?' · today':''}</h2>
+ ${isSun?'<div class="card" onclick="go(\'#insp\')"><div class="ct">Weekly inspection note due to Division</div></div>':''}
+ ${list.map(x=>`<div class="card" onclick="go('#item/${x.it.id}')"><div class="tags"><span class="chip g">${T[x.it.type].n}</span><span class="chip a">${esc(x.l)}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}</div><div class="ct">${esc(x.it.title)}</div></div>`).join('')}
+ ${!list.length&&!isSun?'<p class="empty">Nothing on this day. Tap + to add a meeting.</p>':''}`}
+
+function vInbox(){const l=S.inbox.filter(inScope).sort((a,b)=>b.ts-a.ts);
+ return `<h1 class="pt">Inbox</h1><div class="card"><textarea id="ibT" rows="3" placeholder="XEN direction, meeting point, anything to sort later"></textarea><div class="row mt">${SUB==='A'?subInline('ibS'):''}<button class="btn p" style="flex:1" onclick="A.ibAdd()">Save note</button></div></div>
+ <h2>Waiting (${l.length})</h2>${l.map(x=>`<div class="card"><div>${esc(x.text).replace(/\n/g,'<br>')}</div><div class="meta">${fmtTs(x.ts)}${SUB==='A'?' · '+esc(subName(x.sub)):''}</div><div class="acts"><button class="btn s p" onclick="A.ibConv('${x.id}')">Make task</button><button class="btn s d" onclick="A.ibDel('${x.id}')">Delete</button></div></div>`).join('')||'<p class="empty">Inbox is empty.</p>'}`}
+
+/* ---------- lists ---------- */
+let LF={ty:'',q:'',closed:false,dir:'all',time:'any',cat:'all'};
+function listItems(ty){const q=LF.q.toLowerCase().split(/\s+/).filter(Boolean);const t=today();
+ let l=S.items.filter(it=>it.type===ty&&inScope(it)&&(!q.length||q.every(w=>itemText(it).includes(w))));
+ if(REG[ty]){const df=REG[ty];const since={any:null,'1m':addDays(t,-35),'3m':addDays(t,-100),'6m':addDays(t,-190),'1y':addDays(t,-370)}[LF.time];
+  const aw=it=>ty==='letter'?isOpen(it):S.items.some(x=>x.rel===it.id&&x.type==='task'&&isOpen(x));
+  l=l.filter(it=>(LF.dir==='all'||(LF.dir==='await'?aw(it):it.dir===LF.dir))&&(!since||(it[df]||'')>=since)).sort((a,b)=>(b[df]||'').localeCompare(a[df]||'')||b.createdAt-a.createdAt);
+  return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing matches. Tap + to add.</p>'}
+ if(LIB.includes(ty)){l=l.filter(it=>LF.cat==='all'||it.cat===LF.cat);const g={};l.forEach(it=>{(g[it.cat||'Other']=g[it.cat||'Other']||[]).push(it)});
+  return Object.entries(g).map(([c,a])=>`<h2>${esc(c)} (${a.length})</h2>`+a.sort((x,y)=>x.title.localeCompare(y.title)).map(it=>card(it,false)).join('')).join('')||`<p class="empty">Nothing yet. Tap + to add ${ty==='place'?'a rest house, office or police station':'a manual, canal detail or order'}.</p>`}
+ l=l.filter(it=>LF.closed?!isOpen(it):isOpen(it));
+ if(LF.closed)l.sort((a,b)=>(b.resolvedOn||b.due||'').localeCompare(a.resolvedOn||a.due||''));else l.sort((a,b)=>((keyDate(a)||'9')+a.createdAt).localeCompare((keyDate(b)||'9')+b.createdAt));
+ return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing here.</p>'}
+function vList(ty){if(!T[ty])return vHome();if(LF.ty!==ty)LF={ty,q:'',closed:false,dir:'all',time:'any',cat:'all'};
+ const ch=(k,arr)=>`<div class="fchips">${arr.map(([v,l])=>`<button class="${LF[k]===v?'on':''}" onclick="LF.${k}='${v}';render()">${l}</button>`).join('')}</div>`;
+ let filt='';
+ if(REG[ty])filt=ch('dir',[['all','All'],['Issued','Issued'],['Received','Received'],['await',ty==='letter'?'Awaiting reply':'Action pending']])+ch('time',[['any','Any time'],['1m','Last month'],['3m','3 months'],['6m','6 months'],['1y','1 year']]);
+ else if(LIB.includes(ty))filt=ch('cat',[['all','All']].concat(T[ty].f[1].o.map(c=>[c,c])));
+ else filt=`<div class="fchips"><button class="${LF.closed?'':'on'}" onclick="LF.closed=false;render()">Open</button><button class="${LF.closed?'on':''}" onclick="LF.closed=true;render()">Closed</button></div>`;
+ let top='';if(STG[ty]&&ty!=='complaint'&&!LF.closed){const m={};S.items.filter(it=>it.type===ty&&inScope(it)&&isOpen(it)).forEach(it=>{const s=stageOf(it);m[s]=(m[s]||0)+1});const e=Object.entries(m);
+  if(e.length)top=`<div class="card"><div class="ct">Open by stage</div>${e.map(([s,c])=>`<div class="row between meta"><span>${esc(s)}</span><b>${c}</b></div>`).join('')}</div>`}
+ return `<h1 class="pt">${T[ty].pl}</h1>${ty==='template'?'<div class="card"><label class="btn p">Upload files as templates<input type="file" hidden multiple accept=".docx,.doc,.pdf,.xlsx,.txt" onchange="A.tplBulk(this)"></label><p class="meta">Pick several Word / PDF letters at once. Each becomes a template you can rename and search inside. Or tap + to write a text template with blanks like {canal} {rd} {sen}.</p></div>':''}${ty==='pmiu'?'<p class="meta">Each PMIU canal wire with all its RDs. The app checks each RD against the SEN wires in your imported offence sheet.</p>':''}${ty==='wire'?'<p class="meta">Confirmation and repair wires of water-theft cases go in that case\'s stage note, not here.</p>':''}
+ <input id="lq" type="search" placeholder="Search ${esc(T[ty].pl.toLowerCase())}" value="${esc(LF.q)}" oninput="LF.q=this.value;$('#lres').innerHTML=listItems('${ty}')" style="margin-bottom:8px">${filt}${top}<div id="lres">${listItems(ty)}</div>`}
+
+/* ---------- item detail ---------- */
+function stageBlock(it){const f=STG[it.type];if(!f)return '';const all=f(it);const done=new Map((it.stages||[]).map(s=>[s.name,s]));const cur=stageOf(it);const ci=all.indexOf(cur);
+ const rem=all.slice(ci+1).filter(n=>!done.has(n)&&n!=='Decision: fine or robkar');const sd=stuckDays(it);
+ let h=`<h2>Stage${isStuck(it)?` <span class="rd">· ${sd} days at current stage</span>`:''}</h2><div class="card"><ol class="stg">${all.map(n=>{const s=done.get(n);return `<li class="${s?'d':''} ${n===cur?'c':''}">${s?'✓ ':'○ '}${esc(n)}${s?` <span class="meta">${fmtD(s.date)}${s.note?' — '+esc(s.note):''}</span>`:''}</li>`}).join('')}</ol>`;
+ if(it.type==='theft'&&(it.decision||'Pending')==='Pending'&&done.has('Hearing held')&&isOpen(it))
+  h+=`<div class="card note mt"><div class="ct">Decision after hearing</div><div class="meta">One offence, one punishment: fine or robkar/FIR.</div><div class="acts"><button class="btn p" onclick="A.decide('${it.id}','Fine')">Fine</button><button class="btn p" onclick="A.decide('${it.id}','Robkar / FIR')">Robkar / FIR</button></div></div>`;
+ else if(isOpen(it)&&rem.length)h+=`<div class="mt"><label class="fld"><span>Next stage</span><select id="stSel">${rem.map(n=>`<option>${esc(n)}</option>`).join('')}</select></label><div class="grid2"><input type="date" id="stDate" value="${today()}"><input id="stNote" placeholder="${it.type==='theft'?'Canal wire no / ref':'Note / ref no'}"></div><button class="btn p wide mt" onclick="A.adv('${it.id}')">Mark stage done</button></div>`;
+ else if(isOpen(it))h+='<div class="meta mt">All stages done. Resolve when finished.</div>';
+ return h+'</div>'}
+function docsBlock(it){const id=it.id;
+ return `<h2>Documents</h2><div class="card">${(it.links||[]).map((l,i)=>`<div class="row between lrow"><a href="${l.url?esc(l.url):'#'}" ${l.url?'target="_blank" rel="noopener"':`onclick="A.openDoc('${id}',${i});return false"`}>${esc(l.label||l.name||'Document '+(i+1))}</a><span class="row"><span class="meta">${l.fileId?fsize(l.size||0)+(TEXTS[l.fileId]?' · searchable':''):'link'}</span><button class="btn s" onclick="A.renLink('${id}',${i})">Rename</button><button class="btn s d" onclick="A.rmLink('${id}',${i})">✕</button></span></div>`).join('')||'<div class="meta">Attach the PDF / photo / sheet, or paste a Google Drive link.</div>'}
+ <div class="acts"><label class="btn s p">Upload file<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="A.upload('${id}',this)"></label></div>
+ <div class="grid2 mt"><input id="lkU" placeholder="or paste Drive link" inputmode="url"><input id="lkL" placeholder="Label (optional)"></div><button class="btn s mt" onclick="A.addLink('${id}')">Add link</button></div>`}
+function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Item not found.</p>';const ty=T[it.type];
+ let h=`<a class="back" href="javascript:history.back()">‹ Back</a><div class="tags mt"><span class="chip g">${ty.n}</span><span class="chip">${esc(subName(it.sub))}</span>${it.resolved?`<span class="chip">Closed ${fmtD(it.resolvedOn)}</span>`:''}${it.followUp&&isOpen(it)?`<span class="chip a">Follow-up ${fmtD(it.followUp)}</span>`:''}${it.doneOn===today()&&isOpen(it)?'<span class="chip g">Followed up today</span>':''}</div><h1 class="pt">${esc(it.title)}</h1>`;
+ if(it.type==='inquiry')h+=`<div class="card note">${esc(roleText(it))}</div>`;
+ const kv=ty.f.filter(f=>f.k!=='title'&&f.k!=='details'&&it[f.k]&&!(f.k==='decision'&&it[f.k]==='Pending')&&!(f.k==='tawanStatus'&&it[f.k]==='Not started')).map(f=>`<dt>${esc(f.l.replace(/ \(.*\)$/,''))}</dt><dd>${esc(dispVal(f,it[f.k]))}${f.t==='date'&&isOpen(it)&&['due','hearing','tawanHearing','replyDue'].includes(f.k)?` <span class="meta">(${esc(rel(it[f.k]))})</span>`:''}</dd>`).join('');
+ const relIt=it.rel&&get(it.rel);
+ if(kv||it.details||relIt)h+=`<div class="card">${kv?`<dl class="kv">${kv}</dl>`:''}${it.details?`<p class="det">${esc(it.details).replace(/\n/g,'<br>')}</p>`:''}${relIt?`<p class="det">Linked to: <a href="#item/${relIt.id}">${esc(T[relIt.type].n)} — ${esc(relIt.title)}</a> <button class="btn s" onclick="A.unlink('${id}')">Unlink</button></p>`:''}</div>`;
+ if(it.type==='place')h+=placeBtns(it,false);
+ if(isOpen(it))h+=`<div class="acts"><button class="btn p" onclick="A.done('${id}')">✓ Followed up</button><button class="btn" onclick="A.fu('${id}')">Follow-up date</button><button class="btn" onclick="A.resolve('${id}')">${it.type==='letter'?'Reply received':'Resolve'}</button></div>`;
+ else if(it.resolved)h+=`<div class="acts"><button class="btn" onclick="A.reopen('${id}')">Reopen</button></div>`;
+ const op=person(it.owner);
+ if(op&&op.phone&&isOpen(it))h+=`<div class="acts"><a class="btn s" href="tel:${esc(op.phone)}">Call ${esc(op.name)}</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(op.phone)}?text=${encodeURIComponent('Reminder: '+it.title+'. Please update the status.')}">WhatsApp reminder</a></div>`;
+ h+=stageBlock(it)+theftQuick(it)+(it.type==='pmiu'?pmiuBlock(it):'');
+ if(!LIB.includes(it.type)&&S.items.some(x=>x.type==='template'))h+=`<div class="acts"><button class="btn s" onclick="A.useTpl('${id}')">Use a template</button></div>`;
+ if(it.type==='estimate')h+=`<h2>Bill documents</h2><div class="card pad0">${[['inspNote','SDO inspection note'],['compCert','Completion certificate'],['punch','Punch list']].map(([k,l])=>`<label class="chk"><input type="checkbox" ${it[k]?'checked':''} onchange="A.chk('${id}','${k}')"><span>${l}</span></label>`).join('')}</div>`;
+ if(it.type==='court'&&isOpen(it))h+=`<h2>Record hearing</h2><div class="card"><input id="hOut" placeholder="What happened (adjourned, reply filed …)"><label class="fld mt"><span>Next hearing</span><input type="date" id="hNext"></label><button class="btn p" onclick="A.hear('${id}')">Save hearing</button></div>`;
+ h+=docsBlock(it);
+ const kids=S.items.filter(x=>x.rel===id).sort((a,b)=>itemDate(b).localeCompare(itemDate(a)));
+ let lb='';
+ if(it.type==='letter')lb=`<button class="btn s" onclick="A.linkDown('${id}','resource')">Link a resource</button>${it.rel?'':`<button class="btn s" onclick="A.linkUp('${id}')">Link to a case</button>`}`;
+ else if(it.type==='resource')lb=it.rel?'':`<button class="btn s" onclick="A.linkUp('${id}')">Link to a letter / case</button>`;
+ else if(it.type==='wire')lb=kids.some(x=>x.type==='task')?'':`<button class="btn s p" onclick="A.wireTask('${id}')">Create follow-up from this wire</button>`;
+ else if(it.type!=='place')lb=`<button class="btn s p" onclick="A.relLetter('${id}')">+ New letter</button><button class="btn s" onclick="A.linkDown('${id}','letter')">Link existing letter</button>`;
+ if(kids.length||lb)h+=`<h2>Linked records (${kids.length})</h2>${kids.map(x=>card(x,false)).join('')}${lb?`<div class="acts" style="margin-top:0">${lb}</div>`:''}`;
+ const tl=[...(it.stages||[]).map(s=>({k:s.date+'T23',w:fmtD(s.date),x:'Stage: '+s.name+(s.note?' — '+s.note:'')})),...(it.notes||[]).map(n=>({k:ymd(new Date(n.ts))+'T'+String(n.ts),w:fmtTs(n.ts),x:n.text}))].sort((a,b)=>b.k.localeCompare(a.k));
+ h+=`<h2>Updates (${tl.length})</h2><div class="card">${isOpen(it)?'':`<button class="btn s" onclick="A.done('${id}')">Add note</button>`}${tl.map(x=>`<div class="tl"><span class="meta">${esc(x.w)}</span><div>${esc(x.x)}</div></div>`).join('')}</div>`;
+ h+=`<div class="acts mt"><button class="btn" onclick="go('#edit/${it.type}/${id}')">${it.type==='template'?'Rename / edit':'Edit'}</button><button class="btn d" onclick="A.del('${id}')">Delete</button></div>`;
+ if(it.type==='template'&&it.body)h+=`<h2>Text</h2><div class="card" style="white-space:pre-wrap">${esc(it.body)}</div><button class="btn wide" onclick="TPLCTX=null;A.tplUse('${id}')">Copy / share this text</button>`;
+ if(it.type==='pmiu')h+=dataLists();
+ return h}
+
+let PREFILL=null;
+const THEFT_LATE={hearing:'Fard-e-Qasran received',tawanStatus:'Fard-e-Qasran received',tawanHearing:'Fard-e-Qasran received',tawanAmount:'Fard-e-Qasran received'};
+const reached=(it,n)=>{const a=STG.theft(it),c=a.indexOf(stageOf(it));return c>=a.indexOf(n)&&c>=0};
+function fieldVisible(ty,it,k){if(ty!=='theft')return true;const has=it[k]&&it[k]!=='Pending'&&it[k]!=='Not started';if(has)return true;
+ if(k==='decision')return false;if(['fineAmount','receiptNo'].includes(k))return it.decision==='Fine';if(['robkarNo','policeStation','firNo'].includes(k))return it.decision==='Robkar / FIR';
+ if(THEFT_LATE[k])return !!(it.stages&&it.stages.length)&&reached(it,THEFT_LATE[k]);return true}
+function theftQuick(it){if(it.type!=='theft'||!isOpen(it))return '';const ks=['hearing','tawanStatus','tawanHearing','tawanAmount','fineAmount','receiptNo','robkarNo','policeStation','firNo'].filter(k=>fieldVisible('theft',Object.assign({},it,{[k]:''}),k)&&!it[k]||(k==='tawanStatus'&&fieldVisible('theft',Object.assign({},it,{tawanStatus:''}),k)&&(!it.tawanStatus||it.tawanStatus==='Not started')));
+ if(!ks.length)return '';const fs=ks.map(k=>T.theft.f.find(f=>f.k===k));
+ return `<h2>Details needed at this stage</h2><div class="card">${fs.map(f=>fieldHTML(f,it[f.k]||'').replace('id="f_','id="q_')).join('')}<button class="btn p" onclick="A.quickSet('${it.id}','${ks.join(',')}')">Save details</button></div>`}
+function vEdit(ty,id){if(!T[ty])return vHome();const it=id&&id!=='new'?get(id):null;let src;
+ if(it)src=it;else{src={};(DEFV[ty]||[]).forEach(k=>src[k]=today());if(ty==='wire'){const n=new Date();src.wireTime=pad(n.getHours())+':'+pad(n.getMinutes())}Object.assign(src,PREFILL||{})}
+ const sub=src.sub||(SUB==='A'?'K':SUB);
+ const fv=k=>src[k]==null?'':src[k];
+ const fh=T[ty].f.filter(f=>fieldVisible(ty,src,f.k)).map(f=>{if(ty==='place'&&f.k==='lat')return `<button class="btn wide" style="margin-bottom:8px" onclick="A.geo()">Use my current location</button><div class="grid2">${fieldHTML(f,fv('lat'))}${fieldHTML(T.place.f.find(x=>x.k==='lng'),fv('lng'))}</div>`;if(ty==='place'&&f.k==='lng')return '';return fieldHTML(f,fv(f.k))}).join('');
+ return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1><div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
+
+/* ---------- people ---------- */
+let PQ='',PSEC='all';
+const secKey=s=>(/office/i.test(s||'')?'0':/zilladari/i.test(s||'')?'2':'1')+(s||'~');
+function personCard(p){return `<div class="card"><div onclick="go('#person/${p.id}')"><div class="ct">${esc(p.name)}</div><div class="meta">${[p.designation,p.section,p.posting!==p.section?p.posting:'',SUB==='A'?subName(p.sub):''].filter(Boolean).map(esc).join(' · ')}</div></div>${p.phone?`<div class="acts"><a class="btn s" href="tel:${esc(p.phone)}">Call ${esc(p.phone)}</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(p.phone)}">WhatsApp</a></div>`:''}</div>`}
+function peopleList(){const q=PQ.toLowerCase().split(/\s+/).filter(Boolean);
+ const l=S.people.filter(pScope).filter(p=>(PSEC==='all'||p.section===PSEC)&&(!q.length||q.every(w=>[p.name,p.parentage,p.designation,p.section,p.posting,p.phone,p.cnic].join(' ').toLowerCase().includes(w)))).sort((a,b)=>secKey(a.section).localeCompare(secKey(b.section))||dIdx(a)-dIdx(b)||a.name.localeCompare(b.name));
+ if(!l.length)return '<p class="empty">No people found. Add one, or import your staff file from Settings or the button above.</p>';
+ let h='',sec=null;l.forEach(p=>{if(p.section!==sec){sec=p.section;h+=`<h2>${esc(sec||'No section')}</h2>`}h+=personCard(p)});return h}
+function vPeople(){const secs=[...new Set(S.people.filter(pScope).map(p=>p.section).filter(Boolean))].sort();
+ return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden accept=".json,.csv" onchange="A.pImp(this)"></label></div>
+ <input type="search" placeholder="Search name, designation, section, phone" value="${esc(PQ)}" oninput="PQ=this.value;$('#pres').innerHTML=peopleList()" style="margin-bottom:8px">
+ <div class="fchips">${[['all','All']].concat(secs.map(s=>[s,s])).map(([v,l])=>`<button class="${PSEC===v?'on':''}" onclick="PSEC=this.dataset.v;render()" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div><div id="pres">${peopleList()}</div>`}
+function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#people">‹ People</a><p class="empty">Not found.</p>';
+ const its=S.items.filter(it=>(it.owner===id||it.zildar===id)&&isOpen(it));
+ const row=(l,v)=>v?`<dt>${l}</dt><dd>${esc(v)}</dd>`:'';
+ return `<a class="back" href="javascript:history.back()">‹ Back</a><h1 class="pt">${esc(p.name)}</h1><div class="card"><dl class="kv">${row('Parentage',p.parentage)}${row('Designation',p.designation)}${row('Section',p.section)}${row('Posting',p.posting)}${row('Subdivision',subName(p.sub))}${row('Phone',p.phone)}${row('CNIC',p.cnic)}</dl>${p.notes?`<p class="det">${esc(p.notes)}</p>`:''}${p.phone?`<div class="acts"><a class="btn s" href="tel:${esc(p.phone)}">Call</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(p.phone)}">WhatsApp</a></div>`:''}</div>
+ <h2>Open items (${its.length})</h2>${its.map(it=>card(it,false)).join('')||'<p class="empty">Nothing pending with this person.</p>'}
+ <div class="acts mt"><button class="btn" onclick="go('#editp/${id}')">Edit</button><button class="btn d" onclick="A.delP('${id}')">Delete</button></div>`}
+function vEditP(id){const p=id&&id!=='new'?person(id):null;const v=p||{designation:'',sub:SUB==='A'?'K':SUB};
+ const fl=(k,l,t,lst)=>`<label class="fld"><span>${l}</span><input id="p_${k}" type="${t||'text'}" ${lst?`list="${lst}"`:''} value="${esc(v[k]||'')}"></label>`;
+ return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${p?'Edit person':'New person'}</h1><div class="card">
+ ${fl('name','Name')}${fl('parentage','Parentage (S/O, D/O)')}${fl('designation','Designation (pick or type any)','text','desigs')}
+ <label class="fld"><span>Subdivision</span><select id="p_sub">${subOpts(v.sub,true)}</select></label>
+ ${fl('section','Section / office / zilladari','text','sections')}${fl('posting','Posting / canal / halqa')}${fl('phone','Phone','tel')}${fl('cnic','CNIC')}
+ <label class="fld"><span>Notes</span><textarea id="p_notes" rows="2">${esc(v.notes||'')}</textarea></label>
+ <button class="btn p wide" onclick="A.saveP('${p?p.id:''}')">Save</button></div>${dataLists()}`}
+
+/* ---------- vehicle ---------- */
+let VM=null;
+function vVehicle(){if(!VM)VM=today().slice(0,7);const l=S.vehicle.filter(v=>(v.date||'').startsWith(VM)).sort((a,b)=>b.date.localeCompare(a.date)||(+b.close||0)-(+a.close||0));
+ let km=0,L=0,pr=0,mr=0;l.forEach(v=>{const d=(+v.close||0)-(+v.open||0);if(v.open&&v.close&&d>0)km+=d;L+=+v.polL||0;pr+=+v.polRs||0;mr+=+v.maintRs||0});
+ return `<h1 class="pt">Vehicle & POL</h1>
+ <div class="row between"><button class="btn" onclick="A.vm(-1)">‹</button><b>${new Date(VM+'-01T00:00:00').toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</b><button class="btn" onclick="A.vm(1)">›</button></div>
+ <div class="stats mt"><div><b>${num(km)}</b><span>km covered</span></div><div><b>${num(L)}</b><span>POL litres</span></div><div><b>${num(pr)}</b><span>POL Rs</span></div><div><b>${num(mr)}</b><span>Maint. Rs</span></div><div><b>${L?(km/L).toFixed(1):'–'}</b><span>km / litre</span></div><div><b>${l.length}</b><span>entries</span></div></div>
+ ${l.map(v=>{const d=(+v.close||0)-(+v.open||0);return `<div class="card" onclick="go('#editv/${v.id}')"><div class="row between"><b>${fmtD(v.date)}</b><span>${v.open&&v.close?num(d)+' km':''}</span></div><div class="meta">${[v.open&&v.close?num(v.open)+' → '+num(v.close):'',v.route,v.polL||v.polRs?'POL '+(v.polL?v.polL+' L':'')+(v.polRs?' Rs '+num(v.polRs):''):'',v.maintDesc||v.maintRs?(v.maintDesc||'Maintenance')+(v.maintRs?' Rs '+num(v.maintRs):''):''].filter(Boolean).map(esc).join(' · ')}</div></div>`}).join('')||'<p class="empty">No entries this month.</p>'}`}
+function vEditV(id){const v=id&&id!=='new'?S.vehicle.find(x=>x.id===id):null;const last=S.vehicle.reduce((m,x)=>(+x.close||0)>(+m.close||0)?x:m,{close:''});const e=v||{date:today(),open:last.close||''};
+ const fl=(k,l,t,im)=>`<label class="fld"><span>${l}</span><input id="v_${k}" type="${t||'text'}" ${im?`inputmode="${im}"`:''} value="${esc(e[k]||'')}"></label>`;
+ return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${v?'Edit':'New'} vehicle entry</h1><div class="card">${fl('date','Date','date')}<div class="grid2">${fl('open','Opening km','number','numeric')}${fl('close','Closing km','number','numeric')}</div>${fl('route','Route / purpose')}<div class="grid2">${fl('polL','POL litres','number','decimal')}${fl('polRs','POL Rs','number','numeric')}</div>${fl('maintDesc','Maintenance / repair')}${fl('maintRs','Maintenance Rs','number','numeric')}<button class="btn p wide" onclick="A.saveV('${v?v.id:''}')">Save</button>${v?`<button class="btn d wide mt" onclick="A.delV('${v.id}')">Delete entry</button>`:''}</div>`}
+
+/* ---------- inspections ---------- */
+const canalLabel=v=>{const c=S.canals.find(x=>x.id===v.canalId);return c?c.name:(v.canalName||'Canal')};
+const visitRow=v=>`<div class="lrow" onclick="go('#editvisit/${v.id}')"><b>${esc(canalLabel(v))}</b> <span class="meta">${fmtD(v.date)}</span>${v.remarks?`<div class="meta">${esc(v.remarks)}</div>`:''}${v.link?`<a href="${esc(v.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Document</a>`:''}</div>`;
+function vInsp(){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
+ return `${backHome}<h1 class="pt">Inspections</h1><p class="meta">Week ${fmtD(ws)} – ${fmtD(sun)}. Three complete canals per subdivision; note to Division by Sunday.</p>`+scopeSubs().map(s=>{
+  const wk=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=sun).sort((a,b)=>a.date.localeCompare(b.date));const done=S.inspNotes[s+'|'+ws];
+  const canals=S.canals.filter(c=>c.sub===s).map(c=>({c,last:S.visits.filter(v=>v.canalId===c.id).map(v=>v.date).sort().pop()||''})).sort((a,b)=>a.last.localeCompare(b.last));
+  const past=S.visits.filter(v=>v.sub===s&&v.date<ws).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+  return `<h2>${esc(subName(s))} — ${wk.length}/3 this week</h2><div class="card">${wk.map(visitRow).join('')||'<div class="meta">No canal inspected this week yet.</div>'}<div class="acts"><button class="btn s" onclick="A.inspNote('${s}','${ws}')">${done?'✓ Note submitted '+fmtD(done)+' (undo)':'Mark note submitted'}</button></div></div>
+  <div class="card"><div class="ct">Canals — rotation, least recent first</div>${canals.map(x=>`<div class="row between lrow"><span>${esc(x.c.name)} <span class="meta">${x.last?fmtD(x.last):'never inspected'}</span></span><button class="btn s d" onclick="A.cnDel('${x.c.id}')">✕</button></div>`).join('')||'<div class="meta">Add your canals, distributaries and minors below.</div>'}<div class="row mt"><input id="cn_${s}" placeholder="Add canal / distributary / minor"><button class="btn" onclick="A.cnAdd('${s}')">Add</button></div></div>
+  ${past.length?`<div class="card"><div class="ct">Earlier inspections</div>${past.map(visitRow).join('')}</div>`:''}`}).join('')}
+function vEditVisit(a,b){const v=a&&a!=='new'?S.visits.find(x=>x.id===a):null;const sub=v?v.sub:(b||(SUB==='A'?'K':SUB));const cs=S.canals.filter(c=>c.sub===sub);
+ return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${v?'Edit':'Record'} inspection — ${esc(subName(sub))}</h1><div class="card">
+ ${cs.length?`<label class="fld"><span>Canal</span><select id="vi_c"><option value="">— choose —</option>${cs.map(c=>`<option value="${c.id}" ${v&&v.canalId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
+ <label class="fld"><span>${cs.length?'Or type canal name':'Canal name'}</span><input id="vi_cn" value="${esc(v?v.canalName||'':'')}"></label>
+ <label class="fld"><span>Date</span><input type="date" id="vi_d" value="${v?v.date:today()}"></label>
+ <label class="fld"><span>Remarks</span><textarea id="vi_r" rows="3">${esc(v?v.remarks||'':'')}</textarea></label>
+ <label class="fld"><span>Inspection note / photos (Drive link)</span><input id="vi_l" inputmode="url" value="${esc(v?v.link||'':'')}"></label>
+ <button class="btn p wide" onclick="A.saveVisit('${v?v.id:'new'}','${sub}')">Save</button>${v?`<button class="btn d wide mt" onclick="A.delVisit('${v.id}')">Delete</button>`:''}</div>`}
+
+/* ---------- log / archive / settings ---------- */
+let LOGD=null;
+function vLog(){if(!LOGD)LOGD=today();const ev=S.log.filter(e=>e.date===LOGD&&(SUB==='A'||!e.sub||e.sub===SUB)).sort((a,b)=>a.ts-b.ts);
+ const c=re=>ev.filter(e=>re.test(e.text)).length;const open=S.items.filter(it=>inScope(it)&&isOpen(it)).length;
+ const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const rd=S.routineDone[LOGD]||{};
+ return `${backHome}<h1 class="pt">Daily log</h1><div class="row between"><button class="btn" onclick="A.logD(-1)">‹</button><input type="date" value="${LOGD}" onchange="LOGD=this.value||today();render()" style="width:auto"><button class="btn" onclick="A.logD(1)">›</button></div>
+ <div class="stats mt"><div><b>${c(/^Followed up/)}</b><span>followed up</span></div><div><b>${c(/^Resolved/)}</b><span>resolved</span></div><div><b>${c(/^Added/)}</b><span>added</span></div><div><b>${c(/^Stage/)}</b><span>stage updates</span></div><div><b>${rs.filter(r=>rd[r.id]).length}/${rs.length}</b><span>routine</span></div><div><b>${open}</b><span>open now</span></div></div>
+ <h2>Activity (${ev.length})</h2><div class="card pad0">${ev.map(e=>`<div class="lrow" ${e.id?`onclick="go('#item/${e.id}')"`:''}><span class="meta">${new Date(e.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</span> ${esc(e.text)}${SUB==='A'&&e.sub?` <span class="chip">${esc(subName(e.sub))}</span>`:''}</div>`).join('')||'<p class="empty">No activity recorded.</p>'}</div>
+ <p class="meta center">Open items carry forward to Today every day until you resolve them.</p>`}
+function _unusedArchive(){const l=S.items.filter(it=>inScope(it)&&it.resolved).sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||''));
+ return `${backHome}<h1 class="pt">Archive</h1>${l.map(it=>card(it,false).replace(/<\/div>$/,`<div class="acts"><button class="btn s" onclick="A.reopen('${it.id}')">Reopen</button></div></div>`)).join('')||'<p class="empty">Nothing closed yet.</p>'}`}
+function notifState(){if(!('Notification' in window))return 'This browser does not support notifications.';return {granted:'On. Opening the app gives a summary of overdue and due items; while the app is running you get a reminder up to 2 hours before a timed hearing or event.',denied:'Blocked. Allow notifications for this app in phone settings.',default:'Off.'}[Notification.permission]}
+function vSettings(){const lb=S.settings.lastBackup;
+ setTimeout(async()=>{try{const all=await fAll();const sz=all.reduce((s,r)=>s+(r.size||0),0);const e=$('#stInfo');if(e)e.textContent=`${S.items.length} items · ${S.people.length} people · ${all.length} files (${fsize(sz)}) · ${S.log.length} log entries`}catch(x){}},0);
+ return `${backHome}<h1 class="pt">Settings & backup</h1>
+ <h2>Backup</h2><div class="card"><p class="meta" style="margin-top:0">Last backup: ${lb?fmtD(lb):'never'}. Everything (including uploaded files) is stored on this device only. Back up daily: tap Back up now, choose Drive. On a laptop or new phone, open the app and restore the latest file.</p><div class="acts"><button class="btn p" onclick="A.exp()">Back up now</button><label class="btn">Restore from file<input type="file" hidden accept=".json,application/json" onchange="A.imp(this)"></label></div></div>
+ <h2>Notifications</h2><div class="card"><p class="meta" style="margin-top:0">${notifState()}</p><button class="btn" onclick="A.notif()">Enable notifications</button></div>
+ <h2>Subdivisions</h2><div class="card"><label class="fld"><span>Regular charge</span><input id="snK" value="${esc(S.settings.subs.K)}"></label><label class="fld"><span>Additional charge</span><input id="snI" value="${esc(S.settings.subs.I)}"></label><button class="btn" onclick="A.subNames()">Save names</button></div>
+ <h2>Stored on this device</h2><div class="card meta" id="stInfo">…</div>`}
+
+/* ================= router ================= */
+const IC={home:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',today:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>'};
+let LASTH=null;
+const curView=()=>(location.hash.slice(1)||'home').split('/')[0];
+function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');const v=p[0];if(v!=='edit')PREFILL=null;closeDrawer();
+ $('#seg').innerHTML=[['K',subName('K')],['I',subName('I')],['A','All']].map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
+ const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,offences:vOffences,off:()=>vOff(p[1],p[2])};
+ $('#main').innerHTML=(V[v]||vHome)();
+ $('.fab').style.display=/^edit/.test(v)||v==='settings'||v==='log'?'none':'';
+ if(h!==LASTH){window.scrollTo(0,0);LASTH=h;if(v==='search'){const e=$('#sq');if(e)e.focus()}}}
+function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}render()}
+
+/* ================= actions ================= */
+const A={};
+A.add=()=>sheet(`<div class="ct">Add new</div><div class="grid2 mt">${[['inbox','Quick note (Inbox)'],['task','Follow-up / direction'],['letter','Letter (issued / received)'],['complaint','Complaint'],['estimate','Estimate'],['pmiu','PMIU canal wire'],['court','Court case'],['inquiry','Inquiry'],['wire','Canal wire'],['event','Meeting / event'],['insp','Inspection'],['place','Place / location'],['resource','Resource / file'],['template','Template'],['person','Person'],['vehicle','Vehicle / POL']].map(([k,l])=>`<button class="btn" onclick="A.addGo('${k}')">${l}</button>`).join('')}</div>`);
+A.fab=()=>{const p=(location.hash.slice(1)||'home').split('/');const v=p[0];
+ if(v==='list'&&T[p[1]])return go('edit/'+p[1]+'/new');
+ if(v==='people')return go('editp/new');
+ if(v==='person'&&person(p[1])){const pp=person(p[1]);PREFILL={owner:pp.id,sub:pp.sub==='B'?(SUB==='A'?'K':SUB):pp.sub};return go('edit/task/new')}if(v==='vehicle')return go('editv/new');
+ if(v==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${['K','I'].map(s=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${s}')">${esc(subName(s))}</button>`).join('')}</div>`)}
+ if(v==='cal')return A.newEvent(CAL?CAL.sel:today());
+ if(v==='inbox'){const e=$('#ibT');if(e){e.focus();return}}
+ A.add()};
+A.addGo=k=>{closeSheet();if(k==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${['K','I'].map(x=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${x}')">${esc(subName(x))}</button>`).join('')}</div>`)}const m={inbox:'inbox',person:'editp/new',vehicle:'editv/new'};go(m[k]||'edit/'+k+'/new');if(k==='inbox')setTimeout(()=>{const e=$('#ibT');if(e)e.focus()},80)};
+A.done=id=>{const it=get(id);const op=isOpen(it);sheet(`<div class="ct">${op?'Followed up':'Add note'}</div><div class="meta">${esc(it.title)}</div><textarea id="fuN" rows="3" class="mt" placeholder="${op?'What happened? (optional) e.g. SEN says report by Thursday':'Note'}"></textarea><div class="acts"><button class="btn p" onclick="A.doneSave('${id}')">Save</button><button class="btn" onclick="closeSheet()">Cancel</button></div>${op?'<p class="meta">It leaves Today and comes back tomorrow until resolved.</p>':''}`);setTimeout(()=>{const e=$('#fuN');if(e)e.focus()},60)};
+A.doneSave=id=>{const it=get(id);const tx=($('#fuN').value||'').trim();const op=isOpen(it);if(!op&&!tx)return closeSheet();snap();if(tx)it.notes.push({ts:Date.now(),text:tx});if(op)it.doneOn=today();log((op?'Followed up: ':'Note: ')+it.title+(tx?' — '+tx:''),it);save();closeSheet();render();toast(op?'Followed up':'Note added',1)};
+A.fu=id=>{const t=today(),it=get(id);sheet(`<div class="ct">Next follow-up</div><div class="meta">${esc(it.title)}</div><div class="grid2 mt">${[[1,'Tomorrow'],[2,'In 2 days'],[3,'In 3 days'],[7,'In a week']].map(([n,l])=>`<button class="btn" onclick="A.setFu('${id}','${addDays(t,n)}')">${l}<br><span class="meta">${fmtD(addDays(t,n))}</span></button>`).join('')}</div><label class="fld mt"><span>Or pick a date</span><input type="date" id="fuD" min="${addDays(t,1)}"></label><div class="acts"><button class="btn p" onclick="const v=$('#fuD').value;if(v)A.setFu('${id}',v)">Set date</button>${it.followUp?`<button class="btn" onclick="A.setFu('${id}','')">Clear follow-up</button>`:''}<button class="btn" onclick="closeSheet()">Cancel</button></div>`)};
+A.setFu=(id,d)=>{snap();const it=get(id);it.followUp=d||null;log(d?'Follow-up set '+fmtD(d)+': '+it.title:'Follow-up cleared: '+it.title,it);save();closeSheet();render();toast(d?'Hidden until '+fmtD(d):'Follow-up cleared',1)};
+A.resolve=id=>{snap();const it=get(id);it.resolved=true;it.resolvedOn=today();log('Resolved: '+it.title,it);save();render();toast('Closed and moved to archive',1)};
+A.reopen=id=>{snap();const it=get(id);it.resolved=false;it.resolvedOn=null;it.doneOn=null;log('Reopened: '+it.title,it);save();render();toast('Reopened',1)};
+A.del=id=>{const it=get(id);if(!confirm('Delete permanently? (Resolve keeps it in the archive.)'))return;snap();S.items=S.items.filter(x=>x.id!==id);log('Deleted: '+it.title,{sub:it.sub});save();location.replace('#list/'+it.type);toast('Deleted',1)};
+A.saveItem=(ty,id)=>{const it0=id?get(id):null;const vals={};T[ty].f.forEach(f=>{const el=$('#f_'+f.k);if(el)vals[f.k]=el.value.trim()});
+ if(ty==='inquiry'&&vals.accusedId){const ap=person(vals.accusedId);if(ap){vals.accused=ap.name;vals.accusedDesig=/sub engineer/i.test(ap.designation)?'Sub Engineer (SEN)':(T.inquiry.f.find(f=>f.k==='accusedDesig').o.find(o=>ap.designation.toLowerCase().includes(o.toLowerCase()))||'Other')}}
+ if(ty==='pmiu'&&!vals.title)vals.title='PMIU C.W '+(vals.refNo||'')+(vals.canal?' — '+vals.canal:'');
+ if(!vals.title&&!(it0&&it0.title)){toast('Title / subject is required');return}
+ snap();const it=it0||{id:uid(),type:ty,createdAt:Date.now(),stages:[],notes:[],links:[]};Object.assign(it,vals);it.sub=$('#f_sub').value;
+ if(ty==='complaint'&&!it.due&&it.received&&/^WRIMS/.test(it.source))it.due=addDays(it.received,3);
+ let wt=null;if(ty==='place'&&(it.lat||it.lng)&&(isNaN(parseFloat(it.lat))||isNaN(parseFloat(it.lng)))){toast('Latitude / longitude must be numbers');return}
+ if(!it0){if(FIRST[ty])it.stages.push({name:FIRST[ty][0],date:it[FIRST[ty][1]]||today(),note:''});if(PREFILL&&PREFILL.rel)it.rel=PREFILL.rel;S.items.push(it);log('Added '+T[ty].n.toLowerCase()+': '+it.title,it);
+  if(PREFILL&&PREFILL.inboxId)S.inbox=S.inbox.filter(x=>x.id!==PREFILL.inboxId)}
+ else log('Edited: '+it.title,it);
+ if(ty==='wire'&&it.action==='Needs action'&&!S.items.some(x=>x.rel===it.id&&x.type==='task'))wt=wireFollowUp(it);
+ PREFILL=null;save();location.replace('#item/'+it.id);toast(wt?'Saved. Follow-up created.':'Saved')};
+A.quickSet=(id,ks)=>{const it=get(id);snap();let n=0;ks.split(',').forEach(k=>{const e=$('#q_'+k);if(e&&e.value.trim()&&e.value.trim()!=='Not started'){it[k]=e.value.trim();n++}});if(!n)return toast('Nothing entered');log('Stage — '+it.title+': details updated',it);save();render();toast('Saved',1)};
+A.adv=id=>{const it=get(id);const name=$('#stSel').value,date=$('#stDate').value||today(),note=$('#stNote').value.trim();
+ if(it.type==='estimate'&&name==='Bill submitted to Drawing Branch'&&!(it.inspNote&&it.compCert&&it.punch)&&!confirm('Inspection note, completion certificate or punch list is not marked. Continue?'))return;
+ snap();it.stages.push({name,date,note});it.doneOn=today();log('Stage — '+it.title+': '+name,it);save();render();toast('Stage updated',1)};
+A.decide=(id,d)=>{snap();const it=get(id);it.decision=d;log('Stage — '+it.title+': decision '+d,it);save();render();toast('Decision: '+d,1)};
+A.chk=(id,k)=>{snap();const it=get(id);it[k]=!it[k];log('Stage — '+it.title+': '+k+(it[k]?' done':' unmarked'),it);save();render()};
+A.hear=id=>{const it=get(id);const out=$('#hOut').value.trim(),nd=$('#hNext').value;if(!out&&!nd)return toast('Enter what happened or the next date');
+ snap();it.notes.push({ts:Date.now(),text:'Hearing '+(it.hearing?fmtD(it.hearing):'')+': '+(out||'—')+(nd?' · Next: '+fmtD(nd):'')});if(nd)it.hearing=nd;it.doneOn=today();log('Stage — '+it.title+': hearing recorded',it);save();render();toast('Hearing saved',1)};
+function wireFollowUp(it){const tk={id:uid(),type:'task',createdAt:Date.now()+1,stages:[],notes:[],links:[],sub:it.sub,title:it.title,source:'Canal wire',owner:it.assign||'',due:it.due||'',details:'Canal wire '+(it.refNo?'No '+it.refNo+' ':'')+'('+it.dir+(it.party?', '+it.party:'')+(it.wireDate?', '+fmtD(it.wireDate):'')+')',rel:it.id};S.items.push(tk);log('Added follow-up: '+tk.title,tk);return tk}
+A.wireTask=id=>{snap();const it=get(id);it.action='Needs action';const tk=wireFollowUp(it);save();go('item/'+tk.id);toast('Follow-up created',1)};
+A.linkUp=id=>pick(id,'up',null);A.linkDown=(id,ty)=>pick(id,'down',ty);
+let PK=null;
+function pick(id,mode,ty){PK={id,mode,ty};sheet(`<div class="ct">${mode==='up'?'Link to which letter or case?':'Choose a '+esc(T[ty].n.toLowerCase())+' to link'}</div><input id="pkq" type="search" placeholder="Search" class="mt" oninput="$('#pkr').innerHTML=pickList()"><div id="pkr" class="mt">${pickList()}</div>`);setTimeout(()=>{const e=$('#pkq');if(e)e.focus()},60)}
+function pickList(){const e=$('#pkq');const q=(e?e.value:'').toLowerCase().split(/\s+/).filter(Boolean);const {id,mode,ty}=PK;
+ const pool=S.items.filter(x=>x.id!==id&&inScope(x)&&(mode==='down'?x.type===ty&&x.rel!==id:!LIB.includes(x.type))&&(!q.length||q.every(w=>itemText(x).includes(w)))).sort((a,b)=>itemDate(b).localeCompare(itemDate(a))).slice(0,25);
+ return pool.map(x=>`<div class="lrow" onclick="A.pickDo('${x.id}')"><span class="chip g">${T[x.type].n}</span> ${esc(x.title)}<div class="meta">${esc(summ(x))}</div></div>`).join('')||'<p class="empty">No match.</p>'}
+A.pickDo=xid=>{const {id,mode}=PK;snap();if(mode==='up')get(id).rel=xid;else get(xid).rel=id;save();closeSheet();render();toast('Linked',1)};
+A.unlink=id=>{snap();delete get(id).rel;save();render();toast('Unlinked',1)};
+A.geo=()=>{if(!navigator.geolocation)return toast('Location not available on this device');toast('Getting location…');navigator.geolocation.getCurrentPosition(p=>{$('#f_lat').value=p.coords.latitude.toFixed(6);$('#f_lng').value=p.coords.longitude.toFixed(6);toast('Location captured (±'+Math.round(p.coords.accuracy)+' m)')},er=>toast('Could not get location: '+er.message),{enableHighAccuracy:true,timeout:20000})};
+A.sharePlace=async id=>{const it=get(id);const txt=[it.title,it.address,it.contact&&('Contact: '+it.contact),it.phone&&('Phone: '+it.phone),mapLink(it)].filter(Boolean).join('\n');
+ try{if(navigator.share){await navigator.share({title:it.title,text:txt});return}}catch(e){if(e&&e.name==='AbortError')return}
+ window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener')};
+A.relLetter=id=>{const it=get(id);PREFILL={rel:id,sub:it.sub,canal:it.canal||'',title:it.title,dir:'Issued'};go('edit/letter/new')};
+A.note=id=>{const tx=$('#nT').value.trim();if(!tx)return;snap();const it=get(id);it.notes.push({ts:Date.now(),text:tx});if(isOpen(it))it.doneOn=today();log('Followed up: '+it.title+' — '+tx,it);save();render();toast('Update added',1)};
+A.addLink=id=>{const u=$('#lkU').value.trim(),l=$('#lkL').value.trim();if(!isUrl(u))return toast('Paste a full link starting with https://');snap();const it=get(id);(it.links=it.links||[]).push({url:u,label:l});log('Stage — '+it.title+': document link added',it);save();render()};
+A.rmLink=(id,i)=>{snap();get(id).links.splice(i,1);save();render();toast('Removed',1)};
+A.upload=async(id,inp)=>{const files=[...inp.files];inp.value='';const it=get(id);let n=0;
+ for(const f of files){if(f.size>25e6){toast(f.name+' is over 25 MB. Keep it in Drive and paste the link.');continue}const fid=uid();
+  const text=await extractText(f);try{await fPut({id:fid,name:f.name,type:f.type,size:f.size,blob:f,ts:Date.now(),text})}catch(e){toast('Could not store '+f.name);continue}if(text)TEXTS[fid]=text;
+  if(!n)snap();(it.links=it.links||[]).push({fileId:fid,label:f.name.replace(/\.[^.]+$/,''),name:f.name,size:f.size});n++}
+ if(n){log('Stage — '+it.title+': '+n+' file(s) attached',it);save();render();toast(n+' file(s) attached')}};
+A.openDoc=async(id,i)=>{const it=get(id);const l=it&&it.links&&it.links[i];if(!l)return;if(l.url){window.open(l.url,'_blank','noopener');return}
+ let r;try{r=await fGet(l.fileId)}catch(e){}if(!r)return toast('File not on this device. Restore a backup that includes it.');
+ const u=URL.createObjectURL(r.blob);const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';if(/Android/i.test(navigator.userAgent)||!/pdf|image/.test(r.type||''))a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),120000)};
+A.rt=rid=>{snap();const t=today();const r=S.routines.find(x=>x.id===rid);const d=S.routineDone[t]=S.routineDone[t]||{};d[rid]=!d[rid];log('Routine '+(d[rid]?'done':'unchecked')+': '+r.title,{sub:r.sub});save();render()};
+A.calSel=ds=>{CAL.sel=ds;render()};
+A.calM=n=>{CAL.m+=n;if(CAL.m<0){CAL.m=11;CAL.y--}if(CAL.m>11){CAL.m=0;CAL.y++}render()};
+A.newEvent=ds=>{PREFILL={due:ds};go('edit/event/new')};
+A.ibAdd=()=>{const tx=$('#ibT').value.trim();if(!tx)return;snap();const sub=$('#ibS')?$('#ibS').value:SUB;S.inbox.push({id:uid(),ts:Date.now(),text:tx,sub});log('Inbox note added',{sub});save();render();toast('Saved to Inbox',1)};
+A.ibDel=id=>{snap();S.inbox=S.inbox.filter(x=>x.id!==id);save();render();toast('Deleted',1)};
+A.ibConv=id=>sheet(`<div class="ct">Turn into</div><div class="grid2 mt">${['task','letter','complaint','estimate','theft','court','inquiry','wire','event'].map(t=>`<button class="btn" onclick="A.ibTo('${id}','${t}')">${T[t].n}</button>`).join('')}</div>`);
+A.ibTo=(id,ty)=>{const x=S.inbox.find(i=>i.id===id);closeSheet();PREFILL={title:x.text.split('\n')[0].slice(0,140),details:x.text,sub:x.sub,inboxId:x.id};if(ty==='task')PREFILL.source='XEN direction';go('edit/'+ty+'/new')};
+A.saveP=id=>{const g=k=>$('#p_'+k).value.trim();const name=g('name');if(!name)return toast('Name is required');snap();let p=id?person(id):null;if(!p){p={id:uid()};S.people.push(p)}
+ Object.assign(p,{name,parentage:g('parentage'),designation:g('designation')||'Other',sub:$('#p_sub').value,section:g('section'),posting:g('posting'),phone:g('phone'),cnic:g('cnic'),notes:$('#p_notes').value.trim()});log((id?'Edited':'Added')+' person: '+name,{sub:p.sub});save();location.replace('#person/'+p.id)};
+A.delP=id=>{if(!confirm('Delete this person?'))return;snap();S.people=S.people.filter(p=>p.id!==id);save();location.replace('#people');toast('Deleted',1)};
+function parseCSV(txt){const rows=[];let row=[],cell='',q=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(q){if(c==='"'&&txt[i+1]==='"'){cell+='"';i++}else if(c==='"')q=false;else cell+=c}else if(c==='"')q=true;else if(c===','){row.push(cell);cell=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=c}
+ if(cell||row.length){row.push(cell);rows.push(row)}const hd=(rows.shift()||[]).map(h=>h.trim().toLowerCase());return rows.filter(r=>r.some(Boolean)).map(r=>{const o={};hd.forEach((h,i)=>o[h]=(r[i]||'').trim());return o})}
+A.pImp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=()=>{let arr=[];try{if(/\.csv$/i.test(f.name))arr=parseCSV(r.result);else{const d=JSON.parse(r.result);arr=Array.isArray(d)?d:d.people}if(!Array.isArray(arr))throw 0}catch(e){return toast('Could not read this file')}
+ let add=0,skip=0;snap();arr.forEach(x=>{if(!x||!x.name)return;const nm=String(x.name).trim();if(S.people.some(p=>p.name.toLowerCase()===nm.toLowerCase()&&(p.phone||'')===(x.phone||''))){skip++;return}
+  S.people.push({id:uid(),name:nm,parentage:x.parentage||'',designation:x.designation||'Other',sub:['K','I','B'].includes(x.sub)?x.sub:(SUB==='A'?'K':SUB),section:x.section||'',posting:x.posting||'',phone:x.phone||'',cnic:x.cnic||'',notes:x.notes||''});add++});
+ log('Imported '+add+' people',{});save();render();toast(add+' added'+(skip?', '+skip+' already present':''),1)};r.readAsText(f)};
+A.vm=n=>{const [y,m]=VM.split('-').map(Number);const d=new Date(y,m-1+n,1);VM=d.getFullYear()+'-'+pad(d.getMonth()+1);render()};
+A.saveV=id=>{const g=k=>$('#v_'+k).value.trim();const e={date:g('date')||today(),open:g('open'),close:g('close'),route:g('route'),polL:g('polL'),polRs:g('polRs'),maintDesc:g('maintDesc'),maintRs:g('maintRs')};
+ if(e.open&&e.close&&+e.close<+e.open)return toast('Closing km is less than opening km');snap();let v=id?S.vehicle.find(x=>x.id===id):null;if(!v){v={id:uid()};S.vehicle.push(v)}Object.assign(v,e);
+ log('Vehicle '+fmtD(e.date)+(e.open&&e.close?': '+(e.close-e.open)+' km':'')+(e.polL?', POL '+e.polL+' L':''),{});VM=e.date.slice(0,7);save();location.replace('#vehicle')};
+A.delV=id=>{if(!confirm('Delete this entry?'))return;snap();S.vehicle=S.vehicle.filter(v=>v.id!==id);save();location.replace('#vehicle');toast('Deleted',1)};
+A.saveVisit=(id,sub)=>{const cid=$('#vi_c')?$('#vi_c').value:'';const cn=$('#vi_cn').value.trim();if(!cid&&!cn)return toast('Choose or type a canal');const lk=$('#vi_l').value.trim();if(lk&&!isUrl(lk))return toast('Link must start with https://');
+ snap();let v=id!=='new'?S.visits.find(x=>x.id===id):null;if(!v){v={id:uid(),sub};S.visits.push(v)}Object.assign(v,{canalId:cid,canalName:cid?'':cn,date:$('#vi_d').value||today(),remarks:$('#vi_r').value.trim(),link:lk});
+ log('Inspected '+canalLabel(v)+' ('+subName(v.sub)+')',{sub:v.sub});save();location.replace('#insp')};
+A.delVisit=id=>{if(!confirm('Delete this inspection?'))return;snap();S.visits=S.visits.filter(v=>v.id!==id);save();location.replace('#insp');toast('Deleted',1)};
+A.inspNote=(s,ws)=>{snap();const k=s+'|'+ws;if(S.inspNotes[k]){delete S.inspNotes[k];log('Inspection note unmarked ('+subName(s)+')',{sub:s})}else{S.inspNotes[k]=today();log('Inspection note submitted to Division ('+subName(s)+')',{sub:s})}save();render()};
+A.logD=n=>{LOGD=addDays(LOGD,n);render()};
+A.subNames=()=>{S.settings.subs.K=$('#snK').value.trim()||'Kundian';S.settings.subs.I=$('#snI').value.trim()||'Isakhel';save();render();toast('Saved')};
+A.rtAdd=()=>{const tx=$('#rtN').value.trim();if(!tx)return;snap();S.routines.push({id:uid(),sub:$('#rtS')?$('#rtS').value:SUB,title:tx});save();render()};
+A.rtDel=id=>{snap();S.routines=S.routines.filter(r=>r.id!==id);save();render();toast('Removed',1)};
+A.cnAdd=s=>{const e=$('#cn_'+s);const tx=e?e.value.trim():'';if(!tx)return;snap();S.canals.push({id:uid(),sub:s,name:tx});save();render()};
+A.cnDel=id=>{snap();const c=S.canals.find(x=>x.id===id);S.visits.forEach(v=>{if(v.canalId===id){v.canalId='';v.canalName=c.name}});S.canals=S.canals.filter(x=>x.id!==id);save();render();toast('Removed',1)};
+A.exp=async()=>{toast('Preparing backup…');let files=[];try{const all=await fAll();for(const r of all)files.push({id:r.id,name:r.name,type:r.type,size:r.size,text:r.text||'',data:await blobToB64(r.blob)})}catch(e){}
+ const name='sdo-desk-backup-'+today()+'.json';const blob=new Blob([JSON.stringify(Object.assign({},S,{_files:files}))],{type:'application/json'});
+ try{const file=new File([blob],name,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});markBackup(blob.size);return}}catch(e){if(e&&e.name==='AbortError')return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();markBackup(blob.size)};
+function markBackup(sz){S.settings.lastBackup=today();save();render();toast('Backup created ('+fsize(sz)+')')}
+A.imp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=async()=>{let d;try{d=JSON.parse(r.result);if(!d||!Array.isArray(d.items))throw 0}catch(e){return toast('Not a valid SDO Desk backup file')}
+ if(!confirm('Replace ALL data on this device with this backup ('+d.items.length+' items, '+(d.people||[]).length+' people, '+((d._files||[]).length)+' files)?'))return;
+ const files=d._files||[];delete d._files;for(const x of files){try{const b=await (await fetch(x.data)).blob();await fPut({id:x.id,name:x.name,type:x.type,size:x.size,blob:b,ts:Date.now(),text:x.text||''})}catch(e){}}
+ snap();S=d;fillDefaults();save();await loadTexts();render();toast('Restored',1)};r.readAsText(f)};
+A.notif=async()=>{if(!('Notification' in window))return toast('Not supported in this browser');await Notification.requestPermission();render();if(Notification.permission==='granted'){S.settings.lastNotify=null;dailyNotify()}};
+
+/* ================= v5: offence register, PMIU, templates, police lookup ================= */
+let TEXTS={};
+async function loadTexts(){try{const all=await fAll();TEXTS={};all.forEach(r=>{if(r.text)TEXTS[r.id]=r.text})}catch(e){}}
+/* ---- file text extraction (search inside files) ---- */
+const xmlUnesc=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+function a85(str){str=str.replace(/\s/g,'').replace(/^<~/,'');const k=str.indexOf('~>');if(k>=0)str=str.slice(0,k);const out=[];let i=0;while(i<str.length){if(str[i]==='z'){out.push(0,0,0,0);i++;continue}let ch=str.slice(i,i+5);i+=5;const pn=5-ch.length;ch+='uuuuu'.slice(0,pn);let v=0;for(const c of ch)v=v*85+(c.charCodeAt(0)-33);const b=[Math.floor(v/16777216)%256,Math.floor(v/65536)%256,Math.floor(v/256)%256,v%256];out.push(...b.slice(0,4-pn))}return new Uint8Array(out)}
+function pdfText(buf){let out='';try{const L=new TextDecoder('latin1').decode(buf);let i=0;const parts=[];
+ while((i=L.indexOf('stream',i))!==-1&&parts.length<400){let s=i+6;if(L[s]==='\r')s++;if(L[s]==='\n')s++;const e=L.indexOf('endstream',s);if(e<0)break;let bytes=buf.subarray(s,e);let txt='';const dict=L.slice(Math.max(0,i-300),i);if(/ASCII85Decode/.test(dict.slice(dict.lastIndexOf('<<'))))bytes=a85(L.slice(s,e));
+  try{txt=new TextDecoder('latin1').decode(fflate.unzlibSync(bytes))}catch(x){try{txt=new TextDecoder('latin1').decode(fflate.inflateSync(bytes))}catch(y){txt=new TextDecoder('latin1').decode(bytes)}}
+  if(txt&&/T[Jj]/.test(txt)){const m=txt.match(/\((?:\\.|[^\\)])*\)\s*T[Jj]|\[(?:[^\]]*)\]\s*TJ/g)||[];parts.push(m.map(seg=>(seg.match(/\((?:\\.|[^\\)])*\)/g)||[]).map(x=>x.slice(1,-1).replace(/\\([()\\])/g,'$1').replace(/\\n/g,' ')).join('')).join(' '))}
+  i=e+9}
+ out=parts.join('\n')}catch(e){}return out.replace(/[^\x20-\x7E\n؀-ۿ]/g,' ').replace(/[ \t]{2,}/g,' ').slice(0,60000)}
+async function extractText(file){try{const nm=(file.name||'').toLowerCase();const buf=new Uint8Array(await file.arrayBuffer());
+ if(nm.endsWith('.docx')){const z=fflate.unzipSync(buf,{filter:f=>f.name==='word/document.xml'});const x=new TextDecoder().decode(z['word/document.xml']);return xmlUnesc(x.replace(/<\/w:p>/g,'\n').replace(/<w:tab\/>/g,' ').replace(/<[^>]+>/g,'')).slice(0,60000)}
+ if(nm.endsWith('.xlsx')){const z=fflate.unzipSync(buf,{filter:f=>f.name==='xl/sharedStrings.xml'});const x=z['xl/sharedStrings.xml'];return x?xmlUnesc(new TextDecoder().decode(x).replace(/<\/si>/g,'\n').replace(/<[^>]+>/g,'')).slice(0,60000):''}
+ if(nm.endsWith('.pdf'))return pdfText(buf);
+ if(/\.(txt|csv)$/.test(nm))return new TextDecoder().decode(buf).slice(0,60000)}catch(e){}return ''}
+/* ---- xlsx reader ---- */
+const colIdx=s=>{let n=0;for(const ch of s)n=n*26+ch.charCodeAt(0)-64;return n-1};
+async function readXlsx(file){const buf=new Uint8Array(await file.arrayBuffer());const z=fflate.unzipSync(buf);const dec=new TextDecoder();
+ const X=n=>z[n]?new DOMParser().parseFromString(dec.decode(z[n]),'application/xml'):null;
+ const wb=X('xl/workbook.xml'),rels=X('xl/_rels/workbook.xml.rels'),ss=X('xl/sharedStrings.xml');if(!wb||!rels)throw new Error('Not an Excel (.xlsx) file');
+ const strs=ss?[...ss.getElementsByTagName('si')].map(si=>[...si.getElementsByTagName('t')].map(t=>t.textContent).join('')):[];
+ const rm={};[...rels.getElementsByTagName('Relationship')].forEach(r=>{rm[r.getAttribute('Id')]=r.getAttribute('Target')});
+ return [...wb.getElementsByTagName('sheet')].map(s=>{const rid=s.getAttribute('r:id')||s.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');let tg=(rm[rid]||'').replace(/^\//,'');if(!tg.startsWith('xl/'))tg='xl/'+tg;
+  const d=X(tg);const rows=[];if(d)[...d.getElementsByTagName('row')].forEach(r=>{const ri=+r.getAttribute('r')-1;const arr=[];[...r.getElementsByTagName('c')].forEach(c=>{const col=colIdx(c.getAttribute('r').replace(/\d+/g,''));const t=c.getAttribute('t');const v=c.getElementsByTagName('v')[0];let val=v?v.textContent:'';
+   if(t==='s')val=strs[+val]||'';else if(t==='inlineStr'){val=[...c.getElementsByTagName('t')].map(x=>x.textContent).join('')}else if(t!=='str'&&val!==''&&!isNaN(val))val=Number(val);arr[col]=val});rows[ri]=arr});
+  return {name:s.getAttribute('name'),rows}})}
+/* ---- normalisers ---- */
+const normCh=s=>String(s||'').toLowerCase().replace(/wawana/g,'wawan').replace(/distributary|disty|minor|mnor|sub|down|canal|branch/g,'').replace(/[^a-z0-9]/g,'');
+const sameCh=(a,b)=>{a=normCh(a);b=normCh(b);return !!a&&!!b&&(a===b||(a.length>3&&b.length>3&&(a.startsWith(b)||b.startsWith(a))))};
+function normRD(s){let t=String(s==null?'':s).trim().toUpperCase().replace(/\s+/g,'');if(!t)return {v:null,side:'',raw:''};
+ let side='';const sm=t.match(/\/?([LR])$/);if(sm&&!/^\d+-?[LR]$/.test(t)){side=sm[1];t=t.replace(/\/?[LR]$/,'')}
+ let v=null,v2=null,m;
+ if((m=t.match(/^(\d+)\+(\d+(?:\.\d+)?)/)))v=(+m[1])*1000+(+m[2]);
+ else if((m=t.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/))){const a=+m[1],b=+m[2];if(a<1000&&b<1000){v=a*1000;v2=b*1000}else{v=a;v2=b}}
+ else if((m=t.match(/^(\d+(?:\.\d+)?)$/)))v=+m[1];
+ return {v,v2,side,raw:t}}
+function rdMatch(a,b){const x=normRD(a),y=normRD(b);if(x.v==null||y.v==null)return x.raw&&x.raw===y.raw;if(x.side&&y.side&&x.side!==y.side)return false;
+ const xa=x.v,xb=x.v2!=null?x.v2:x.v,ya=y.v,yb=y.v2!=null?y.v2:y.v;return xa<=yb+60&&ya<=xb+60}
+const fmtRD=s=>String(s||'').trim();
+function parseDT(v){if(v===''||v==null)return {iso:'',err:''};
+ if(typeof v==='number'){if(v>20000&&v<80000){const d=new Date(Date.UTC(1899,11,30)+v*864e5);return {iso:d.toISOString().slice(0,10),err:''}}return {iso:'',err:'not a date'}}
+ let s=String(v).trim();if(!s||/^yes$/i.test(s))return {iso:'',err:''};let err='';
+ if(/,/.test(s)){err='comma in date';s=s.replace(/,/g,'.')}s=s.replace(/\s+/g,'');
+ let m=s.match(/^(\d{1,2})\.(\d{1,2})\.(\d{2})\.(\d{2})$/);if(m){err='broken year';s=m[1]+'.'+m[2]+'.'+m[3]+m[4]}
+ m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);if(!m)return {iso:'',err:'unreadable date'};
+ let d=+m[1],mo=+m[2],y=+m[3];if(m[3].length===2)y=2000+y;if(m[3].length===3)return {iso:'',err:'wrong year ('+m[3]+')'};
+ if(mo<1||mo>12||d<1||d>31)return {iso:'',err:'invalid date'};const iso=y+'-'+pad(mo)+'-'+pad(d);
+ const ty=new Date().getFullYear();if(y<2015||y>ty+1)err=err||'year '+y;else if(iso>addDays(today(),7))err=err||'future date';return {iso,err}}
+/* ---- offence sheet import ---- */
+const OFF_MAP=[['sr',/^sr/],['subdiv',/name of sub ?div/],['channel',/channel/],['rd',/outlet|rd ?& ?side/],['offence',/offen[cs]e type/],
+ ['senCwNo',/^sen c\.? ?w.*\bno/],['senCwDate',/^sen c\.? ?w.*date/],['sdoCwNo',/^sdo confirm.*\bno/],['sdoCwDate',/^sdo confirm.*date/],['senRepNo',/^sen repair.*\bno/],['senRepDate',/^sen repair.*date/],['sdoRepNo',/^sdo repair.*\bno/],['sdoRepDate',/^sdo repair.*date/],
+ ['pmiuNo',/pmiu canal wire\s*no/],['pmiuDate',/pmiu canal wire\s*date/],['fardDate',/fard/],['penaltyDate',/penalty notice/],['tawanSub',/tawan case/],['tawanNotice',/tawan notice/],
+ ['robkarNo',/robkar no/],['robkarDate',/robkar issue/],['firNo',/fir no/],['firDate',/fir init/],['ps',/concerned police/],['psRecv',/receiving by police/],['fine',/fine imposed/],['decNo',/decision no/],['decDate',/decision date/],['amount',/amount/],
+ ['folder',/other than pmiu/],['pmiuFolder',/^pmiu folder/],['zildarSec',/zill?dar section/],['section',/^section name/],['sen',/name of sen/],['zildar',/name of zill?dar/],['halqa',/patwari halqa/],['patwari',/name of canal patwari/],['village',/village/],['remarks',/remarks/]];
+const OFF_LBL={sr:'Sr',channel:'Channel',rd:'Outlet RD & side',offence:'Offence type',senCwNo:'SEN C.W No',senCwDate:'SEN C.W date',sdoCwNo:'SDO confirmation C.W No',sdoCwDate:'SDO confirmation C.W date',senRepNo:'SEN repair C.W No',senRepDate:'SEN repair C.W date',sdoRepNo:'SDO repair C.W No',sdoRepDate:'SDO repair C.W date',pmiuNo:'PMIU C.W No',pmiuDate:'PMIU C.W date',fardDate:'Fard-e-Qasran received (SDR)',penaltyDate:'Penalty notice issued',tawanSub:'Tawan case submitted',tawanNotice:'Tawan notice issued',robkarNo:'Robkar No',robkarDate:'Robkar issue date',firNo:'FIR No',firDate:'FIR date',ps:'Police station (sheet)',psRecv:'Received by police station',fine:'Fine imposed',decNo:'Tawan decision No',decDate:'Tawan decision date',amount:'Tawan amount (Rs)',folder:'Folder link',pmiuFolder:'PMIU folder',section:'Section',sen:'SEN',zildarSec:'Zilladari',zildar:'Zilladar',halqa:'Patwar halqa',patwari:'Patwari',village:'Village',remarks:'Remarks'};
+const DATE_F=['senCwDate','sdoCwDate','senRepDate','sdoRepDate','pmiuDate','fardDate','penaltyDate','tawanSub','tawanNotice','robkarDate','firDate','decDate'];
+function parseOffSheet(rows){let h=-1;for(let i=0;i<Math.min(rows.length,15);i++){const r=(rows[i]||[]).map(x=>String(x==null?'':x).toLowerCase());if(r.some(x=>/^sr/.test(x.trim()))&&r.some(x=>/channel/.test(x)))h=i;if(h>=0)break}
+ if(h<0)return null;const r3=rows[h]||[],r4=rows[h+1]||[];const n=Math.max(r3.length,r4.length);const cols={};const used=new Set();let carry='';
+ for(let j=0;j<n;j++){const a=String(r3[j]==null?'':r3[j]).trim(),b=String(r4[j]==null?'':r4[j]).trim();if(a)carry=a;const key=((a||(b?carry:''))+' '+b).replace(/\s+/g,' ').trim().toLowerCase();if(!key)continue;
+  const hit=OFF_MAP.find(([f,re])=>!used.has(f)&&re.test(key));if(hit){used.add(hit[0]);cols[hit[0]]=j}}
+ const out=[];for(let i=h+1;i<rows.length;i++){const r=rows[i];if(!r)continue;const sr=r[cols.sr!=null?cols.sr:0];if(typeof sr!=='number'&&!/^\d+$/.test(String(sr||'').trim()))continue;
+  const o={};for(const f in cols){const v=r[cols[f]];o[f]=v==null?'':(typeof v==='number'&&!DATE_F.includes(f)?v:String(v).trim()===''?'':(typeof v==='number'?v:String(v).replace(/\s+/g,' ').trim()))}
+  o.sr=Number(String(sr).trim());out.push(o)}
+ return {cols,rows:out}}
+function parsePS(rows){let h=-1;for(let i=0;i<Math.min(rows.length,10);i++){const r=(rows[i]||[]).map(x=>String(x==null?'':x).toLowerCase());if(r.some(x=>/police/.test(x))&&r.some(x=>/start/.test(x)))h=i;if(h>=0)break}
+ if(h<0)return [];const r=rows[h].map(x=>String(x==null?'':x).toLowerCase());const ci=re=>r.findIndex(x=>re.test(x));const cc=ci(/channel|distributary|canal/),cs=ci(/start/),ce=ci(/end/),cp=ci(/police/);
+ const out=[];let last='';for(let i=h+1;i<rows.length;i++){const x=rows[i];if(!x)continue;const ch=String(x[cc]==null?'':x[cc]).trim()||last;const ps=String(x[cp]==null?'':x[cp]).trim();if(!ch)continue;last=ch;
+  const st=normRD(x[cs]===0?'0':x[cs]).v;const enRaw=String(x[ce]==null?'':x[ce]);const en=/tail/i.test(enRaw)&&normRD(enRaw.replace(/\(.*\)/,'')).v==null?Infinity:normRD(enRaw.replace(/\(.*\)/,'').trim()).v;
+  out.push({ch,start:st==null?0:st,end:en==null?Infinity:en,ps})}return out}
+function psLookup(sub,ch,rd){const map=(S.psMaps||{})[sub]||[];const c=map.filter(m=>sameCh(m.ch,ch)&&m.ps);if(!c.length)return '';const v=normRD(rd).v;
+ if(v==null)return c.length===1||c.every(x=>x.ps===c[0].ps)?c[0].ps:'';const hit=c.find(m=>v>=m.start&&v<=m.end);return hit?hit.ps:''}
+/* ---- gap analysis ---- */
+function offAnalyse(sub){const sh=(S.offSheets||{})[sub];if(!sh)return null;const t=today();
+ const rows=sh.rows.map(o=>{const d={};const errs=[];DATE_F.forEach(f=>{const p=parseDT(o[f]);d[f]=p.iso;if(p.err&&o[f]!==''&&!/^yes$/i.test(String(o[f]).trim()))errs.push(OFF_LBL[f]+': '+p.err+' ('+o[f]+')')});
+  const rb=String(o.robkarNo||'').trim();const fineRaw=String(o.fine==null?'':o.fine).trim();const fineAmt=typeof o.fine==='number'?o.fine:(/^\d+$/.test(fineRaw)?+fineRaw:0);
+  const fine=fineAmt>0||/^y(es)?$/i.test(fineRaw);const robkar=!!rb;const fir=!!String(o.firNo||'').trim();const tawanDone=!!String(o.decNo||'').trim()||typeof o.amount==='number';
+  const m=rb.match(/(\d{1,2}[.,]\d{1,2}[.,]\d{2,4})/);if(m&&d.robkarDate){const p=parseDT(m[1]);if(p.iso&&p.iso!==d.robkarDate)errs.push('Robkar No date '+m[1]+' ≠ issue date '+o.robkarDate)}
+  const base=d.senCwDate||d.sdoCwDate;
+  if(base&&d.robkarDate&&d.robkarDate<base)errs.push('Robkar issued before offence');
+  if(d.senCwDate&&d.sdoCwDate&&d.sdoCwDate<d.senCwDate)errs.push('SDO confirmation before SEN wire');
+  if(d.senCwDate&&d.sdoCwDate&&diffDays(d.sdoCwDate,d.senCwDate)>60)errs.push('SEN wire '+diffDays(d.sdoCwDate,d.senCwDate)+' days before confirmation');
+  if(robkar&&fine)errs.push('Both fine and robkar recorded');
+  const psL=psLookup(sub,o.channel,o.rd);if(robkar&&psL&&o.ps&&normCh(psL.replace(/police station/i,''))!==normCh(String(o.ps).replace(/police station/i,'')))errs.push('Police station '+o.ps+' but jurisdiction list says '+psL);
+  const age=base?diffDays(t,base):0;
+  return {o,d,errs,robkar,fine,fineAmt,fir,tawanDone,age,psL,
+   noFir:robkar&&!fir,firAge:robkar&&!fir&&d.robkarDate?diffDays(t,d.robkarDate):0,
+   noAction:!robkar&&!fine&&age>15,fineNoAmt:fine&&!fineAmt,key:normCh(o.channel)+'|'+(normRD(o.rd).v!=null?normRD(o.rd).v+normRD(o.rd).side:normRD(o.rd).raw)}});
+ const rep={};rows.forEach(x=>{(rep[x.key]=rep[x.key]||[]).push(x)});
+ const repeats=Object.values(rep).filter(a=>a.length>=3).sort((a,b)=>b.length-a.length);
+ return {sh,rows,repeats,n:rows.length,robkar:rows.filter(x=>x.robkar).length,fir:rows.filter(x=>x.fir).length,fine:rows.filter(x=>x.fine).length,
+  noFir:rows.filter(x=>x.noFir),noAction:rows.filter(x=>x.noAction),fineNoAmt:rows.filter(x=>x.fineNoAmt),noTawan:rows.filter(x=>!x.tawanDone),errors:rows.filter(x=>x.errs.length),
+  tawanRs:rows.reduce((s,x)=>s+(typeof x.o.amount==='number'?x.o.amount:0),0),fineRs:rows.reduce((s,x)=>s+x.fineAmt,0)}}
+let OFA={sub:null,a:null,ver:null};
+function offA(sub){const sh=(S.offSheets||{})[sub];const ver=sh?sh.importedAt+'|'+sh.rows.length+'|'+JSON.stringify((S.psMaps||{})[sub]||[]).length:null;if(OFA.sub!==sub||OFA.ver!==ver){OFA={sub,ver,a:offAnalyse(sub)}}return OFA.a}
+/* ---- offence register view ---- */
+let OF={filter:'nofir',q:''};
+const offRowTitle=x=>`Sr ${x.o.sr} · ${fmtRD(x.o.channel)} ${fmtRD(x.o.rd)}`;
+function offFlags(x){return [x.noFir?`<span class="chip r">FIR pending${x.firAge?' '+x.firAge+'d':''}</span>`:'',x.noAction?`<span class="chip r">no fine / robkar · ${x.age}d</span>`:'',x.fineNoAmt?'<span class="chip a">fine amount missing</span>':'',!x.tawanDone?'<span class="chip">no tawan decision</span>':'',x.errs.length?`<span class="chip r">${x.errs.length} error${x.errs.length>1?'s':''}</span>`:''].join('')}
+function offRow(sub,x){return `<div class="card" onclick="go('#off/${sub}/${x.o.sr}')"><div class="ct">${esc(offRowTitle(x))}</div><div class="meta">${esc([x.o.offence,x.o.senCwNo&&('SEN C.W '+x.o.senCwNo+(x.d.senCwDate?' · '+fmtD(x.d.senCwDate):'')),x.robkar?'Robkar '+x.o.robkarNo:x.fine?'Fine'+(x.fineAmt?' Rs '+num(x.fineAmt):''):''].filter(Boolean).join(' · '))}</div><div class="tags" style="margin-top:4px">${offFlags(x)}</div></div>`}
+const OFF_FILTERS=[['nofir','FIR pending',a=>a.noFir],['noaction','No fine / robkar',a=>a.noAction],['fineamt','Fine amount missing',a=>a.fineNoAmt],['notawan','No tawan decision',a=>a.noTawan],['errors','Data errors',a=>a.errors],['repeat','Repeat outlets',null],['all','All',a=>a.rows]];
+function offList(sub){const a=offA(sub);if(!a)return '';const f=OFF_FILTERS.find(x=>x[0]===OF.filter)||OFF_FILTERS[0];const q=OF.q.toLowerCase().split(/\s+/).filter(Boolean);
+ if(f[0]==='repeat')return a.repeats.map(g=>{const x=g[0];const rb=g.filter(y=>y.robkar).length,fn=g.filter(y=>y.fine).length;return `<div class="card"><div class="ct">${esc(fmtRD(x.o.channel))} ${esc(fmtRD(x.o.rd))} <span class="chip r">${g.length} offences</span></div><div class="meta">Robkar ${rb} · Fine ${fn} · FIR ${g.filter(y=>y.fir).length} · Sr ${g.map(y=>y.o.sr).join(', ')}</div></div>`}).join('')||'<p class="empty">No outlet with 3 or more offences.</p>';
+ let l=f[2](a);if(q.length)l=l.filter(x=>q.every(w=>(Object.values(x.o).join(' ')+' '+x.psL).toLowerCase().includes(w)));
+ if(f[0]==='nofir')l=l.slice().sort((x,y)=>y.firAge-x.firAge);else if(f[0]==='noaction')l=l.slice().sort((x,y)=>y.age-x.age);
+ const btn=l.length&&f[0]!=='all'?`<button class="btn s p" style="margin-bottom:8px" onclick="A.offTask('${sub}','${f[0]}')">Make one follow-up for these ${l.length}</button>`:'';
+ return btn+(l.map(x=>offRow(sub,x)).join('')||'<p class="empty">Nothing in this list.</p>')}
+function vOffences(){const subs=scopeSubs();let h='<h1 class="pt">Offence register</h1><p class="meta">Read-only copy of your offence sheet. Staff keep the sheet; import the latest copy weekly and work the gaps here.</p>';
+ if(subs.length>1)return h+subs.map(s=>{const a=offA(s);return `<div class="card" onclick="setSub('${s}');go('#offences')"><div class="ct">${esc(subName(s))}</div><div class="meta">${a?`${a.n} offences · <span class="rd">${a.noFir.length} FIR pending · ${a.noAction.length} no action</span> · imported ${fmtD(a.sh.importedAt)}`:'No sheet imported yet'}</div></div>`}).join('')+'<p class="meta">Pick a subdivision at the top to work its register.</p>';
+ const sub=subs[0];const a=offA(sub);const sh=(S.offSheets||{})[sub];const link=(S.settings.sheetLinks||{})[sub]||'';const t=today();
+ h+=`<div class="card"><div class="row between"><div><div class="ct">${sh?esc(sh.file):'No sheet imported'}</div><div class="meta">${sh?`Imported ${fmtD(sh.importedAt)}${diffDays(t,sh.importedAt)>=7?` <span class="rd">· ${diffDays(t,sh.importedAt)} days old, import the latest</span>`:''} · ${a.n} offences${(S.psMaps||{})[sub]&&(S.psMaps||{})[sub].length?' · police list '+S.psMaps[sub].length+' rows':''}`:'Download the sheet from Drive as .xlsx and import it.'}</div></div></div>
+ <div class="acts"><label class="btn s p">Import latest sheet (.xlsx)<input type="file" hidden accept=".xlsx" onchange="A.offImp('${sub}',this)"></label>${isUrl(link)?`<a class="btn s" href="${esc(link)}" target="_blank" rel="noopener">Open master sheet</a>`:''}<button class="btn s" onclick="A.sheetLink('${sub}')">${link?'Change':'Save'} sheet link</button></div></div>`;
+ if(!a)return h;
+ h+=`<div class="stats"><div><b>${a.n}</b><span>offences</span></div><div class="rd"><b>${a.noFir.length}</b><span>robkar, FIR pending</span></div><div class="rd"><b>${a.noAction.length}</b><span>no fine / robkar 15d+</span></div><div><b>${a.robkar} / ${a.fir}</b><span>robkars / FIRs</span></div><div><b>${a.fine}</b><span>fines (${a.fineNoAmt.length} no amount)</span></div><div><b>Rs ${num(a.tawanRs)}</b><span>tawan decided (${a.n-a.noTawan.length})</span></div></div>`;
+ h+=`<div class="fchips">${OFF_FILTERS.map(([k,l,fn])=>`<button class="${OF.filter===k?'on':''}" onclick="OF.filter='${k}';render()">${l}${fn?' '+fn(a).length:' '+a.repeats.length}</button>`).join('')}</div>`;
+ h+=`<input type="search" placeholder="Search channel, RD, robkar, SEN…" value="${esc(OF.q)}" oninput="OF.q=this.value;$('#ofl').innerHTML=offList('${sub}')" style="margin-bottom:8px"><div id="ofl">${offList(sub)}</div>`;
+ return h}
+function vOff(sub,sr){const a=offA(sub);const x=a&&a.rows.find(r=>String(r.o.sr)===String(sr));if(!x)return '<a class="back" href="#offences">‹ Register</a><p class="empty">Not found. Import the sheet again.</p>';
+ const kv=Object.keys(OFF_LBL).filter(k=>k!=='sr'&&x.o[k]!==''&&x.o[k]!=null).map(k=>{const v=x.o[k];const disp=k==='folder'||k==='pmiuFolder'?(isUrl(v)?`<a href="${esc(v)}" target="_blank" rel="noopener">Open</a>`:esc(v)):esc(DATE_F.includes(k)&&x.d[k]?fmtD(x.d[k]):(k==='amount'&&typeof v==='number'?'Rs '+num(v):v));return `<dt>${esc(OFF_LBL[k])}</dt><dd>${disp}</dd>`}).join('');
+ const pm=S.items.filter(it=>it.type==='pmiu'&&it.sub===sub&&(it.pmOff||[]).some(r=>pmMatch(it,r).row===x));
+ return `<a class="back" href="javascript:history.back()">‹ Back</a><div class="tags mt"><span class="chip g">Offence (sheet)</span><span class="chip">${esc(subName(sub))}</span></div><h1 class="pt">${esc(offRowTitle(x))}</h1><div class="tags">${offFlags(x)}</div>
+ ${x.errs.length?`<div class="card warn"><div class="ct">Check in sheet</div>${x.errs.map(e=>`<div class="meta">• ${esc(e)}</div>`).join('')}</div>`:''}
+ <div class="card"><dl class="kv">${kv}${x.psL?`<dt>Police station (jurisdiction)</dt><dd>${esc(x.psL)}</dd>`:''}</dl></div>
+ ${pm.length?`<h2>PMIU wires</h2>${pm.map(it=>card(it,false)).join('')}`:''}
+ <button class="btn p wide" onclick="A.offTask1('${sub}','${x.o.sr}')">Make follow-up for this offence</button><p class="meta center">Edit this offence in the master sheet; the app updates on the next import.</p>`}
+/* ---- PMIU ---- */
+function pmMatch(it,r){const a=offA(it.sub);if(!a)return {st:'nosheet'};const pd=it.wireDate;
+ const cands=a.rows.filter(x=>sameCh(x.o.channel,r.canal)&&rdMatch(x.o.rd,r.rd));
+ const byNo=it.refNo?cands.filter(x=>String(x.o.pmiuNo||'').trim()===String(it.refNo).trim()):[];
+ const before=cands.filter(x=>x.d.senCwDate&&pd&&x.d.senCwDate<=pd&&diffDays(pd,x.d.senCwDate)<=45).sort((p,q)=>q.d.senCwDate.localeCompare(p.d.senCwDate));
+ if(before.length)return {st:'covered',row:before[0],days:diffDays(pd,before[0].d.senCwDate)};
+ const after=cands.filter(x=>x.d.senCwDate&&pd&&x.d.senCwDate>pd&&diffDays(x.d.senCwDate,pd)<=30).sort((p,q)=>p.d.senCwDate.localeCompare(q.d.senCwDate));
+ if(after.length)return {st:'late',row:after[0],days:diffDays(after[0].d.senCwDate,pd)};
+ if(byNo.length)return {st:'listed',row:byNo[0]};
+ return {st:'none'}}
+function pmChecks(x){if(!x)return '';const c=(ok,l)=>`<span class="chip ${ok?'g':'r'}">${ok?'✓':'✗'} ${l}</span>`;
+ return c(!!x.o.sdoCwNo||!!x.d.sdoCwDate,'SDO confirmation')+(x.o.senRepNo||x.o.sdoRepNo?c(!!x.o.sdoRepNo,'repair confirmed'):'')+c(x.robkar||x.fine,x.robkar?'robkar':x.fine?'fine':'fine / robkar')+(x.robkar?c(x.fir,'FIR'):'')+c(x.tawanDone,'tawan decision')}
+function pmiuBlock(it){const rows=it.pmOff||[];const res=rows.map(r=>({r,m:pmMatch(it,r)}));const cov=res.filter(x=>x.m.st==='covered').length,late=res.filter(x=>x.m.st==='late'||x.m.st==='none').length;
+ const ready=res.filter(x=>x.m.row&&x.m.st==='covered'&&!/✗/.test(pmChecks(x.m.row))).length;const noSheet=!offA(it.sub);
+ let h=`<h2>Offences reported by PMIU (${rows.length})</h2>`;
+ if(rows.length)h+=`<div class="card note"><b>${cov} covered by SEN beforehand · ${late?`<span class="rd">${late} SEN miss / not in sheet</span>`:'0 missed'} · ${ready}/${rows.length} reply-ready</b>${noSheet?'<div class="meta">Import the offence sheet to check coverage.</div>':''}</div>`;
+ h+=res.map(({r,m},i)=>{const st={covered:`<span class="chip g">Covered · SEN C.W ${esc(m.row&&m.row.o.senCwNo)} on ${fmtD(m.row&&m.row.d.senCwDate)} (${m.days}d before)</span>`,late:`<span class="chip r">SEN miss · reported ${m.days}d after PMIU</span>`,listed:'<span class="chip a">In sheet under this PMIU wire, SEN date unclear</span>',none:'<span class="chip r">Not in offence sheet</span>',nosheet:'<span class="chip">Sheet not imported</span>'}[m.st];
+  const ps=psLookup(it.sub,r.canal,r.rd);
+  return `<div class="card ${m.st==='late'||m.st==='none'?'over':''}"><div class="row between"><div class="ct">${esc(r.canal)} ${esc(r.rd)}</div><button class="btn s d" onclick="A.pmDel('${it.id}',${i})">✕</button></div><div class="meta">${esc([r.type,ps&&('PS: '+ps)].filter(Boolean).join(' · '))}</div><div class="tags" style="margin-top:4px">${st}</div>${m.row?`<div class="tags">${pmChecks(m.row)}</div><a class="meta" href="#off/${it.sub}/${m.row.o.sr}">Open sheet row Sr ${m.row.o.sr}</a>`:''}${(m.st==='late'||m.st==='none')&&isOpen(it)?`<div class="acts"><button class="btn s" onclick="A.pmInq('${it.id}',${i})">Raise inquiry against SEN</button></div>`:''}</div>`}).join('');
+ if(isOpen(it))h+=`<div class="card"><div class="ct">Add offence from this wire</div><div class="grid2 mt"><input id="pm_c" list="canals" placeholder="Canal" value="${esc((rows[rows.length-1]||{}).canal||it.canal||'')}"><input id="pm_r" placeholder="RD & side e.g. 8+000/L"></div><input id="pm_t" list="offtypes" placeholder="Offence type" class="mt"><button class="btn p mt" onclick="A.pmAdd('${it.id}')">Add</button></div>`;
+ return h}
+/* ---- templates ---- */
+const TPL_FILL=it=>{const n=new Date();const o=person(it.owner);return {canal:it.canal||'',rd:it.rd||'',date:pad(n.getDate())+'.'+pad(n.getMonth()+1)+'.'+n.getFullYear(),sen:o?o.name:'',no:it.refNo||it.letterNo||it.estNo||'',subject:it.title||'',party:it.party||'',subdivision:subName(it.sub)+' Canal Sub Division',ps:it.policeStation||'',culprits:it.culprits||'',amount:it.amount||it.fineAmount||''}};
+function fillTpl(body,it){const m=it?TPL_FILL(it):{};return String(body||'').replace(/\{(\w+)\}/g,(a,k)=>m[k]?m[k]:a)}
+function tplPickList(){const e=$('#tpq');const q=(e?e.value:'').toLowerCase().split(/\s+/).filter(Boolean);
+ const l=S.items.filter(x=>x.type==='template'&&(!q.length||q.every(w=>itemText(x).includes(w)))).sort((a,b)=>a.title.localeCompare(b.title)).slice(0,40);
+ return l.map(x=>`<div class="lrow" onclick="A.tplUse('${x.id}')"><span class="chip g">${esc(x.cat||'Template')}</span> ${esc(x.title)}<div class="meta">${x.body?'text with blanks':''}${x.body&&(x.links||[]).length?' · ':''}${(x.links||[]).length?(x.links.length+' file'):''}</div></div>`).join('')||'<p class="empty">No templates yet. Add them under Templates in the menu.</p>'}
+/* ---- v5 actions ---- */
+A.offImp=async(sub,inp)=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;toast('Reading sheet…');
+ try{const sheets=await readXlsx(f);let off=null,ps=[];for(const s of sheets){if(!off){const r=parseOffSheet(s.rows);if(r&&r.rows.length)off=r}if(!ps.length&&(/police/i.test(s.name)||1)){const p=parsePS(s.rows);if(p.length)ps=p}}
+  if(!off)return toast('No offence table found (needs Sr. No. and Channel Name headers)');
+  S.offSheets=S.offSheets||{};S.psMaps=S.psMaps||{};S.offSheets[sub]={file:f.name,importedAt:today(),v:Date.now(),rows:off.rows,cols:Object.keys(off.cols)};if(ps.length)S.psMaps[sub]=ps;
+  log('Offence sheet imported ('+subName(sub)+'): '+off.rows.length+' offences',{sub});save();render();toast(off.rows.length+' offences imported'+(ps.length?' · police list '+ps.length+' rows':''))}
+ catch(e){toast('Could not read: '+(e.message||e))}};
+A.sheetLink=sub=>{const cur=(S.settings.sheetLinks||{})[sub]||'';const u=prompt('Paste the Google Sheets / Drive link of the master offence sheet',cur);if(u===null)return;if(u&&!isUrl(u.trim()))return toast('Link must start with https://');S.settings.sheetLinks=S.settings.sheetLinks||{};S.settings.sheetLinks[sub]=u.trim();save();render()};
+const sdrOf=sub=>{const p=S.people.find(p=>(p.sub===sub||p.sub==='B')&&/SDR/.test(p.designation));return p?p.id:''};
+function offLine(x){return `Sr ${x.o.sr} ${fmtRD(x.o.channel)} ${fmtRD(x.o.rd)} (${x.o.offence||'offence'})${x.robkar?' — robkar '+x.o.robkarNo:''}${x.noFir&&x.firAge?', no FIR for '+x.firAge+'d':''}${x.noAction?', no action for '+x.age+'d':''}${x.fineNoAmt?', fine amount missing':''}`}
+A.offTask=(sub,fk)=>{const a=offA(sub);const f=OFF_FILTERS.find(x=>x[0]===fk);const l=f[2](a);const sr=l.map(x=>x.o.sr);
+ PREFILL={sub,source:'Self',owner:sdrOf(sub),title:`${f[1]}: ${l.length} offences (Sr ${sr.slice(0,12).join(', ')}${sr.length>12?'…':''})`,details:l.map(offLine).join('\n')};go('edit/task/new')};
+A.offTask1=(sub,sr)=>{const x=offA(sub).rows.find(r=>String(r.o.sr)===String(sr));const gap=x.noFir?'FIR pending':x.noAction?'no fine / robkar':x.fineNoAmt?'fine amount missing':!x.tawanDone?'tawan decision pending':x.errs.length?'correct sheet entry':'follow up';
+ PREFILL={sub,source:'Self',owner:sdrOf(sub),title:`Offence Sr ${x.o.sr} ${fmtRD(x.o.channel)} ${fmtRD(x.o.rd)}: ${gap}`,details:offLine(x)+(x.errs.length?'\nSheet errors: '+x.errs.join('; '):'')};go('edit/task/new')};
+A.pmAdd=id=>{const c=$('#pm_c').value.trim(),r=$('#pm_r').value.trim(),ty=$('#pm_t').value.trim();if(!c||!r)return toast('Canal and RD are needed');snap();const it=get(id);(it.pmOff=it.pmOff||[]).push({canal:c,rd:r,type:ty});log('Stage — '+it.title+': offence '+c+' '+r+' added',it);save();render();setTimeout(()=>{const e=$('#pm_r');if(e)e.focus()},50)};
+A.pmDel=(id,i)=>{snap();get(id).pmOff.splice(i,1);save();render();toast('Removed',1)};
+A.pmInq=(id,i)=>{const it=get(id);const r=it.pmOff[i];const m=pmMatch(it,r);const sn=m.row&&m.row.o.sen?String(m.row.o.sen).toLowerCase():'';
+ const sen=sn?S.people.find(p=>/sub engineer/i.test(p.designation)&&(p.name.toLowerCase().includes(sn)||sn.includes(p.name.toLowerCase()))):null;
+ PREFILL={sub:it.sub,rel:id,title:`PMIU C.W ${it.refNo||''} (${fmtD(it.wireDate)}): ${r.canal} ${r.rd}${r.type?' ('+r.type+')':''} not reported before PMIU visit`,accusedId:sen?sen.id:'',accusedDesig:'Sub Engineer (SEN)',details:m.st==='late'?'SEN reported '+m.days+' days after PMIU inspection.':'Offence not found in offence register.'};go('edit/inquiry/new')};
+let TPLCTX=null;
+A.useTpl=id=>{TPLCTX=id||null;sheet(`<div class="ct">Choose a template</div><input id="tpq" type="search" class="mt" placeholder="Search templates" oninput="$('#tpr').innerHTML=tplPickList()"><div id="tpr" class="mt">${tplPickList()}</div>`);setTimeout(()=>{const e=$('#tpq');if(e)e.focus()},60)};
+A.tplUse=tid=>{const tp=get(tid);const ctx=TPLCTX?get(TPLCTX):null;if(!tp.body){closeSheet();if((tp.links||[]).length)return A.openDoc(tid,0);return go('item/'+tid)}
+ const txt=fillTpl(tp.body,ctx);sheet(`<div class="ct">${esc(tp.title)}</div><p class="meta">Blanks still in {curly brackets} need filling by hand.</p><textarea id="tpT" rows="12">${esc(txt)}</textarea><div class="acts"><button class="btn p" onclick="A.tplCopy()">Copy</button><button class="btn" onclick="A.tplShare()">Share</button>${(tp.links||[]).length?`<button class="btn" onclick="A.openDoc('${tid}',0)">Open file</button>`:''}<button class="btn" onclick="closeSheet()">Close</button></div>`)};
+A.tplCopy=async()=>{const v=$('#tpT').value;try{await navigator.clipboard.writeText(v);toast('Copied')}catch(e){$('#tpT').select();document.execCommand&&document.execCommand('copy');toast('Copied')}};
+A.tplShare=async()=>{const v=$('#tpT').value;try{if(navigator.share){await navigator.share({text:v});return}}catch(e){if(e&&e.name==='AbortError')return}window.open('https://wa.me/?text='+encodeURIComponent(v),'_blank','noopener')};
+const tplCat=n=>/robkar|notice/i.test(n)?'Robkar / notice':/pmiu|reply|report/i.test(n)?'Reply / report':/wire|c\.?w\b/i.test(n)?'Canal wire':/inspect/i.test(n)?'Inspection note':/proforma|form/i.test(n)?'Proforma':'Letter';
+A.tplBulk=async inp=>{const files=[...inp.files];inp.value='';let n=0;toast('Adding '+files.length+' file(s)…');snap();
+ for(const f of files){if(f.size>25e6){toast(f.name+' is over 25 MB');continue}const fid=uid();const text=await extractText(f);
+  try{await fPut({id:fid,name:f.name,type:f.type,size:f.size,blob:f,ts:Date.now(),text})}catch(e){continue}if(text)TEXTS[fid]=text;
+  const base=f.name.replace(/\.[^.]+$/,'').replace(/[_]+/g,' ').trim();S.items.push({id:uid(),type:'template',sub:'B',title:base,cat:tplCat(base),body:'',details:'',createdAt:Date.now(),stages:[],notes:[],links:[{fileId:fid,label:base,name:f.name,size:f.size}]});n++}
+ log('Added '+n+' template(s)',{});save();render();toast(n+' template(s) added. Tap one to rename or set category.',1)};
+A.renLink=(id,i)=>{const it=get(id);const l=it.links[i];const v=prompt('New name for this document',l.label||l.name||'');if(v===null||!v.trim())return;snap();l.label=v.trim();save();render()};
+
+/* ================= reminders ================= */
+async function notify(title,body){try{const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'});else new Notification(title,{body})}catch(e){}}
+function dailyNotify(){if(!('Notification' in window)||Notification.permission!=='granted')return;const t=today();if(S.settings.lastNotify===t)return;const c=counts(true);S.settings.lastNotify=t;save();if(c.over||c.today)notify('SDO Desk',c.over+' overdue, '+c.today+' due today')}
+function checkSoon(){if(!('Notification' in window)||Notification.permission!=='granted')return;const t=today(),now=new Date();let ch=false;
+ S.items.forEach(it=>{if(!isOpen(it))return;let d=null,tm=null,l='';if(it.type==='court'){d=it.hearing;tm=it.attendTime;l='Court'}else if(it.type==='event'){d=it.due;tm=it.time;l='Event'}
+  if(d!==t||!tm||it._nt===t)return;const hm=tm.split(':').map(Number);const mins=hm[0]*60+hm[1]-(now.getHours()*60+now.getMinutes());
+  if(mins>0&&mins<=120){it._nt=t;ch=true;notify(l+' at '+tm,it.title+(it.attendWhere?' — '+it.attendWhere:it.place?' — '+it.place:''))}});if(ch)save()}
+
+/* ================= start ================= */
+$('#desigs').innerHTML=DESIGS.map(d=>`<option value="${esc(d)}">`).join('');
+window.addEventListener('hashchange',render);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(!/^edit/.test(curView())&&curView()!=='search')render();dailyNotify();checkSoon()}});
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+prune();render();loadTexts();dailyNotify();checkSoon();setInterval(checkSoon,300000);setTimeout(fileGC,4000);
+</script>
+</body>
+</html>
