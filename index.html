@@ -612,29 +612,23 @@ function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}ren
 
 /* ================= actions ================= */
 const A={};
-/* + : type first, the app suggests the form */
+/* + menu */
 const ADDG=[['Daily work',[['task','Follow-up','XEN / SE direction, anything to chase'],['complaint','Complaint','WRIMS / Ombudsman'],['theft','Water theft','offence, fine, robkar'],['event','Meeting / event','date and time']]],
  ['Office record',[['letter','Letter','issued or received'],['wire','Canal wire','issued or received'],['pmiu','PMIU wire','PMIU inspection report'],['estimate','Estimate','work, amount, sanction'],['court','Court case','hearing dates'],['inquiry','Inquiry','DR / inquiry officer']]],
  ['Field',[['insp','Inspection','canal visit'],['vehicle','Vehicle / POL','km, litres, repair']]],
  ['Reference',[['person','Person','staff, officer, contact'],['place','Place','office, rest house, site'],['resource','Resource / file','manuals, notifications'],['template','Template','letter formats']]]];
 const ADDN={};ADDG.forEach(g=>g[1].forEach(([k,n])=>ADDN[k]=n));
-function guessType(t){t=t.toLowerCase();const R=[['complaint',/wrims|ombudsman|complain|shikayat|شکایت/],['theft',/theft|chori|چوری|offence|robkar|tawan|illegal|pipe|siphon/],['court',/court|hearing|writ|\bwp\b|petition|case no|adalat|عدالت/],['inquiry',/inquiry|enquiry|charge sheet|\bpeeda\b|show cause/],['pmiu',/pmiu/],['wire',/canal wire|\bc\.?w\b|wire no/],['estimate',/estimate|\bmb\b|sanction|tender|bill/],['letter',/letter|memo|no\.\s*\d|dated|endst/],['event',/meeting|\bat \d|\d{1,2}[:.]\d\d|tomorrow|kal\b|visit of/]];
- for(const [k,re] of R)if(re.test(t))return k;return 'task'}
-A.add=()=>{sheet(`<div class="ct">What happened?</div><p class="meta" style="margin-top:2px">Type it in your own words. The app picks the form; you can change it.</p>
- <textarea id="qaT" rows="3" class="mt" placeholder="e.g. XEN: send gauge report of Randhore Disty by Friday" oninput="A.qaGuess()"></textarea>
- ${SUB==='A'?`<div class="mt">${subInline('qaS')}</div>`:''}
- <div id="qaB" class="acts"></div>
- <details class="mt"><summary class="meta" style="cursor:pointer;padding:6px 0">Or pick a form yourself</summary>
- ${ADDG.map(([g,l])=>`<div class="meta" style="margin:10px 0 4px;font-weight:600">${g}</div><div class="grid2">${l.map(([k,n,h])=>`<button class="btn" style="text-align:left" onclick="A.qaPick('${k}')"><b style="font-weight:600">${n}</b><br><span class="meta">${h}</span></button>`).join('')}</div>`).join('')}</details>`);
- A.qaGuess();setTimeout(()=>{const e=$('#qaT');if(e)e.focus()},80)};
-let QAT='task';
-A.qaGuess=()=>{const e=$('#qaT');const t=e?e.value.trim():'';QAT=guessType(t);const b=$('#qaB');if(!b)return;
- b.innerHTML=t?`<button class="btn p" style="flex:1" onclick="A.qaPick(QAT)">Next: ${esc(ADDN[QAT])} ›</button><button class="btn" onclick="A.qaChange()">Other form</button><button class="btn" onclick="A.qaInbox()">Save for later</button>`:''};
-A.qaChange=()=>{const d=$('#sheet details');if(!d)return;d.open=true;const g=d.querySelector('.meta+.grid2')||d;setTimeout(()=>g.scrollIntoView({behavior:'smooth',block:'start'}),30)};
-A.qaInbox=()=>{const tx=$('#qaT').value.trim();if(!tx)return;snap();const sub=$('#qaS')?$('#qaS').value:SUB;S.inbox.push({id:uid(),ts:Date.now(),text:tx,sub});log('Inbox note added',{sub});save();closeSheet();render();toast('Saved to Inbox. Sort it later.',1)};
-A.qaPick=k=>{const e=$('#qaT');const tx=e?e.value.trim():'';const sub=$('#qaS')?$('#qaS').value:(SUB==='A'?'K':SUB);
- if(tx&&T[k]){PREFILL={title:tx.split('\n')[0].slice(0,140),details:tx,sub};if(k==='task')PREFILL.source=/xen/i.test(tx)?'XEN direction':/\bse\b|chief/i.test(tx)?'SE / Chief direction':/meeting/i.test(tx)?'Meeting':'Self';closeSheet();return go('edit/'+k+'/new')}
- A.addGo(k)};
+/* + shows the 6 forms used most (starts with these defaults, then learns from use); the rest sit under More */
+const ADDTOP=['task','complaint','theft','letter','wire','event'];
+function topAdds(){const u=S.settings.addUse||{};const all=Object.keys(ADDN);
+ return all.map((k,i)=>[k,(u[k]||0)+(ADDTOP.includes(k)?0.5-ADDTOP.indexOf(k)*0.01:0),i]).sort((a,b)=>b[1]-a[1]||a[2]-b[2]).slice(0,6).map(x=>x[0])}
+const addBtn=k=>{const h=ADDG.flatMap(g=>g[1]).find(x=>x[0]===k);return `<button class="btn" style="text-align:left;padding:12px" onclick="A.qaPick('${k}')"><b style="font-weight:600">${h[1]}</b><br><span class="meta">${h[2]}</span></button>`};
+A.add=()=>{const top=topAdds();sheet(`<div class="ct">Add</div>
+ <div class="grid2 mt">${top.map(addBtn).join('')}</div>
+ <div class="acts"><button class="btn" style="flex:1" onclick="A.addGo('inbox')">Quick note</button><button class="btn" style="flex:1" onclick="A.addMore()">More ›</button></div>`)};
+A.addMore=()=>{const top=topAdds();sheet(`<a class="back" href="javascript:void 0" onclick="A.add()">‹ Back</a><div class="ct">More</div>
+ ${ADDG.map(([g,l])=>{l=l.filter(x=>!top.includes(x[0]));return l.length?`<div class="meta" style="margin:10px 0 4px;font-weight:600">${g}</div><div class="grid2">${l.map(x=>addBtn(x[0])).join('')}</div>`:''}).join('')}`)};
+A.qaPick=k=>{const u=S.settings.addUse=S.settings.addUse||{};u[k]=(u[k]||0)+1;save();A.addGo(k)};
 A.fab=()=>{const p=(location.hash.slice(1)||'home').split('/');const v=p[0];
  if(v==='list'&&T[p[1]])return go('edit/'+p[1]+'/new');
  if(v==='people')return go('editp/new');
