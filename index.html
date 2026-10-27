@@ -126,7 +126,7 @@ a{color:var(--acc)}
 </style>
 </head>
 <body>
-<header><button class="ham" onclick="openDrawer()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1 onclick="go('#home')" style="cursor:pointer">SDO Desk</h1><button class="ham" onclick="go('#search')" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><div class="seg" id="seg"></div></header>
+<header><button class="ham" onclick="openDrawer()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><h1 onclick="go('#home')" style="cursor:pointer">SDO Desk</h1><button class="ham" id="homeBtn" style="margin-right:auto;align-items:center;gap:6px;font:inherit;font-weight:600;color:var(--acc)" onclick="go('#home')" aria-label="Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button><button class="ham" onclick="go('#search')" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><div class="seg" id="seg"></div></header>
 <main id="main"></main>
 <button class="fab" onclick="A.fab()" aria-label="Add">+</button>
 <div id="toast"></div>
@@ -301,10 +301,15 @@ function card(it,acts){const t=today();const kd=keyDate(it);let cls='',dchip='';
  const meta=[kd&&it.type!=='letter'?lbl+' '+fmtD(kd):'',stageOf(it),pShort(it.owner),summ(it),it.followUp&&isOpen(it)?'Follow-up '+fmtD(it.followUp):''].filter(Boolean).map(esc).join(' · ');
  return `<div class="card ${cls}"><div onclick="go('#item/${it.id}')"><div class="tags"><span class="chip g">${T[it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(it.sub))}</span>`:''}${dchip}</div><div class="ct">${esc(it.title)}</div>${meta?`<div class="meta">${meta}</div>`:''}</div>${acts&&isOpen(it)?`<div class="acts"><button class="btn s p" onclick="A.done('${it.id}')">✓ Followed up</button><button class="btn s" onclick="A.fu('${it.id}')">Follow-up date</button><button class="btn s" onclick="A.resolve('${it.id}')">Resolve</button></div>`:''}${!acts&&(it.links||[]).length&&['letter','resource','wire','template'].includes(it.type)?`<div class="acts"><button class="btn s p" onclick="A.openDoc('${it.id}',0)">Open ${esc((it.links[0].label||'document').slice(0,30))}</button></div>`:''}${!acts&&it.type==='place'?placeBtns(it,true):''}</div>`}
 function placeBtns(it,small){const s=small?' s':'';const ml=mapLink(it),dl=dirLink(it);return `<div class="acts">${ml?`<a class="btn${s} p" href="${esc(ml)}" target="_blank" rel="noopener">Map</a>`:''}${dl?`<a class="btn${s}" href="${esc(dl)}" target="_blank" rel="noopener">Directions</a>`:''}<button class="btn${s}" onclick="A.sharePlace('${it.id}')">Share</button>${it.phone?`<a class="btn${s}" href="tel:${esc(it.phone)}">Call</a>`:''}</div>`}
-function sheet(html){closeSheet();const d=document.createElement('div');d.id='sheet';d.innerHTML=`<div class="scrim" onclick="closeSheet()"></div><div class="sheetbox">${html}</div>`;document.body.appendChild(d)}
+function sheet(html){closeSheet();ovPush();const d=document.createElement('div');d.id='sheet';d.innerHTML=`<div class="scrim" onclick="closeSheet()"></div><div class="sheetbox">${html}</div>`;document.body.appendChild(d)}
 function closeSheet(){const d=$('#sheet');if(d)d.remove()}
 let tT;function toast(msg,u){const t=$('#toast');t.innerHTML=esc(msg)+(u&&UNDO?'<button onclick="undo()">Undo</button>':'');t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),5000)}
-const backHome='';
+const backHome='<a class="back" href="javascript:goBack()">‹ Back</a>';
+/* ---- navigation: Back never strands you; phone Back closes menus first ---- */
+function goBack(){if(history.state&&history.state.root)location.replace('#home');else history.back()}
+function ovPush(){if(!(history.state&&history.state.ov))history.pushState({ov:1,root:!!(history.state&&history.state.root)},'',location.href)}
+window.addEventListener('popstate',()=>{const o=$('#sheet')||$('#drawer');if(o){closeSheet();closeDrawer();return}
+ const h=location.hash.slice(1)||'home';if(h===LASTH&&!(history.state&&history.state.root))history.back()});
 
 /* ================= drawer ================= */
 const MTOP=[['home','Home'],['cal','Calendar'],['inbox','Inbox']];
@@ -320,7 +325,7 @@ function openDrawer(){const t=today();const cur=location.hash.slice(1)||'home';
  const link=([h,l])=>{const c=cnt(h);return `<a href="#${h}" class="${cur===h||(h==='home'&&cur==='today')?'on':''}" onclick="closeDrawer()">${l}${c.r?`<span class="r">${c.r}</span>`:c.n!=null?`<span>${c.n}</span>`:''}</a>`};
  MENU.forEach(([g,ls],i)=>{if(ls.some(([h])=>cur===h||cur.startsWith(h+'/')))DOPEN[i]=true});
  const html=`<div class="scrim" onclick="closeDrawer()"></div><div class="drawer"><div class="dh">SDO Desk</div>${MTOP.map(link).join('')}${MENU.map(([g,ls],i)=>{const red=ls.reduce((x,l)=>x+(cnt(l[0]).r||0),0);return `<div class="dp" onclick="DOPEN[${i}]=!DOPEN[${i}];closeDrawer();openDrawer()"><span>${g}</span><em>${red?`<span class="badge" style="position:static;margin-right:8px">${red}</span>`:''}${DOPEN[i]?'▾':'▸'}</em></div>${DOPEN[i]?`<div class="dc">${ls.map(link).join('')}</div>`:''}`}).join('')}</div>`;
- const d=document.createElement('div');d.id='drawer';d.innerHTML=html;document.body.appendChild(d)}
+ const d=document.createElement('div');d.id='drawer';d.innerHTML=html;document.body.appendChild(d);ovPush()}
 function closeDrawer(){const d=$('#drawer');if(d)d.remove()}
 
 /* ================= views ================= */
@@ -366,7 +371,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  if(staffL.length)h+=`<h2>Pending with staff</h2><div class="card pad0">${staffL.map(([id,s])=>`<a class="lrow" style="display:flex;justify-content:space-between;gap:10px" href="#person/${id}"><span>${esc(pShort(id))} <span class="meta">${esc(person(id).designation)}</span></span><span>${s.o?`<span class="rd">${s.o} overdue</span> · `:''}${s.n} open</span></a>`).join('')}</div>`;
  return h}
 
-function vLagging(){const l=lagging();return `<a class="back" href="javascript:history.back()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
+function vLagging(){const l=lagging();return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
 
 function vToday(){return vHome()}
 function todayBody(g){let h='';
@@ -474,7 +479,7 @@ function docsBlock(it){const id=it.id;
  <div class="acts"><label class="btn s p">Upload file<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="A.upload('${id}',this)"></label></div>
  <div class="grid2 mt"><input id="lkU" placeholder="or paste Drive link" inputmode="url"><input id="lkL" placeholder="Label (optional)"></div><button class="btn s mt" onclick="A.addLink('${id}')">Add link</button></div>`}
 function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Item not found.</p>';const ty=T[it.type];
- let h=`<a class="back" href="javascript:history.back()">‹ Back</a><div class="tags mt"><span class="chip g">${ty.n}</span><span class="chip">${esc(subName(it.sub))}</span>${it.resolved?`<span class="chip">Closed ${fmtD(it.resolvedOn)}</span>`:''}${it.followUp&&isOpen(it)?`<span class="chip a">Follow-up ${fmtD(it.followUp)}</span>`:''}${it.doneOn===today()&&isOpen(it)?'<span class="chip g">Followed up today</span>':''}</div><h1 class="pt">${esc(it.title)}</h1>`;
+ let h=`<a class="back" href="javascript:goBack()">‹ Back</a><div class="tags mt"><span class="chip g">${ty.n}</span><span class="chip">${esc(subName(it.sub))}</span>${it.resolved?`<span class="chip">Closed ${fmtD(it.resolvedOn)}</span>`:''}${it.followUp&&isOpen(it)?`<span class="chip a">Follow-up ${fmtD(it.followUp)}</span>`:''}${it.doneOn===today()&&isOpen(it)?'<span class="chip g">Followed up today</span>':''}</div><h1 class="pt">${esc(it.title)}</h1>`;
  if(it.type==='inquiry')h+=`<div class="card note">${esc(roleText(it))}</div>`;
  const kv=ty.f.filter(f=>f.k!=='title'&&f.k!=='details'&&it[f.k]&&!(f.k==='decision'&&it[f.k]==='Pending')&&!(f.k==='tawanStatus'&&it[f.k]==='Not started')).map(f=>`<dt>${esc(f.l.replace(/ \(.*\)$/,''))}</dt><dd>${esc(dispVal(f,it[f.k]))}${f.t==='date'&&isOpen(it)&&['due','hearing','tawanHearing','replyDue'].includes(f.k)?` <span class="meta">(${esc(rel(it[f.k]))})</span>`:''}</dd>`).join('');
  const relIt=it.rel&&get(it.rel);
@@ -517,7 +522,7 @@ function vEdit(ty,id){if(!T[ty])return vHome();const it=id&&id!=='new'?get(id):n
  const sub=src.sub||(SUB==='A'?'K':SUB);
  const fv=k=>src[k]==null?'':src[k];
  const fh=T[ty].f.filter(f=>fieldVisible(ty,src,f.k)).map(f=>{if(ty==='place'&&f.k==='lat')return `<button class="btn wide" style="margin-bottom:8px" onclick="A.geo()">Use my current location</button><div class="grid2">${fieldHTML(f,fv('lat'))}${fieldHTML(T.place.f.find(x=>x.k==='lng'),fv('lng'))}</div>`;if(ty==='place'&&f.k==='lng')return '';return fieldHTML(f,fv(f.k))}).join('');
- return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1><div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
+ return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1><div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
 
 /* ---------- people ---------- */
 let PQ='',PSEC='all';
@@ -534,12 +539,12 @@ function vPeople(){const secs=[...new Set(S.people.filter(pScope).map(p=>p.secti
 function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#people">‹ People</a><p class="empty">Not found.</p>';
  const its=S.items.filter(it=>(it.owner===id||it.zildar===id)&&isOpen(it));
  const row=(l,v)=>v?`<dt>${l}</dt><dd>${esc(v)}</dd>`:'';
- return `<a class="back" href="javascript:history.back()">‹ Back</a><h1 class="pt">${esc(p.name)}</h1><div class="card"><dl class="kv">${row('Parentage',p.parentage)}${row('Designation',p.designation)}${row('Section',p.section)}${row('Posting',p.posting)}${row('Subdivision',subName(p.sub))}${row('Phone',p.phone)}${row('CNIC',p.cnic)}</dl>${p.notes?`<p class="det">${esc(p.notes)}</p>`:''}${p.phone?`<div class="acts"><a class="btn s" href="tel:${esc(p.phone)}">Call</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(p.phone)}">WhatsApp</a></div>`:''}</div>
+ return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">${esc(p.name)}</h1><div class="card"><dl class="kv">${row('Parentage',p.parentage)}${row('Designation',p.designation)}${row('Section',p.section)}${row('Posting',p.posting)}${row('Subdivision',subName(p.sub))}${row('Phone',p.phone)}${row('CNIC',p.cnic)}</dl>${p.notes?`<p class="det">${esc(p.notes)}</p>`:''}${p.phone?`<div class="acts"><a class="btn s" href="tel:${esc(p.phone)}">Call</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(p.phone)}">WhatsApp</a></div>`:''}</div>
  <h2>Open items (${its.length})</h2>${its.map(it=>card(it,false)).join('')||'<p class="empty">Nothing pending with this person.</p>'}
  <div class="acts mt"><button class="btn" onclick="go('#editp/${id}')">Edit</button><button class="btn d" onclick="A.delP('${id}')">Delete</button></div>`}
 function vEditP(id){const p=id&&id!=='new'?person(id):null;const v=p||{designation:'',sub:SUB==='A'?'K':SUB};
  const fl=(k,l,t,lst)=>`<label class="fld"><span>${l}</span><input id="p_${k}" type="${t||'text'}" ${lst?`list="${lst}"`:''} value="${esc(v[k]||'')}"></label>`;
- return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${p?'Edit person':'New person'}</h1><div class="card">
+ return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${p?'Edit person':'New person'}</h1><div class="card">
  ${fl('name','Name')}${fl('parentage','Parentage (S/O, D/O)')}${fl('designation','Designation (pick or type any)','text','desigs')}
  <label class="fld"><span>Subdivision</span><select id="p_sub">${subOpts(v.sub,true)}</select></label>
  ${fl('section','Section / office / zilladari','text','sections')}${fl('posting','Posting / canal / halqa')}${fl('phone','Phone','tel')}${fl('cnic','CNIC')}
@@ -556,7 +561,7 @@ function vVehicle(){if(!VM)VM=today().slice(0,7);const l=S.vehicle.filter(v=>(v.
  ${l.map(v=>{const d=(+v.close||0)-(+v.open||0);return `<div class="card" onclick="go('#editv/${v.id}')"><div class="row between"><b>${fmtD(v.date)}</b><span>${v.open&&v.close?num(d)+' km':''}</span></div><div class="meta">${[v.open&&v.close?num(v.open)+' → '+num(v.close):'',v.route,v.polL||v.polRs?'POL '+(v.polL?v.polL+' L':'')+(v.polRs?' Rs '+num(v.polRs):''):'',v.maintDesc||v.maintRs?(v.maintDesc||'Maintenance')+(v.maintRs?' Rs '+num(v.maintRs):''):''].filter(Boolean).map(esc).join(' · ')}</div></div>`}).join('')||'<p class="empty">No entries this month.</p>'}`}
 function vEditV(id){const v=id&&id!=='new'?S.vehicle.find(x=>x.id===id):null;const last=S.vehicle.reduce((m,x)=>(+x.close||0)>(+m.close||0)?x:m,{close:''});const e=v||{date:today(),open:last.close||''};
  const fl=(k,l,t,im)=>`<label class="fld"><span>${l}</span><input id="v_${k}" type="${t||'text'}" ${im?`inputmode="${im}"`:''} value="${esc(e[k]||'')}"></label>`;
- return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${v?'Edit':'New'} vehicle entry</h1><div class="card">${fl('date','Date','date')}<div class="grid2">${fl('open','Opening km','number','numeric')}${fl('close','Closing km','number','numeric')}</div>${fl('route','Route / purpose')}<div class="grid2">${fl('polL','POL litres','number','decimal')}${fl('polRs','POL Rs','number','numeric')}</div>${fl('maintDesc','Maintenance / repair')}${fl('maintRs','Maintenance Rs','number','numeric')}<button class="btn p wide" onclick="A.saveV('${v?v.id:''}')">Save</button>${v?`<button class="btn d wide mt" onclick="A.delV('${v.id}')">Delete entry</button>`:''}</div>`}
+ return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${v?'Edit':'New'} vehicle entry</h1><div class="card">${fl('date','Date','date')}<div class="grid2">${fl('open','Opening km','number','numeric')}${fl('close','Closing km','number','numeric')}</div>${fl('route','Route / purpose')}<div class="grid2">${fl('polL','POL litres','number','decimal')}${fl('polRs','POL Rs','number','numeric')}</div>${fl('maintDesc','Maintenance / repair')}${fl('maintRs','Maintenance Rs','number','numeric')}<button class="btn p wide" onclick="A.saveV('${v?v.id:''}')">Save</button>${v?`<button class="btn d wide mt" onclick="A.delV('${v.id}')">Delete entry</button>`:''}</div>`}
 
 /* ---------- inspections ---------- */
 const canalLabel=v=>{const c=S.canals.find(x=>x.id===v.canalId);return c?c.name:(v.canalName||'Canal')};
@@ -570,7 +575,7 @@ function vInsp(){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
   <div class="card"><div class="ct">Canals — rotation, least recent first</div>${canals.map(x=>`<div class="row between lrow"><span>${esc(x.c.name)} <span class="meta">${x.last?fmtD(x.last):'never inspected'}</span></span><button class="btn s d" onclick="A.cnDel('${x.c.id}')">✕</button></div>`).join('')||'<div class="meta">Add your canals, distributaries and minors below.</div>'}<div class="row mt"><input id="cn_${s}" placeholder="Add canal / distributary / minor"><button class="btn" onclick="A.cnAdd('${s}')">Add</button></div></div>
   ${past.length?`<div class="card"><div class="ct">Earlier inspections</div>${past.map(visitRow).join('')}</div>`:''}`}).join('')}
 function vEditVisit(a,b){const v=a&&a!=='new'?S.visits.find(x=>x.id===a):null;const sub=v?v.sub:(b||(SUB==='A'?'K':SUB));const cs=S.canals.filter(c=>c.sub===sub);
- return `<a class="back" href="javascript:history.back()">‹ Cancel</a><h1 class="pt">${v?'Edit':'Record'} inspection — ${esc(subName(sub))}</h1><div class="card">
+ return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${v?'Edit':'Record'} inspection — ${esc(subName(sub))}</h1><div class="card">
  ${cs.length?`<label class="fld"><span>Canal</span><select id="vi_c"><option value="">— choose —</option>${cs.map(c=>`<option value="${c.id}" ${v&&v.canalId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
  <label class="fld"><span>${cs.length?'Or type canal name':'Canal name'}</span><input id="vi_cn" value="${esc(v?v.canalName||'':'')}"></label>
  <label class="fld"><span>Date</span><input type="date" id="vi_d" value="${v?v.date:today()}"></label>
@@ -606,6 +611,7 @@ function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');co
  $('#seg').innerHTML=[['K',subName('K')],['I',subName('I')],['A','All']].map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
  const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,offences:vOffences,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
+ const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);$('#homeBtn').style.display=isHome?'none':'';$('header h1').style.display=isHome?'':'none';
  $('.fab').style.display=/^edit/.test(v)||v==='settings'||v==='log'?'none':'';
  if(h!==LASTH){window.scrollTo(0,0);LASTH=h;if(v==='search'){const e=$('#sq');if(e)e.focus()}}}
 function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}render()}
@@ -856,7 +862,7 @@ function vOffences(){const subs=scopeSubs();let h='<h1 class="pt">Offence regist
 function vOff(sub,sr){const a=offA(sub);const x=a&&a.rows.find(r=>String(r.o.sr)===String(sr));if(!x)return '<a class="back" href="#offences">‹ Register</a><p class="empty">Not found. Import the sheet again.</p>';
  const kv=Object.keys(OFF_LBL).filter(k=>k!=='sr'&&x.o[k]!==''&&x.o[k]!=null).map(k=>{const v=x.o[k];const disp=k==='folder'||k==='pmiuFolder'?(isUrl(v)?`<a href="${esc(v)}" target="_blank" rel="noopener">Open</a>`:esc(v)):esc(DATE_F.includes(k)&&x.d[k]?fmtD(x.d[k]):(k==='amount'&&typeof v==='number'?'Rs '+num(v):v));return `<dt>${esc(OFF_LBL[k])}</dt><dd>${disp}</dd>`}).join('');
  const pm=S.items.filter(it=>it.type==='pmiu'&&it.sub===sub&&(it.pmOff||[]).some(r=>pmMatch(it,r).row===x));
- return `<a class="back" href="javascript:history.back()">‹ Back</a><div class="tags mt"><span class="chip g">Offence (sheet)</span><span class="chip">${esc(subName(sub))}</span></div><h1 class="pt">${esc(offRowTitle(x))}</h1><div class="tags">${offFlags(x)}</div>
+ return `<a class="back" href="javascript:goBack()">‹ Back</a><div class="tags mt"><span class="chip g">Offence (sheet)</span><span class="chip">${esc(subName(sub))}</span></div><h1 class="pt">${esc(offRowTitle(x))}</h1><div class="tags">${offFlags(x)}</div>
  ${x.errs.length?`<div class="card warn"><div class="ct">Check in sheet</div>${x.errs.map(e=>`<div class="meta">• ${esc(e)}</div>`).join('')}</div>`:''}
  <div class="card"><dl class="kv">${kv}${x.psL?`<dt>Police station (jurisdiction)</dt><dd>${esc(x.psL)}</dd>`:''}</dl></div>
  ${pm.length?`<h2>PMIU wires</h2>${pm.map(it=>card(it,false)).join('')}`:''}
@@ -944,6 +950,7 @@ window.addEventListener('hashchange',render);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if(!/^edit/.test(curView())&&curView()!=='search')render();dailyNotify();checkSoon()}});
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+(()=>{const h=location.hash;if(!/(access_token|error|state)=/.test(h)&&!(history.state&&(history.state.root||history.state.ov))){if(h&&h!=='#home'&&h!=='#'){history.replaceState({root:1},'','#home');history.pushState(null,'',h)}else history.replaceState({root:1},'',location.href)}})();
 prune();render();loadTexts();dailyNotify();checkSoon();setInterval(checkSoon,300000);setTimeout(fileGC,4000);
 </script>
 <script src="drive.js"></script>
