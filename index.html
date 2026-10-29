@@ -103,6 +103,7 @@ textarea{resize:vertical}
 .stats .am b{color:var(--amb)}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .sum{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.sum.tabsonly{margin-top:0;padding:4px 10px 0}.sum.tabsonly .htabs{margin-top:0;border-top:0}
 .sum .top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
 .sum .nums{display:flex;margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
 .htabs{display:flex;margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
@@ -399,9 +400,8 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const staffL=Object.entries(staff).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
  const lb=S.settings.lastBackup;
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.overF.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
- let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>${routinesBlock()}${inspHome()}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
- <div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div>
- ${homeTabs(g)}</div>${homeTabBody(g)}
+ let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div><div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>${routinesBlock()}${inspHome()}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
+ <h2>Work by date</h2><div class="sum tabsonly"> ${homeTabs(g)}</div>${homeTabBody(g)}
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
  h+=todayBody(g);const lag2=lag.filter(x=>!x.od);
  if(lag2.length)h+=`<h2>Stuck or untouched (${lag2.length})</h2>`+(lag2.length?`<div class="card pad0">${lag2.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag2.length>7?`<a class="lrow center" href="#lagging">See all</a>`:''}</div>`:'<div class="card meta">Nothing stuck or untouched.</div>');
