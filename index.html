@@ -101,6 +101,35 @@ textarea{resize:vertical}
 .stats .rd b{color:var(--red)}
 .stats .am b{color:var(--amb)}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
+.sum .top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
+.sum .nums{display:flex;margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.sum .nums a{flex:1;text-align:center;text-decoration:none;color:var(--mute);font-size:11.5px;line-height:1.2}
+.sum .nums a+a{border-left:1px solid var(--line)}
+.sum .nums b{display:block;font-size:18px;color:var(--ink)}
+.sum .nums .rd b{color:var(--red)}.sum .nums .am b{color:var(--amb)}
+.list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.trow{display:flex;gap:10px;align-items:flex-start;padding:10px 8px 10px 12px;border-bottom:1px solid var(--line)}
+.trow:last-child{border-bottom:0}
+.trow.over{box-shadow:inset 3px 0 var(--red)}.trow.today{box-shadow:inset 3px 0 var(--amb)}
+.tick{width:22px;height:22px;border-radius:50%;border:2px solid var(--mute);background:none;flex:none;margin-top:1px;padding:0;cursor:pointer}
+.tick:active{background:var(--oks);border-color:var(--ok)}
+.trow .bd{flex:1;min-width:0;cursor:pointer}
+.trow .tt{font-weight:550;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.trow .mt2{font-size:12.5px;color:var(--mute);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trow .ty{color:var(--acc);font-weight:600}
+.trow .due{font-size:12px;white-space:nowrap;margin-top:2px;color:var(--mute)}
+.trow .due.r{color:var(--red);font-weight:600}.trow .due.a{color:var(--amb);font-weight:600}
+.kebab{border:0;background:none;color:var(--mute);font-size:20px;line-height:1;padding:0 6px;cursor:pointer;flex:none}
+.rtr{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.rtr:last-child{border-bottom:0}.rtr span{flex:1}
+.pill{border:1px solid var(--line);background:var(--card);color:var(--mute);border-radius:999px;font:inherit;font-size:12px;padding:3px 10px;cursor:pointer}
+.pill.on{background:var(--oks);border-color:transparent;color:var(--ok);font-weight:600}
+.arow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink)}
+.arow:last-child{border-bottom:0}.arow .an{flex:1;min-width:0}.arow .an div{font-size:12.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arow .ac{font-weight:650;font-size:16px;min-width:24px;text-align:right}.arow .chev{color:var(--mute)}
+.mrow{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;font:inherit;color:var(--ink);padding:13px 4px;cursor:pointer}
+.mrow:last-child{border-bottom:0}.mrow small{display:block;color:var(--mute);font-size:12.5px}
 @media (min-width:640px){.dgrid{grid-template-columns:1fr 1fr 1fr}}
 .dtile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;text-decoration:none;color:var(--ink);display:block}
 .dtile .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
@@ -300,6 +329,11 @@ function card(it,acts){const t=today();const kd=keyDate(it);let cls='',dchip='';
  const lbl=kd?(datesOf(it).find(x=>x.d===kd)||{}).l:'';
  const meta=[kd&&it.type!=='letter'?lbl+' '+fmtD(kd):'',stageOf(it),pShort(it.owner),summ(it),it.followUp&&isOpen(it)?'Follow-up '+fmtD(it.followUp):''].filter(Boolean).map(esc).join(' · ');
  return `<div class="card ${cls}"><div onclick="go('#item/${it.id}')"><div class="tags"><span class="chip g">${T[it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(it.sub))}</span>`:''}${dchip}</div><div class="ct">${esc(it.title)}</div>${meta?`<div class="meta">${meta}</div>`:''}</div>${acts&&isOpen(it)?`<div class="acts"><button class="btn s p" onclick="A.done('${it.id}')">✓ Followed up</button><button class="btn s" onclick="A.fu('${it.id}')">Follow-up date</button><button class="btn s" onclick="A.resolve('${it.id}')">Resolve</button></div>`:''}${!acts&&(it.links||[]).length&&['letter','resource','wire','template'].includes(it.type)?`<div class="acts"><button class="btn s p" onclick="A.openDoc('${it.id}',0)">Open ${esc((it.links[0].label||'document').slice(0,30))}</button></div>`:''}${!acts&&it.type==='place'?placeBtns(it,true):''}</div>`}
+function trow(it){const t=today();const kd=keyDate(it);let cls='',due='',dc='';
+ if(kd){const n=diffDays(kd,t);if(n<0){cls='over';due=(-n)+'d overdue';dc='r'}else if(n===0){cls='today';due=it.type==='court'&&it.attendTime?it.attendTime:it.type==='event'&&it.time?it.time:'Today';dc='a'}else due=n===1?'Tomorrow':fmtD(kd)}
+ else if(it.followUp)due='Follow-up';
+ const meta=[SUB==='A'?subName(it.sub):'',pShort(it.owner),stageOf(it)].filter(Boolean).map(esc).join(' · ');
+ return `<div class="trow ${cls}"><button class="tick" aria-label="Followed up" onclick="A.tick('${it.id}')"></button><div class="bd" onclick="go('#item/${it.id}')"><div class="tt">${esc(it.title)}</div><div class="mt2"><span class="ty">${T[it.type].n}</span>${meta?' · '+meta:''}</div></div><div style="text-align:right"><div class="due ${dc}">${esc(due)}</div></div><button class="kebab" aria-label="More" onclick="A.more('${it.id}')">⋮</button></div>`}
 function placeBtns(it,small){const s=small?' s':'';const ml=mapLink(it),dl=dirLink(it);return `<div class="acts">${ml?`<a class="btn${s} p" href="${esc(ml)}" target="_blank" rel="noopener">Map</a>`:''}${dl?`<a class="btn${s}" href="${esc(dl)}" target="_blank" rel="noopener">Directions</a>`:''}<button class="btn${s}" onclick="A.sharePlace('${it.id}')">Share</button>${it.phone?`<a class="btn${s}" href="tel:${esc(it.phone)}">Call</a>`:''}</div>`}
 function sheet(html){closeSheet();ovPush();const d=document.createElement('div');d.id='sheet';d.innerHTML=`<div class="scrim" onclick="closeSheet()"></div><div class="sheetbox">${html}</div>`;document.body.appendChild(d)}
 function closeSheet(){const d=$('#sheet');if(d)d.remove()}
@@ -336,7 +370,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const rd=S.routineDone[t]||{};const act=g.over.length+g.today.length+g.soon.length+g.fu.length;
  const by=ty=>open.filter(it=>it.type===ty);const R=(n,txt)=>n?`<span class="rd">${n} ${txt}</span>`:'';
  const nextOf=(arr,f)=>{const x=arr.map(it=>({it,d:f(it)})).filter(x=>x.d&&x.d>=t).sort((a,b)=>a.d.localeCompare(b.d))[0];return x?fmtD(x.d)+' · '+esc(x.it.title.slice(0,32)):''};
- const tile=(h,title,main,rows,cls)=>`<a class="dtile ${cls||''}" href="#${h}"><div class="hd"><b>${title}</b><em>${main}</em></div>${rows.filter(Boolean).map(r=>`<div class="dl">${r}</div>`).join('')}</a>`;
+ const QUIET=[];const tile=(h,title,main,rows)=>{rows=rows.filter(Boolean);if((main===0||main==='–')&&!rows.some(r=>/class="rd"/.test(r))){QUIET.push(`<a href="#${h}" style="color:inherit">${title}</a>`);return ''}const red=rows.filter(r=>/class="rd"/.test(r));const line=(red.length?red:rows).slice(0,2).join(' · ');return `<a class="arow" href="#${h}"><span class="an"><b style="font-weight:600">${title}</b>${line?`<div>${line}</div>`:''}</span><span class="ac">${String(main).trim()}</span><span class="chev">›</span></a>`};
  const cp=by('complaint'),ct=by('court'),es=by('estimate'),th=by('theft'),iq=by('inquiry'),tk=by('task');
  const estIdx=it=>{const a=STG.estimate(it),c=a.indexOf(stageOf(it));return c<a.indexOf('Sanctioned')?0:c<a.indexOf('Bill submitted to Drawing Branch')?1:2};
  const stDate=(it,n)=>{const s=(it.stages||[]).find(x=>x.name===n);return s?s.date:''};
@@ -351,12 +385,12 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const lb=S.settings.lastBackup;
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
  let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>
- <div class="card mt"><div class="row between"><b>Today: ${doneT} done · ${leftT} left</b><span class="meta">${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>
- <div class="stats s4"><a href="#lagging" class="rd"><b>${over}</b><span>overdue</span></a><div class="am"><b>${dueT}</b><span>due today</span></div><a href="#cal"><b>${n7}</b><span>next 7 days</span></a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b><span>stuck</span></a></div>
+ <div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div>
+ <div class="nums"><a href="#lagging" class="${over?'rd':''}"><b>${over}</b>overdue</a><a href="javascript:void 0" onclick="const e=$('.list .trow');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})" class="${dueT?'am':''}"><b>${dueT}</b>due today</a><a href="#cal"><b>${n7}</b>next 7 days</a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b>stuck</a></div></div>
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
  h+=todayBody(g);const lag2=lag.filter(x=>!x.od);
- h+=`<h2>Stuck or untouched (${lag2.length})</h2>`+(lag2.length?`<div class="card pad0">${lag2.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag2.length>7?`<a class="lrow center" href="#lagging">See all</a>`:''}</div>`:'<div class="card meta">Nothing stuck or untouched.</div>');
- h+=`<h2>All areas</h2><div class="dgrid">`+[
+ if(lag2.length)h+=`<h2>Stuck or untouched (${lag2.length})</h2>`+(lag2.length?`<div class="card pad0">${lag2.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag2.length>7?`<a class="lrow center" href="#lagging">See all</a>`:''}</div>`:'<div class="card meta">Nothing stuck or untouched.</div>');
+ h+=`<h2>All areas</h2><div class="list">`+[
   tile('list/complaint','Complaints',cp.length,[R(cp.filter(ov).length,'overdue'),`WRIMS ${cp.filter(it=>/^WRIMS/.test(it.source)).length} · Ombudsman ${cp.filter(it=>/^Ombud/.test(it.source)).length}`,nextOf(cp,it=>it.due)&&'Next due '+nextOf(cp,it=>it.due)]),
   tile('list/court','Court cases',ct.length,[R(ct.filter(ov).length,'hearing date passed'),nextOf(ct,it=>it.hearing)?'Next '+nextOf(ct,it=>it.hearing):'No hearing fixed']),
   tile('list/estimate','Estimates',es.length,[`Sanction ${es.filter(it=>estIdx(it)===0).length} · Execution ${es.filter(it=>estIdx(it)===1).length} · Bills ${es.filter(it=>estIdx(it)===2).length}`,R(es.filter(isStuck).length,'stuck'),es.length?'Rs '+num(es.reduce((s,it)=>s+(+it.amount||0),0))+' total':'']),
@@ -367,18 +401,18 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
   tile('list/letter','Correspondence',lt.length,[`This month ${ltMo.length} (issued ${ltMo.filter(it=>it.dir==='Issued').length}, received ${ltMo.filter(it=>it.dir==='Received').length})`,`Awaiting reply ${ltAw.length}`,R(ltAw.filter(ov).length,'reply overdue'),`Canal wires this week ${its.filter(it=>it.type==='wire'&&(it.wireDate||'')>=ws).length}`]),
   tile('insp','Inspections',' ',insp),
   tile('vehicle','Vehicle & POL',num(km),['km this month',`POL ${num(L)} L · Rs ${num(Rs)}`],'full')
- ].join('')+'</div>';
- if(staffL.length)h+=`<h2>Pending with staff</h2><div class="card pad0">${staffL.map(([id,s])=>`<a class="lrow" style="display:flex;justify-content:space-between;gap:10px" href="#person/${id}"><span>${esc(pShort(id))} <span class="meta">${esc(person(id).designation)}</span></span><span>${s.o?`<span class="rd">${s.o} overdue</span> · `:''}${s.n} open</span></a>`).join('')}</div>`;
+ ].join('')+(QUIET.length?`<div class="arow" style="font-size:12.5px;color:var(--mute)"><span class="an" style="white-space:normal">Nothing open: ${QUIET.join(', ')}</span></div>`:'')+'</div>';
+ if(staffL.length)h+=`<h2>Pending with staff</h2><div class="list">${staffL.map(([id,s])=>`<a class="arow" href="#person/${id}"><span class="an"><b style="font-weight:600">${esc(pShort(id))}</b><div>${esc(person(id).designation)}${s.o?` · <span class="rd">${s.o} overdue</span>`:''}</div></span><span class="ac">${s.n}</span><span class="chev">›</span></a>`).join('')}</div>`;
  return h}
 
 function vLagging(){const l=lagging();return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
 
 function vToday(){return vHome()}
 function todayBody(g){let h='';
- const ib=S.inbox.filter(inScope).length;if(ib)h+=`<div class="card note mt" onclick="go('#inbox')">${ib} note${ib>1?'s':''} in Inbox waiting to become tasks.</div>`;
+ const ib=S.inbox.filter(inScope).length;if(ib)h+=`<a class="arow list mt" href="#inbox" style="margin-top:10px"><span class="an">Inbox<div>${ib} note${ib>1?'s':''} to sort into tasks</div></span><span class="ac">${ib}</span><span class="chev">›</span></a>`;
  if([5,6,0].includes(new Date().getDay()))h+=inspCards(true);
  h+=routinesBlock();
- const sec=(k,title)=>g[k].length?`<h2>${title} (${g[k].length})</h2>`+g[k].map(it=>card(it,true)).join(''):'';
+ const sec=(k,title)=>g[k].length?`<h2>${title} (${g[k].length})</h2><div class="list">`+g[k].map(trow).join('')+'</div>':'';
  h+=sec('over','Overdue')+sec('today','Due today')+sec('soon','Next 2 days')+sec('fu','Follow up');
  if(!g.over.length&&!g.today.length&&!g.soon.length&&!g.fu.length)h+='<p class="empty">Nothing pending for today.</p>';
  if(g.later)h+=`<p class="meta center">${g.later} open item${g.later>1?'s are':' is'} waiting for a later date.</p>`;
@@ -392,7 +426,8 @@ function routinesBlock(){const t=today();const rs=S.routines.filter(r=>scopeSubs
  const hd=`<h2 class="row between"><span>Daily routine (${dc}/${rs.length})</span><a href="#" onclick="RTED=!RTED;render();return false" style="text-transform:none;letter-spacing:0;font-weight:500">${RTED?'Done':'Edit'}</a></h2>`;
  if(RTED)return hd+`<div class="card">${rs.map(r=>`<div class="row between lrow"><span>${esc(r.title)}${SUB==='A'?` <span class="chip">${esc(subName(r.sub))}</span>`:''}</span><button class="btn s d" onclick="A.rtDel('${r.id}')">✕</button></div>`).join('')}<div class="row mt"><input id="rtN" placeholder="New routine item">${SUB==='A'?subInline('rtS'):''}<button class="btn" onclick="A.rtAdd()">Add</button></div></div>`;
  if(!rs.length)return hd+'<div class="card meta">No routine items. Tap Edit to add.</div>';
- return hd+`<div class="card pad0">${rs.map(r=>`<label class="chk"><input type="checkbox" ${dn[r.id]?'checked':''} onchange="A.rt('${r.id}')"><span class="${dn[r.id]?'strike':''}">${esc(r.title)}${SUB==='A'?` <span class="chip">${esc(subName(r.sub))}</span>`:''}</span></label>`).join('')}</div>`}
+ const grp={};rs.forEach(r=>{const k=r.title.trim().toLowerCase();(grp[k]=grp[k]||[]).push(r)});
+ return hd+`<div class="list">${Object.values(grp).map(l=>`<div class="rtr"><span class="${l.every(r=>dn[r.id])?'strike':''}">${esc(l[0].title)}</span>${l.map(r=>`<button class="pill ${dn[r.id]?'on':''}" onclick="A.rt('${r.id}')">${dn[r.id]?'✓ ':''}${SUB==='A'?esc(subName(r.sub)):'Done'}</button>`).join('')}</div>`).join('')}</div>`}
 
 /* ---------- search ---------- */
 let SQ={q:'',type:'all',time:'any'};
@@ -644,6 +679,12 @@ A.fab=()=>{const p=(location.hash.slice(1)||'home').split('/');const v=p[0];
  if(v==='inbox'){const e=$('#ibT');if(e){e.focus();return}}
  A.add()};
 A.addGo=k=>{closeSheet();if(k==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${['K','I'].map(x=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${x}')">${esc(subName(x))}</button>`).join('')}</div>`)}const m={inbox:'inbox',person:'editp/new',vehicle:'editv/new'};go(m[k]||'edit/'+k+'/new');if(k==='inbox')setTimeout(()=>{const e=$('#ibT');if(e)e.focus()},80)};
+A.tick=id=>{const it=get(id);snap();it.doneOn=today();log('Followed up: '+it.title,it);save();render();toast('Followed up. Back tomorrow until resolved.',1)};
+A.more=id=>{const it=get(id);sheet(`<div class="ct">${esc(it.title)}</div><div class="meta">${T[it.type].n}${it.owner?' · '+esc(pShort(it.owner)):''}</div><div class="mt">
+ <button class="mrow" onclick="A.done('${id}')">✓ Followed up, with a note<small>What happened, e.g. SEN says report by Thursday</small></button>
+ <button class="mrow" onclick="A.fu('${id}')">Set next follow-up date<small>Hides it from Today until then</small></button>
+ <button class="mrow" onclick="closeSheet();A.resolve('${id}')">Resolve / close<small>Moves it to the archive</small></button>
+ <button class="mrow" onclick="closeSheet();go('#item/${id}')">Open full details</button></div>`)};
 A.done=id=>{const it=get(id);const op=isOpen(it);sheet(`<div class="ct">${op?'Followed up':'Add note'}</div><div class="meta">${esc(it.title)}</div><textarea id="fuN" rows="3" class="mt" placeholder="${op?'What happened? (optional) e.g. SEN says report by Thursday':'Note'}"></textarea><div class="acts"><button class="btn p" onclick="A.doneSave('${id}')">Save</button><button class="btn" onclick="closeSheet()">Cancel</button></div>${op?'<p class="meta">It leaves Today and comes back tomorrow until resolved.</p>':''}`);setTimeout(()=>{const e=$('#fuN');if(e)e.focus()},60)};
 A.doneSave=id=>{const it=get(id);const tx=($('#fuN').value||'').trim();const op=isOpen(it);if(!op&&!tx)return closeSheet();snap();if(tx)it.notes.push({ts:Date.now(),text:tx});if(op)it.doneOn=today();log((op?'Followed up: ':'Note: ')+it.title+(tx?' — '+tx:''),it);save();closeSheet();render();toast(op?'Followed up':'Note added',1)};
 A.fu=id=>{const t=today(),it=get(id);sheet(`<div class="ct">Next follow-up</div><div class="meta">${esc(it.title)}</div><div class="grid2 mt">${[[1,'Tomorrow'],[2,'In 2 days'],[3,'In 3 days'],[7,'In a week']].map(([n,l])=>`<button class="btn" onclick="A.setFu('${id}','${addDays(t,n)}')">${l}<br><span class="meta">${fmtD(addDays(t,n))}</span></button>`).join('')}</div><label class="fld mt"><span>Or pick a date</span><input type="date" id="fuD" min="${addDays(t,1)}"></label><div class="acts"><button class="btn p" onclick="const v=$('#fuD').value;if(v)A.setFu('${id}',v)">Set date</button>${it.followUp?`<button class="btn" onclick="A.setFu('${id}','')">Clear follow-up</button>`:''}<button class="btn" onclick="closeSheet()">Cancel</button></div>`)};
