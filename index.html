@@ -219,7 +219,9 @@ async function fileGC(){try{const used=new Set();S.items.forEach(it=>(it.links||
 const DESIGS=['XEN','SE','Chief Engineer','SDO','Sub Engineer (SEN)','Sub Divisional Clerk (SDC)','Sub Divisional Reader (SDR)','SDR / Zilladar','Zilladar','Canal Patwari','Signaller','Mate','Mistry','Earthwork Mistry','Gauge Reader','Regular Beldar','Beldar','Artificer','Telephone Attendant','Naib Qasid','Dak Runner','Chowkidar','Chowkidar cum Cook','Cook','Sweeper','Drawing Branch','NESPAK','AAG / Law Officer','Police (SHO)','Other'];
 const dIdx=p=>{const i=DESIGS.indexOf(p.designation);return i<0?99:i};
 const F=(k,l,t,o)=>({k,l,t:t||'text',o});
-const PRI=['Normal','High','Low'];const priRank=it=>it.priority==='High'?0:it.priority==='Low'?2:1;
+const PRI=['Normal','High','Low'];
+const LACTS=['Record only','Reply to write','Directions to act on','Awaiting their reply'];
+const actOf=it=>it.act||(it.replyDue?(it.dir==='Received'?'Reply to write':'Awaiting their reply'):'Record only');const priRank=it=>it.priority==='High'?0:it.priority==='Low'?2:1;
 const T={
  task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('priority','Priority','sel',PRI),F('assignees','Assigned to (one or more)','people'),F('due','Deadline','date'),F('details','Details','textarea')]},
  complaint:{n:'Complaint',pl:'Complaints',daily:1,f:[F('source','Source','sel',['WRIMS (PMIU)','Ombudsman Punjab','Other']),F('refNo','Complaint No'),F('title','Subject'),F('received','Received on','date'),F('due','Reply due (WRIMS: auto 3 days if left blank)','date'),F('side','Side','sel',['Technical','Revenue']),F('owner','Report from','person'),F('details','Details','textarea')]},
@@ -228,7 +230,7 @@ const T={
  court:{n:'Court case',pl:'Court cases',daily:0,f:[F('title','Case title'),F('refNo','Case No'),F('court','Court','sel',['Civil Court','Lahore High Court','Other']),F('courtName','Court / bench'),F('hearing','Next hearing','date'),F('attendTime','Attend time','time'),F('attendWhere','Attend at (e.g. AAG office)'),F('owner','Handled by','person'),F('details','Details','textarea')]},
  inquiry:{n:'Inquiry',pl:'Inquiries',daily:0,f:[F('role','Your role','sel',['Inquiry Officer','DR','Accused']),F('title','Subject / charges'),F('apptBy','Appointed by (authority)'),F('orderNo','Order No'),F('orderDate','Order date','date'),F('accusedIds','Accused (pick one or more)','people'),F('accused','Accused not in People (type names, comma separated)'),F('dr','Departmental Representative (DR)'),F('io','Inquiry Officer'),F('chargeDate','Charge sheet / show cause date','date'),F('replyDue','Reply due (when you are accused)','date'),F('hearing','Next hearing','date'),F('details','Details','textarea')]},
  wire:{n:'Canal wire',pl:'Canal wires',daily:0,f:[F('dir','Wire','sel',['Received','Issued']),F('refNo','Wire No'),F('wireDate','Date','date'),F('wireTime','Time','time'),F('party','From / To','list','parties'),F('owner','Signaller','person'),F('title','Subject'),F('action','Action','sel',['Information only','Needs action']),F('assign','Action by (received wire)','person'),F('recips','Sent to for action (issued wire, one or more)','people'),F('due','Action deadline','date'),F('details','Details','textarea')]},
- letter:{n:'Letter',pl:'Correspondence',daily:0,f:[F('dir','Letter','sel',['Issued','Received']),F('letterNo','Letter No'),F('letterDate','Letter date','date'),F('party','To / From (office or department)','list','parties'),F('title','Subject'),F('canal','Canal / channel','list','canals'),F('rd','RD / outlet / site'),F('replyDue','Reply expected by (leave blank if none)','date'),F('details','Gist / keywords','textarea')]},
+ letter:{n:'Letter',pl:'Correspondence',daily:0,f:[F('dir','Letter','sel',['Received','Issued']),F('act','What next','sel',LACTS),F('replyDue','By date','date'),F('letterNo','Letter No'),F('letterDate','Letter date','date'),F('party','To / From (office or department)','list','parties'),F('title','Subject'),F('canal','Canal / channel','list','canals'),F('rd','RD / outlet / site'),F('details','Gist / keywords','textarea')]},
  event:{n:'Event',pl:'Meetings & events',daily:0,f:[F('title','Title'),F('due','Date','date'),F('time','Time','time'),F('place','Place'),F('details','Details','textarea')]},
  resource:{n:'Resource',pl:'Resources',daily:0,f:[F('title','Title'),F('cat','Category','sel',['Department manuals','Canal details','Notifications & orders','Rules & SOPs','Proformas & forms','Sheets & data','Maps & L-sections','Police jurisdiction','Staff lists','Other']),F('details','Notes / keywords','textarea')]},
  pmiu:{n:'PMIU wire',pl:'PMIU wires',daily:0,f:[F('refNo','PMIU canal wire No'),F('wireDate','Inspection / wire date','date'),F('canal','Canal(s) visited','list','canals'),F('title','Subject (auto if blank)'),F('meetingDate','SE meeting date','date'),F('details','Notes','textarea')]},
@@ -258,7 +260,7 @@ const SUBK=()=>Object.keys(S.settings.subs||{});const defSub=()=>SUB==='A'||!S.s
 const scopeSubs=()=>SUB==='A'||!S.settings.subs[SUB]?SUBK():[SUB];
 const get=id=>S.items.find(x=>x.id===id);
 const LIB=['resource','place','template'],REG={letter:'letterDate',wire:'wireDate'};
-const isOpen=it=>{if(it.resolved||LIB.includes(it.type))return false;if(it.type==='wire')return asgPend(it).length>0&&!!idsOf(it.recips).length;if(it.type==='letter')return !!it.replyDue&&!S.items.some(x=>x.type==='prep'&&x.rel===it.id);if(it.type==='event')return !(it.due&&it.due<today());return true};
+const isOpen=it=>{if(it.resolved||LIB.includes(it.type))return false;if(it.type==='wire')return asgPend(it).length>0&&!!idsOf(it.recips).length;if(it.type==='letter'){const a=actOf(it);if(a==='Awaiting their reply')return !!it.replyDue;if(a==='Reply to write')return !S.items.some(x=>x.type==='prep'&&x.rel===it.id);if(a==='Directions to act on')return !S.items.some(x=>x.type==='task'&&x.rel===it.id);return false}if(it.type==='event')return !(it.due&&it.due<today());return true};
 const person=id=>S.people.find(p=>p.id===id);
 const pShort=id=>{const p=person(id);return p?p.name:''};
 const mapLink=it=>{const la=parseFloat(it.lat),ln=parseFloat(it.lng);if(!isNaN(la)&&!isNaN(ln))return 'https://www.google.com/maps/search/?api=1&query='+la+','+ln;if(isUrl(it.mapUrl))return it.mapUrl;if(it.address)return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(it.title+' '+it.address);return ''};
@@ -269,7 +271,7 @@ function datesOf(it){const r=[];const p=(d,l)=>{if(d)r.push({d,l})};
   case 'court':p(it.hearing,'Hearing'+(it.attendTime?' '+it.attendTime:''));break;
   case 'inquiry':p(it.hearing,'Hearing');p(inqReportDue(it),'Inquiry report due');if(inqRole(it)==='Accused'&&!it.replyD)p(it.replyDue,'Reply due');if(it.appealBy&&it.appealBy>=today())p(it.appealBy,'Appeal by');break;
   case 'complaint':p(it.due,'Reply due');break;
-  case 'letter':p(it.replyDue,'Reply due');break;
+  case 'letter':{const a=actOf(it);if(a!=='Record only')p(it.replyDue,a==='Awaiting their reply'?'Reply expected':a==='Directions to act on'?'Act by':'Reply due');break}
   case 'wire':if(isOpen(it))p(wireDue(it),'Action due');break;
   case 'resource':case 'place':case 'template':break;
   case 'pmiu':p(it.meetingDate,'SE meeting');break;
@@ -291,7 +293,7 @@ function summ(it){switch(it.type){
  case 'place':return [it.cat,it.address,it.phone].filter(Boolean).join(' · ');
  case 'pmiu':return [it.refNo&&'No '+it.refNo,fmtD(it.wireDate),it.canal,(it.pmOff||[]).length+' offences'].filter(Boolean).join(' · ');
  case 'template':return [it.cat,it.body?'text with blanks':'',(it.links||[]).length?(it.links.length+' file'):''].filter(Boolean).join(' · ');
- case 'letter':return [it.dir,it.letterNo&&'No '+it.letterNo,fmtD(it.letterDate),it.party,it.canal,it.rd].filter(Boolean).join(' · ');
+ case 'letter':return [it.dir,actOf(it)!=='Record only'&&actOf(it).replace('Directions to act on','directions to act on').replace('Reply to write','reply to write').replace('Awaiting their reply','awaiting reply'),it.letterNo&&'No '+it.letterNo,fmtD(it.letterDate),it.party,it.canal,it.rd].filter(Boolean).join(' · ');
  case 'resource':return [it.cat,(it.links||[]).length+' file(s)'].filter(Boolean).join(' · ');
  case 'event':return [it.time,it.place].filter(Boolean).join(', ');
  case 'inquiry':return ['You are '+inqRole(it),(it.hears||[]).length?(it.hears.length)+' hearing(s)':'',inqAccused(it).join(', ')].filter(Boolean).join(' · ');
@@ -389,7 +391,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const stDate=(it,n)=>{const s=(it.stages||[]).find(x=>x.name===n);return s?s.date:''};
  const thAll=its.filter(it=>it.type==='theft');const fineMo=thAll.filter(it=>it.decision==='Fine'&&(stDate(it,'Receipt issued')||stDate(it,'Fine imposed')).startsWith(mo)).reduce((s,it)=>s+(+it.fineAmount||0),0);
  const robMo=thAll.filter(it=>stDate(it,'Robkar sent to SHO').startsWith(mo)).length;
- const lt=its.filter(it=>it.type==='letter');const ltMo=lt.filter(it=>(it.letterDate||'').startsWith(mo));const ltAw=lt.filter(isOpen);
+ const lt=its.filter(it=>it.type==='letter');const ltMo=lt.filter(it=>(it.letterDate||'').startsWith(mo));const ltAw=lt.filter(it=>isOpen(it)&&actOf(it)==='Awaiting their reply');
  const oa=scopeSubs().map(offA).filter(Boolean);const pmw=by('pmiu');const pmMiss=pmw.reduce((x,it)=>x+(it.pmOff||[]).filter(r=>['late','none'].includes(pmMatch(it,r).st)).length,0);
  const ws=weekStart(t);const insp=scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=addDays(ws,6)).length;const dn=S.inspNotes[s+'|'+ws];return `${esc(subName(s))}: ${n}/3 · ${dn?'note sent':(t===addDays(ws,6)?'<span class="rd">note due today</span>':'note due Sun')}`});
  const vh=S.vehicle.filter(v=>(v.date||'').startsWith(mo));let km=0,L=0,Rs=0;vh.forEach(v=>{const d=(+v.close||0)-(+v.open||0);if(v.open&&v.close&&d>0)km+=d;L+=+v.polL||0;Rs+=+v.polRs||0});
@@ -397,7 +399,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const staffL=Object.entries(staff).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
  const lb=S.settings.lastBackup;
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.overF.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
- let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>${inspAlarms().map(a=>`<a class="card ${a.r?'over':'warn'}" href="#insp" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${a.r?'⚠ ':''}${esc(a.t)}</b></a>`).join('')}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
+ let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>${routinesBlock()}${inspHome()}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
  <div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div>
  ${homeTabs(g)}</div>${homeTabBody(g)}
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
@@ -423,20 +425,19 @@ function vLagging(){const l=lagging();return `<a class="back" href="javascript:g
 function vToday(){return vHome()}
 function todayBody(g){let h='';
  const ib=S.inbox.filter(inScope).length;if(ib)h+=`<a class="arow list mt" href="#inbox" style="margin-top:10px"><span class="an">Inbox<div>${ib} note${ib>1?'s':''} to sort into tasks</div></span><span class="ac">${ib}</span><span class="chev">›</span></a>`;
- h+=routinesBlock();
  const shown=new Set([...g.over,...g.overF,...g.today].map(x=>x.id));const pw=S.items.filter(it=>it.type==='prep'&&inScope(it)&&isOpen(it)&&!shown.has(it.id)).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));if(pw.length)h+=`<h2>You must write (${pw.length})</h2><div class="list">${pw.slice(0,5).map(trow).join('')}${pw.length>5?`<a class="arow" href="#list/prep"><span class="an">See all ${pw.length}</span><span class="chev">›</span></a>`:''}</div>`;
- h+=inspHome();
  if(g.later)h+=`<p class="meta center">${g.later} open item${g.later>1?'s are':' is'} waiting for a later date.</p>`;
  return h}
 function inspCards(pendingOnly){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
  return scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=sun).length;const done=S.inspNotes[s+'|'+ws];if(pendingOnly&&done)return '';
   const cls=done?'':(t===sun?'over':(n<3?'today':''));
   return `<div class="card ${cls} mt" onclick="go('#insp')"><div class="ct">Weekly inspection — ${esc(subName(s))}</div><div class="meta">${n}/3 canals inspected · note ${done?'submitted '+fmtD(done):'due Sunday '+fmtD(sun)}</div></div>`}).join('')}
-let RTED=false;
+let RTED=false,RTX=false;
 function routinesBlock(){const t=today();const rs=S.routines.filter(r=>scopeSubs().includes(r.sub));const dn=S.routineDone[t]||{};const dc=rs.filter(r=>dn[r.id]).length;
  const hd=`<h2 class="row between"><span>Daily routine (${dc}/${rs.length})</span><a href="#" onclick="RTED=!RTED;render();return false" style="text-transform:none;letter-spacing:0;font-weight:500">${RTED?'Done':'Edit'}</a></h2>`;
  if(RTED)return hd+`<div class="card">${rs.map(r=>`<div class="row between lrow"><span>${esc(r.title)}${SUB==='A'?` <span class="chip">${esc(subName(r.sub))}</span>`:''}</span><button class="btn s d" onclick="A.rtDel('${r.id}')">✕</button></div>`).join('')}<div class="row mt"><input id="rtN" placeholder="New routine item">${SUB==='A'?subInline('rtS'):''}<button class="btn" onclick="A.rtAdd()">Add</button></div></div>`;
  if(!rs.length)return hd+'<div class="card meta">No routine items. Tap Edit to add.</div>';
+ if(dc===rs.length&&!RTX)return `<h2>Daily routine</h2><a class="arow list" href="#" onclick="RTX=true;render();return false"><span class="an">All ${rs.length} done today</span><span class="ac" style="color:var(--acc)">✓</span><span class="chev">›</span></a>`;
  const grp={};rs.forEach(r=>{const k=r.title.trim().toLowerCase();(grp[k]=grp[k]||[]).push(r)});
  return hd+`<div class="list">${Object.values(grp).map(l=>`<div class="rtr"><span class="${l.every(r=>dn[r.id])?'strike':''}">${esc(l[0].title)}</span>${l.map(r=>`<button class="pill ${dn[r.id]?'on':''}" onclick="A.rt('${r.id}')">${dn[r.id]?'✓ ':''}${SUB==='A'?esc(subName(r.sub)):'Done'}</button>`).join('')}</div>`).join('')}</div>`}
 
@@ -503,7 +504,7 @@ function listItems(ty){const q=LF.q.toLowerCase().split(/\s+/).filter(Boolean);c
 function vList(ty){if(!T[ty])return vHome();if(LF.ty!==ty)LF={ty,q:'',closed:false,dir:'all',time:'any',cat:'all'};
  const ch=(k,arr)=>`<div class="fchips">${arr.map(([v,l])=>`<button class="${LF[k]===v?'on':''}" onclick="LF.${k}='${v}';render()">${l}</button>`).join('')}</div>`;
  let filt='';
- if(REG[ty])filt=ch('dir',[['all','All'],['Issued','Issued'],['Received','Received'],['await',ty==='letter'?'Awaiting reply':'Action pending']])+ch('time',[['any','Any time'],['1m','Last month'],['3m','3 months'],['6m','6 months'],['1y','1 year']]);
+ if(REG[ty])filt=ch('dir',[['all','All'],['Issued','Issued'],['Received','Received'],['await',ty==='letter'?'Pending':'Action pending']])+ch('time',[['any','Any time'],['1m','Last month'],['3m','3 months'],['6m','6 months'],['1y','1 year']]);
  else if(LIB.includes(ty))filt=ch('cat',[['all','All']].concat(T[ty].f[1].o.map(c=>[c,c])));
  else filt=`<div class="fchips"><button class="${LF.closed?'':'on'}" onclick="LF.closed=false;render()">Open</button><button class="${LF.closed?'on':''}" onclick="LF.closed=true;render()">Closed</button></div>`;
  let top='';if(STG[ty]&&ty!=='complaint'&&!LF.closed){const m={};S.items.filter(it=>it.type===ty&&inScope(it)&&isOpen(it)).forEach(it=>{const s=stageOf(it);m[s]=(m[s]||0)+1});const e=Object.entries(m);
@@ -536,7 +537,7 @@ function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Ite
  const op=person(it.owner);
  if(op&&op.phone&&isOpen(it))h+=`<div class="acts"><a class="btn s" href="tel:${esc(op.phone)}">Call ${esc(op.name)}</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(op.phone)}?text=${encodeURIComponent('Reminder: '+it.title+'. Please update the status.')}">WhatsApp reminder</a></div>`;
  h+=(it.type==='inquiry'?inqBlock(it):'')+((it.type==='task'||it.type==='wire')?asgBlock(it):'')+stageBlock(it)+theftQuick(it)+(it.type==='pmiu'?pmiuBlock(it):'')+fuBlock(it);
- if(it.type==='letter'&&it.dir==='Received'&&!it.resolved&&!S.items.some(x=>x.type==='prep'&&x.rel===id))h+=`<div class="acts"><button class="btn s p" onclick="A.prepFrom('${id}')">Prepare reply (add to To prepare)</button></div>`;
+ if(it.type==='letter'&&it.dir==='Received'&&!it.resolved){const hp=S.items.some(x=>x.type==='prep'&&x.rel===id),ht=S.items.some(x=>x.type==='task'&&x.rel===id);if(!hp||!ht)h+=`<div class="acts">${hp?'':`<button class="btn s p" onclick="A.prepFrom('${id}')">Prepare reply</button>`}${ht?'':`<button class="btn s" onclick="A.dirFrom('${id}')">Directions → Follow-up</button>`}</div>`}
  if(!LIB.includes(it.type)&&S.items.some(x=>x.type==='template'))h+=`<div class="acts"><button class="btn s" onclick="A.useTpl('${id}')">Use a template</button></div>`;
  if(it.type==='court'&&isOpen(it))h+=`<h2>Record hearing</h2><div class="card"><input id="hOut" placeholder="What happened (adjourned, reply filed …)"><label class="fld mt"><span>Next hearing</span><input type="date" id="hNext"></label><button class="btn p" onclick="A.hear('${id}')">Save hearing</button></div>`;
  h+=docsBlock(it);
@@ -568,9 +569,10 @@ function vEdit(ty,id){if(!T[ty])return vHome();const it=id&&id!=='new'?get(id):n
  if(ty==='task'&&!src.assignees&&src.owner)src=Object.assign({},src,{assignees:src.owner});
  if(ty==='inquiry'){src=Object.assign({},src);if(!src.role&&it)src.role=inqRole(it);if(!src.accusedIds&&src.accusedId)src.accusedIds=src.accusedId}
  const sub=src.sub||(defSub());
+ if(ty==='letter'){src=Object.assign({},src);src.act=actOf(src);setTimeout(A.ltForm,0)}
  const fv=k=>src[k]==null?'':src[k];
  const fh=T[ty].f.filter(f=>fieldVisible(ty,src,f.k)).map(f=>{if(ty==='place'&&f.k==='lat')return `<button class="btn wide" style="margin-bottom:8px" onclick="A.geo()">Use my current location</button><div class="grid2">${fieldHTML(f,fv('lat'))}${fieldHTML(T.place.f.find(x=>x.k==='lng'),fv('lng'))}</div>`;if(ty==='place'&&f.k==='lng')return '';return fieldHTML(f,fv(f.k))}).join('');
- return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1><div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
+ return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1>${!it&&ty==='letter'?`<p class="meta">Not written yet? <a href="#" onclick="PREFILL={sub:$('#f_sub')?$('#f_sub').value:defSub()};location.replace('#edit/prep/new');return false">Add it to To prepare</a> instead.</p>`:''}<div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
 
 /* ---------- people ---------- */
 let PQ='',PSEC='all';
@@ -673,7 +675,7 @@ function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}ren
 const A={};
 /* + menu */
 const ADDG=[['Daily work',[['task','Follow-up','XEN / SE direction, anything to chase'],['prep','To prepare','letter / report you must write'],['complaint','Complaint','WRIMS / Ombudsman'],['theft','Water theft','offence, fine, robkar'],['event','Meeting / event','date and time']]],
- ['Office record',[['letter','Letter','issued or received'],['wire','Canal wire','issued or received'],['pmiu','PMIU wire','PMIU inspection report'],['estimate','Estimate','work, amount, sanction'],['court','Court case','hearing dates'],['inquiry','Inquiry','DR / inquiry officer']]],
+ ['Office record',[['letter','Letter','received, issued, awaiting reply'],['wire','Canal wire','issued or received'],['pmiu','PMIU wire','PMIU inspection report'],['estimate','Estimate','work, amount, sanction'],['court','Court case','hearing dates'],['inquiry','Inquiry','DR / inquiry officer']]],
  ['Field',[['insp','Inspection','canal visit'],['vehicle','Vehicle / POL','km, litres, repair']]],
  ['Reference',[['person','Person','staff, officer, contact'],['place','Place','office, rest house, site'],['resource','Resource / file','manuals, notifications'],['template','Template','letter formats']]]];
 const ADDN={};ADDG.forEach(g=>g[1].forEach(([k,n])=>ADDN[k]=n));
@@ -715,6 +717,7 @@ A.saveItem=(ty,id)=>{const it0=id?get(id):null;const vals={};T[ty].f.forEach(f=>
  if(ty==='pmiu'&&!vals.title)vals.title='PMIU C.W '+(vals.refNo||'')+(vals.canal?' — '+vals.canal:'');
  if(!vals.title&&!(it0&&it0.title)){toast('Title / subject is required');return}
  if((ty==='task'||ty==='prep')&&!vals.due){toast('Deadline is required');return}
+ if(ty==='letter'){if(vals.act==='Record only')vals.replyDue='';else if(!vals.replyDue&&vals.act!=='Reply to write'){toast(vals.act==='Awaiting their reply'?'Enter the date their reply is expected':'Enter the deadline for the directions');return}}
  const prevA=it0?asgOf(it0).map(x=>Object.assign({},x)):[];
  snap();const it=it0||{id:uid(),type:ty,createdAt:Date.now(),stages:[],notes:[],links:[]};Object.assign(it,vals);it.sub=$('#f_sub').value;
  if(ty==='task'||ty==='wire'){const ids=idsOf(ty==='task'?it.assignees:it.recips);if(ids.length||it.asg)it.asg=ids.map(p=>prevA.find(a=>a.p===p)||{p,st:'Pending'});if(ty==='task')it.owner=ids[0]||''}
@@ -723,8 +726,10 @@ A.saveItem=(ty,id)=>{const it0=id?get(id):null;const vals={};T[ty].f.forEach(f=>
  if(!it0){if(FIRST[ty])it.stages.push({name:FIRST[ty][0],date:it[FIRST[ty][1]]||today(),note:''});if(PREFILL&&PREFILL.rel)it.rel=PREFILL.rel;S.items.push(it);log('Added '+T[ty].n.toLowerCase()+': '+it.title,it);
   if(PREFILL&&PREFILL.inboxId)S.inbox=S.inbox.filter(x=>x.id!==PREFILL.inboxId);
   if(ty==='estimate'){it.ch={rcv:{date:it.estDate||today(),no:it.estNo||''}};it.stages.push({name:'Received from SEN',date:it.estDate||today(),note:it.estNo?'No '+it.estNo:''})}
-  if(ty==='letter'&&it.dir==='Received'&&it.replyDue)prepOf(it)}
+}
  else log('Edited: '+it.title,it);
+ let dt=null;if(ty==='letter'){if(it.act==='Reply to write'&&!S.items.some(x=>x.type==='prep'&&x.rel===it.id))prepOf(it);if(it.act==='Directions to act on'&&!S.items.some(x=>x.type==='task'&&x.rel===it.id))dt=dirTaskOf(it)}
+ if(dt){PREFILL=null;save();location.replace('#edit/task/'+dt.id);toast('Follow-up created from this letter. Choose who will act, then Save.',1);return}
  if(ty==='wire'&&it.action==='Needs action'&&!idsOf(it.recips).length&&!S.items.some(x=>x.rel===it.id&&x.type==='task'))wt=wireFollowUp(it);
  PREFILL=null;save();location.replace('#item/'+it.id);toast(wt?'Saved. Follow-up created.':'Saved')};
 A.quickSet=(id,ks)=>{const it=get(id);snap();let n=0;ks.split(',').forEach(k=>{const e=$('#q_'+k);if(e&&e.value.trim()&&e.value.trim()!=='Not started'){it[k]=e.value.trim();n++}});if(!n)return toast('Nothing entered');log('Stage — '+it.title+': details updated',it);save();render();toast('Saved',1)};
@@ -1072,7 +1077,10 @@ function inspAlarms(){const t=today(),ws=weekStart(t),dow=(new Date(t+'T00:00:00
   else if(dow===3&&x.n<2)out.push({r:0,s,t:`${nm}: only ${x.n} of 3 inspected. Notes due Friday.`});
   else if(dow===4&&(x.n<3||x.sub<3))out.push({r:1,s,t:x.n<3?`${nm}: only ${x.n} of 3 inspected. Today is the target day.`:`${nm}: ${x.sub} of 3 notes submitted. Submit today.`});
   else if(dow===5&&(x.n<3||x.sub<3))out.push({r:1,s,t:`Final: ${nm} ${x.n}/3 inspected, ${x.sub}/3 notes to Division. Finish before tonight.`})});return out}
-function inspHome(){const t=today(),ws=weekStart(t);return `<h2>This week's inspections</h2><div class="list">${scopeSubs().map(s=>{const x=inspStat(s,ws);const ok=x.n>=3&&x.sub>=3;return `<a class="arow" href="#insp"><span class="an"><b style="font-weight:600">${esc(subName(s))}</b><div>${x.n}/3 inspected · <span class="${ok?'':'rd'}">${x.sub}/3 notes submitted</span> · due Sat ${fmtD(addDays(ws,5))}</div><div class="prog" style="margin-top:5px"><i style="width:${Math.min(100,Math.round((Math.min(x.n,3)+Math.min(x.sub,3))*100/6))}%"></i></div></span><span class="chev">›</span></a>`}).join('')}</div>`}
+function inspHome(){const t=today(),ws=weekStart(t);const al={};inspAlarms().forEach(a=>al[a.s]=a);const st=scopeSubs().map(s=>[s,inspStat(s,ws)]);
+ if(st.every(([s,x])=>x.n>=3&&x.sub>=3))return `<h2>This week's inspections</h2><a class="arow list" href="#insp"><span class="an">All done · 3/3 inspected and notes submitted</span><span class="ac" style="color:var(--acc)">✓</span><span class="chev">›</span></a>`;
+ const fri=addDays(ws,4),sat=addDays(ws,5);const when=t<fri?'target Fri '+fmtD(fri):t===fri?'target today':t===sat?'<span class="rd">final day today</span>':'';
+ return `<h2>This week's inspections${when?' · <span style="text-transform:none;letter-spacing:0">'+when+'</span>':''}</h2><div class="list">${st.map(([s,x])=>{const ok=x.n>=3&&x.sub>=3;const a=al[s];return `<a class="arow" href="#insp"><span class="an" style="display:flex;justify-content:space-between;gap:8px"><b style="font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(subName(s))}</b><span style="font-size:13px;white-space:nowrap;${ok?'color:var(--acc)':a?(a.r?'color:var(--red);font-weight:600':'color:var(--amb);font-weight:600'):'color:var(--mute)'}">${ok?'✓ done':x.n+'/3 inspected · '+x.sub+'/3 notes'}</span></span><span class="chev">›</span></a>`}).join('')}</div>`}
 const NOTE_ST=['Not written','Drafted','Signed','Submitted'];
 A.noteSt=(vid)=>{const v=S.visits.find(x=>x.id===vid);sheet(`<div class="ct">Inspection note — ${esc(canalLabel(v))}</div><div class="meta">${fmtD(v.date)}</div><label class="fld mt"><span>Status</span><select id="nsS">${NOTE_ST.map(s=>`<option ${(v.noteSt||'Not written')===s?'selected':''}>${s}</option>`).join('')}</select></label><div class="grid2"><label class="fld"><span>Letter No (when submitted)</span><input id="nsN" value="${esc(v.noteNo||'')}"></label><label class="fld"><span>Date</span><input type="date" id="nsD" value="${v.noteDate||today()}"></label></div><button class="btn p wide" onclick="A.noteStSave('${vid}')">Save</button>`)};
 A.noteStSave=vid=>{const v=S.visits.find(x=>x.id===vid);snap();v.noteSt=$('#nsS').value;v.noteNo=$('#nsN').value.trim();v.noteDate=v.noteSt==='Submitted'?($('#nsD').value||today()):'';log('Inspection note '+v.noteSt.toLowerCase()+': '+canalLabel(v)+(v.noteNo?' (No '+v.noteNo+')':''),{sub:v.sub});save();closeSheet();render();toast('Saved',1)};
@@ -1249,6 +1257,9 @@ A.rulesSave=()=>{const r={};Object.keys(RULES_DEF).forEach(k=>{const v=Number($(
 function juneAlerts(){const t=today();const out=[];S.items.filter(it=>it.type==='estimate'&&inScope(it)&&!it.resolved&&sancD(it)).forEach(it=>{const v=validTill(it);if(revalOpen(it))return;if(revalNeed(it))out.push({it,t:'Revalidation required'});else if(t.slice(5,7)==='06'&&v===t.slice(0,4)+'-06-30'&&!it.compD)out.push({it,t:'Bill before 30 Jun or revalidation needed'})});return out}
 
 function prepOf(L){const pr={id:uid(),type:'prep',createdAt:Date.now()+1,stages:[{name:'To draft',date:today(),note:''}],notes:[],links:[],sub:L.sub,kind:'Reply',title:'Reply: '+L.title,dirBy:'Other',party:L.party||'',priority:'Normal',due:L.replyDue||addDays(today(),3),details:'Reply to letter '+(L.letterNo?'No '+L.letterNo+' ':'')+(L.letterDate?'dated '+fmtDot(L.letterDate):''),rel:L.id};S.items.push(pr);log('Added to prepare: '+pr.title,pr);return pr}
+function dirTaskOf(L){const t={id:uid(),type:'task',createdAt:Date.now()+1,stages:[],notes:[],links:[],sub:L.sub,title:L.title,source:/\b(SE|S\.E|Superintending|Chief)\b/i.test(L.party||'')?'SE / Chief direction':'XEN direction',priority:'Normal',assignees:'',asg:[],owner:'',due:L.replyDue||addDays(today(),7),details:'Directions in letter '+(L.letterNo?'No '+L.letterNo+' ':'')+(L.letterDate?'dated '+fmtDot(L.letterDate)+' ':'')+(L.party?'from '+L.party:''),rel:L.id};S.items.push(t);log('Follow-up from letter: '+t.title,t);return t}
+A.dirFrom=id=>{const L=get(id);snap();if(actOf(L)==='Record only')L.act='Directions to act on';const t=dirTaskOf(L);save();go('#edit/task/'+t.id);toast('Follow-up created. Choose who will act, then Save.',1)};
+A.ltForm=()=>{const d=$('#f_dir'),a=$('#f_act'),r=$('#f_replyDue');if(!d||!a||!r)return;const ok=d.value==='Issued'?['Record only','Awaiting their reply']:['Record only','Reply to write','Directions to act on'];let v=a.value;if(!ok.includes(v))v=d.value==='Issued'&&v!=='Record only'?'Awaiting their reply':'Record only';a.innerHTML=ok.map(o=>`<option ${o===v?'selected':''}>${o}</option>`).join('');const lb=r.closest('label');lb.style.display=v==='Record only'?'none':'';lb.querySelector('span').textContent={'Reply to write':'Reply to send by (blank = 3 days)','Directions to act on':'Deadline for action','Awaiting their reply':'Their reply expected by'}[v]||'By date';d.onchange=A.ltForm;a.onchange=A.ltForm};
 A.prepFrom=id=>{const L=get(id);snap();const pr=prepOf(L);save();go('#item/'+pr.id);toast('Added to To prepare',1)};
 
 function migrateV12(){let ch=false;S.items.forEach(it=>{if(it.type==='estimate'&&!it.ch){it.ch={rcv:{date:it.estDate||ymd(new Date(it.createdAt||Date.now())),no:it.estNo||''}};ch=true}if(it.type==='inquiry'&&!it.role){it.role=inqRole(it);ch=true}});if(ch)save()}
