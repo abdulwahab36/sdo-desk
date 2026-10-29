@@ -20,6 +20,7 @@ header h1{font-size:17px;margin:0;font-weight:650;white-space:nowrap;flex:1}
 .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:2px;flex:none}
 .seg button{border:0;background:none;color:var(--mute);padding:6px 9px;border-radius:8px;font:inherit;font-size:13px}
 .seg button.on{background:var(--acc);color:#fff}
+.segsel{border:0;background:none;font:inherit;font-size:13px;color:var(--acc);font-weight:600;padding:6px 4px;width:auto;max-width:150px}
 main{max-width:720px;margin:0 auto;padding:12px 14px 110px}
 nav.bot{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:5}
 nav.bot a{flex:1;text-align:center;color:var(--mute);text-decoration:none;font-size:11.5px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
@@ -104,6 +105,12 @@ textarea{resize:vertical}
 .sum{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px}
 .sum .top{display:flex;justify-content:space-between;align-items:baseline;font-size:14px}
 .sum .nums{display:flex;margin-top:10px;border-top:1px solid var(--line);padding-top:8px}
+.htabs{display:flex;margin-top:10px;border-top:1px solid var(--line);padding-top:4px}
+.htabs button{flex:1;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-size:11.5px;color:var(--mute);padding:5px 2px 6px;line-height:1.2;cursor:pointer}
+.htabs button b{display:block;font-size:18px;color:var(--ink)}
+.htabs button.on{border-bottom-color:var(--acc);color:var(--acc);font-weight:600}
+.htabs button.rd b{color:var(--red)}.htabs button.am b{color:var(--amb)}
+.cust{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .sum .nums a{flex:1;text-align:center;text-decoration:none;color:var(--mute);font-size:11.5px;line-height:1.2}
 .sum .nums a+a{border-left:1px solid var(--line)}
 .sum .nums b{display:block;font-size:18px;color:var(--ink)}
@@ -247,7 +254,8 @@ const untouched=it=>isOpen(it)&&!keyDate(it)&&!(it.followUp&&it.followUp>today()
 const subName=k=>k==='B'?'Both':(S.settings.subs[k]||k);
 const inScope=x=>SUB==='A'||x.sub===SUB||x.sub==='B';
 const pScope=p=>SUB==='A'||p.sub===SUB||p.sub==='B';
-const scopeSubs=()=>SUB==='A'?['K','I']:[SUB];
+const SUBK=()=>Object.keys(S.settings.subs||{});const defSub=()=>SUB==='A'||!S.settings.subs[SUB]?SUBK()[0]:SUB;
+const scopeSubs=()=>SUB==='A'||!S.settings.subs[SUB]?SUBK():[SUB];
 const get=id=>S.items.find(x=>x.id===id);
 const LIB=['resource','place','template'],REG={letter:'letterDate',wire:'wireDate'};
 const isOpen=it=>{if(it.resolved||LIB.includes(it.type))return false;if(it.type==='wire')return asgPend(it).length>0&&!!idsOf(it.recips).length;if(it.type==='letter')return !!it.replyDue&&!S.items.some(x=>x.type==='prep'&&x.rel===it.id);if(it.type==='event')return !(it.due&&it.due<today());return true};
@@ -307,9 +315,9 @@ function lagging(){const t=today();return S.items.filter(it=>inScope(it)&&isOpen
 function weekStart(t){const d=new Date(t+'T00:00:00');return addDays(t,-((d.getDay()+6)%7))}
 
 /* ================= UI parts ================= */
-const subOpts=(v,both)=>[['K',subName('K')],['I',subName('I')]].concat(both?[['B','Both']]:[]).map(([k,l])=>`<option value="${k}" ${k===v?'selected':''}>${esc(l)}</option>`).join('');
+const subOpts=(v,both)=>SUBK().map(k=>[k,subName(k)]).concat(both?[['B','All subdivisions']]:[]).map(([k,l])=>`<option value="${k}" ${k===v?'selected':''}>${esc(l)}</option>`).join('');
 const subFld=(v,both)=>SUB!=='A'&&!both?`<input type="hidden" id="f_sub" value="${v}">`:`<label class="fld"><span>Subdivision</span><select id="f_sub">${subOpts(v,both)}</select></label>`;
-const subInline=id=>`<select id="${id}" style="width:auto;flex:none">${subOpts(SUB==='A'?'K':SUB)}</select>`;
+const subInline=id=>`<select id="${id}" style="width:auto;flex:none">${subOpts(defSub())}</select>`;
 function peopleOpts(val){const groups={};S.people.slice().sort((a,b)=>dIdx(a)-dIdx(b)||a.name.localeCompare(b.name)).forEach(p=>{(groups[p.designation]=groups[p.designation]||[]).push(p)});
  return Object.entries(groups).map(([d,ps])=>`<optgroup label="${esc(d)}">${ps.map(p=>`<option value="${p.id}" ${p.id===val?'selected':''}>${esc(p.name)}${p.section?' — '+esc(p.section):''}</option>`).join('')}</optgroup>`).join('')}
 function dataLists(){const uniq=a=>[...new Set(a.filter(Boolean).map(x=>String(x).trim()))].sort();
@@ -391,7 +399,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.overF.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
  let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div>${inspAlarms().map(a=>`<a class="card ${a.r?'over':'warn'}" href="#insp" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${a.r?'⚠ ':''}${esc(a.t)}</b></a>`).join('')}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
  <div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div>
- <div class="nums"><a href="#lagging" class="${over?'rd':''}"><b>${over}</b>overdue</a><a href="javascript:void 0" onclick="const e=$('.list .trow');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})" class="${dueT?'am':''}"><b>${dueT}</b>due today</a><a href="#cal"><b>${n7}</b>next 7 days</a><a href="#lagging" class="${stuck?'rd':''}"><b>${stuck}</b>stuck</a></div></div>
+ ${homeTabs(g)}</div>${homeTabBody(g)}
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
  h+=todayBody(g);const lag2=lag.filter(x=>!x.od);
  if(lag2.length)h+=`<h2>Stuck or untouched (${lag2.length})</h2>`+(lag2.length?`<div class="card pad0">${lag2.slice(0,7).map(x=>`<a class="lrow" href="#item/${x.it.id}"><span class="chip g">${T[x.it.type].n}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}<div class="ct" style="margin-top:2px">${esc(x.it.title)}</div><div class="meta">${[x.od?`<span class="rd">${x.od}d overdue</span>`:'',x.sd?`<span class="rd">${x.sd} days at "${esc(stageOf(x.it))}"</span>`:'',x.ud?`<span class="rd">untouched ${x.ud} days</span>`:'',x.it.owner?esc(pShort(x.it.owner)):''].filter(Boolean).join(' · ')}</div></a>`).join('')}${lag2.length>7?`<a class="lrow center" href="#lagging">See all</a>`:''}</div>`:'<div class="card meta">Nothing stuck or untouched.</div>');
@@ -416,10 +424,6 @@ function vToday(){return vHome()}
 function todayBody(g){let h='';
  const ib=S.inbox.filter(inScope).length;if(ib)h+=`<a class="arow list mt" href="#inbox" style="margin-top:10px"><span class="an">Inbox<div>${ib} note${ib>1?'s':''} to sort into tasks</div></span><span class="ac">${ib}</span><span class="chev">›</span></a>`;
  h+=routinesBlock();
- const sec=(k,title)=>g[k].length?`<h2>${title} (${g[k].length})</h2><div class="list">`+g[k].map(trow).join('')+'</div>':'';
- const no=g.over.length+g.overF.length;if(no)h+=`<h2>Overdue (${no})</h2><div class="list">${g.over.map(trow).join('')}${g.overF.length?`<div class="subh">Being followed (${g.overF.length})</div>`+g.overF.map(trow).join(''):''}</div>`;
- h+=sec('today','Due today')+sec('soon','Next 2 days')+sec('fu','Follow up');
- if(!no&&!g.today.length&&!g.soon.length&&!g.fu.length)h+='<p class="empty">Nothing pending for today.</p>';
  const shown=new Set([...g.over,...g.overF,...g.today].map(x=>x.id));const pw=S.items.filter(it=>it.type==='prep'&&inScope(it)&&isOpen(it)&&!shown.has(it.id)).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));if(pw.length)h+=`<h2>You must write (${pw.length})</h2><div class="list">${pw.slice(0,5).map(trow).join('')}${pw.length>5?`<a class="arow" href="#list/prep"><span class="an">See all ${pw.length}</span><span class="chev">›</span></a>`:''}</div>`;
  h+=inspHome();
  if(g.later)h+=`<p class="meta center">${g.later} open item${g.later>1?'s are':' is'} waiting for a later date.</p>`;
@@ -563,7 +567,7 @@ function vEdit(ty,id){if(!T[ty])return vHome();const it=id&&id!=='new'?get(id):n
  if(it)src=it;else{src={};(DEFV[ty]||[]).forEach(k=>src[k]=today());if(ty==='wire'){const n=new Date();src.wireTime=pad(n.getHours())+':'+pad(n.getMinutes())}Object.assign(src,PREFILL||{})}
  if(ty==='task'&&!src.assignees&&src.owner)src=Object.assign({},src,{assignees:src.owner});
  if(ty==='inquiry'){src=Object.assign({},src);if(!src.role&&it)src.role=inqRole(it);if(!src.accusedIds&&src.accusedId)src.accusedIds=src.accusedId}
- const sub=src.sub||(SUB==='A'?'K':SUB);
+ const sub=src.sub||(defSub());
  const fv=k=>src[k]==null?'':src[k];
  const fh=T[ty].f.filter(f=>fieldVisible(ty,src,f.k)).map(f=>{if(ty==='place'&&f.k==='lat')return `<button class="btn wide" style="margin-bottom:8px" onclick="A.geo()">Use my current location</button><div class="grid2">${fieldHTML(f,fv('lat'))}${fieldHTML(T.place.f.find(x=>x.k==='lng'),fv('lng'))}</div>`;if(ty==='place'&&f.k==='lng')return '';return fieldHTML(f,fv(f.k))}).join('');
  return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${it?'Edit':'New'} ${esc(T[ty].n.toLowerCase())}</h1><div class="card">${ty==='template'?'<input type="hidden" id="f_sub" value="B"><p class="meta" style="margin-top:0">Templates are not tied to a subdivision; they move with you to every posting.</p>':subFld(sub,LIB.includes(ty))}${fh}${!it&&['letter','resource','wire','place'].includes(ty)?'<p class="meta">Attach files or Drive links on the next screen.</p>':''}<button class="btn p wide" onclick="A.saveItem('${ty}','${it?it.id:''}')">Save</button></div>${dataLists()}`}
@@ -586,7 +590,7 @@ function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#peo
  return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">${esc(p.name)}</h1><div class="card"><dl class="kv">${row('Parentage',p.parentage)}${row('Designation',p.designation)}${row('Section',p.section)}${row('Posting',p.posting)}${row('Subdivision',subName(p.sub))}${row('Phone',p.phone)}${row('CNIC',p.cnic)}</dl>${p.notes?`<p class="det">${esc(p.notes)}</p>`:''}${p.phone?`<div class="acts"><a class="btn s" href="tel:${esc(p.phone)}">Call</a><a class="btn s" target="_blank" rel="noopener" href="https://wa.me/${wa(p.phone)}">WhatsApp</a></div>`:''}</div>
  <h2>Open items (${its.length})</h2>${its.map(it=>card(it,false)).join('')||'<p class="empty">Nothing pending with this person.</p>'}
  <div class="acts mt"><button class="btn" onclick="go('#editp/${id}')">Edit</button><button class="btn d" onclick="A.delP('${id}')">Delete</button></div>`}
-function vEditP(id){const p=id&&id!=='new'?person(id):null;const v=p||{designation:'',sub:SUB==='A'?'K':SUB};
+function vEditP(id){const p=id&&id!=='new'?person(id):null;const v=p||{designation:'',sub:defSub()};
  const fl=(k,l,t,lst)=>`<label class="fld"><span>${l}</span><input id="p_${k}" type="${t||'text'}" ${lst?`list="${lst}"`:''} value="${esc(v[k]||'')}"></label>`;
  return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${p?'Edit person':'New person'}</h1><div class="card">
  ${fl('name','Name')}${fl('parentage','Parentage (S/O, D/O)')}${fl('designation','Designation (pick or type any)','text','desigs')}
@@ -618,7 +622,7 @@ function vInsp(){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
   const st=inspStat(s,ws);return `<h2>${esc(subName(s))} — ${st.n}/3 inspected · ${st.sub}/3 notes submitted</h2><div class="card">${wk.map(visitRow).join('')||'<div class="meta">No canal inspected this week yet.</div>'}${done?`<div class="meta mt">Week marked submitted ${fmtD(done)} (earlier version). <a href="javascript:void 0" onclick="A.inspNote('${s}','${ws}')">Undo</a></div>`:''}</div>
   <div class="card"><div class="ct">Canals — rotation, least recent first</div>${canals.map(x=>`<div class="row between lrow"><span onclick="go('#canal/${x.c.id}')" style="cursor:pointer"><u>${esc(x.c.name)}</u> <span class="meta">${x.last?fmtD(x.last):'never inspected'}</span></span><button class="btn s d" onclick="A.cnDel('${x.c.id}')">✕</button></div>`).join('')||'<div class="meta">Add your canals, distributaries and minors below.</div>'}<div class="row mt"><input id="cn_${s}" placeholder="Add canal / distributary / minor"><button class="btn" onclick="A.cnAdd('${s}')">Add</button></div></div>
   ${past.length?`<div class="card"><div class="ct">Earlier inspections</div>${past.map(visitRow).join('')}</div>`:''}`}).join('')}
-function vEditVisit(a,b){const v=a&&a!=='new'?S.visits.find(x=>x.id===a):null;const sub=v?v.sub:(b||(SUB==='A'?'K':SUB));const cs=S.canals.filter(c=>c.sub===sub);
+function vEditVisit(a,b){const v=a&&a!=='new'?S.visits.find(x=>x.id===a):null;const sub=v?v.sub:(b||(defSub()));const cs=S.canals.filter(c=>c.sub===sub);
  return `<a class="back" href="javascript:goBack()">‹ Cancel</a><h1 class="pt">${v?'Edit':'Record'} inspection — ${esc(subName(sub))}</h1><div class="card">
  ${cs.length?`<label class="fld"><span>Canal</span><select id="vi_c"><option value="">— choose —</option>${cs.map(c=>`<option value="${c.id}" ${v&&v.canalId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
  <label class="fld"><span>${cs.length?'Or type canal name':'Canal name'}</span><input id="vi_cn" value="${esc(v?v.canalName||'':'')}"></label>
@@ -648,7 +652,7 @@ function vSettings(){const lb=S.settings.lastBackup;
  <h2>Backup</h2><div class="card"><p class="meta" style="margin-top:0">Last backup: ${lb?fmtD(lb):'never'}. Everything (including uploaded files) is stored on this device only. Back up daily: tap Back up now, choose Drive. On a laptop or new phone, open the app and restore the latest file.</p><div class="acts"><button class="btn p" onclick="A.exp()">Back up now</button><label class="btn">Restore from file<input type="file" hidden onchange="A.imp(this)"></label></div></div>
  ${remindersHTML()}
  ${rulesHTML()}
- <h2>Subdivisions</h2><div class="card"><label class="fld"><span>Regular charge</span><input id="snK" value="${esc(S.settings.subs.K)}"></label><label class="fld"><span>Additional charge</span><input id="snI" value="${esc(S.settings.subs.I)}"></label><button class="btn" onclick="A.subNames()">Save names</button></div>
+ ${subsHTML()}
  <h2>Stored on this device</h2><div class="card meta" id="stInfo">…</div>`}
 
 /* ================= router ================= */
@@ -656,7 +660,8 @@ const IC={home:'<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3
 let LASTH=null;
 const curView=()=>(location.hash.slice(1)||'home').split('/')[0];
 function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');const v=p[0];if(v!=='edit')PREFILL=null;closeDrawer();
- $('#seg').innerHTML=[['K',subName('K')],['I',subName('I')],['A','All']].map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
+ if(SUB!=='A'&&!S.settings.subs[SUB])SUB='A';
+ $('#seg').innerHTML=SUBK().length>2?`<select class="segsel" onchange="setSub(this.value)">${[['A','All']].concat(SUBK().map(k=>[k,subName(k)])).map(([k,l])=>`<option value="${k}" ${SUB===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`:SUBK().concat('A').map(k=>[k,k==='A'?'All':subName(k)]).map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
  const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,canal:()=>vCanal(p[1]),offences:vOffences,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
  const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);$('#homeBtn').style.display=isHome?'none':'';$('header h1').style.display=isHome?'':'none';
@@ -686,12 +691,12 @@ A.qaPick=k=>{const u=S.settings.addUse=S.settings.addUse||{};u[k]=(u[k]||0)+1;sa
 A.fab=()=>{const p=(location.hash.slice(1)||'home').split('/');const v=p[0];
  if(v==='list'&&T[p[1]])return go('edit/'+p[1]+'/new');
  if(v==='people')return go('editp/new');
- if(v==='person'&&person(p[1])){const pp=person(p[1]);PREFILL={owner:pp.id,sub:pp.sub==='B'?(SUB==='A'?'K':SUB):pp.sub};return go('edit/task/new')}if(v==='vehicle')return go('editv/new');
- if(v==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${['K','I'].map(s=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${s}')">${esc(subName(s))}</button>`).join('')}</div>`)}
+ if(v==='person'&&person(p[1])){const pp=person(p[1]);PREFILL={owner:pp.id,sub:pp.sub==='B'?(defSub()):pp.sub};return go('edit/task/new')}if(v==='vehicle')return go('editv/new');
+ if(v==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${SUBK().map(s=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${s}')">${esc(subName(s))}</button>`).join('')}</div>`)}
  if(v==='cal')return A.newEvent(CAL?CAL.sel:today());
  if(v==='inbox'){const e=$('#ibT');if(e){e.focus();return}}
  A.add()};
-A.addGo=k=>{closeSheet();if(k==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${['K','I'].map(x=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${x}')">${esc(subName(x))}</button>`).join('')}</div>`)}const m={inbox:'inbox',person:'editp/new',vehicle:'editv/new'};go(m[k]||'edit/'+k+'/new');if(k==='inbox')setTimeout(()=>{const e=$('#ibT');if(e)e.focus()},80)};
+A.addGo=k=>{closeSheet();if(k==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${SUBK().map(x=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${x}')">${esc(subName(x))}</button>`).join('')}</div>`)}const m={inbox:'inbox',person:'editp/new',vehicle:'editv/new'};go(m[k]||'edit/'+k+'/new');if(k==='inbox')setTimeout(()=>{const e=$('#ibT');if(e)e.focus()},80)};
 A.tick=id=>{const it=get(id);snap();it.doneOn=today();(it.fus=it.fus||[]).push({d:today(),text:''});log('Followed up: '+it.title,it);save();render();toast('Followed up. Back tomorrow until resolved.',1)};
 A.more=id=>{const it=get(id);sheet(`<div class="ct">${esc(it.title)}</div><div class="meta">${T[it.type].n}${it.owner?' · '+esc(pShort(it.owner)):''}</div><div class="mt">
  <button class="mrow" onclick="A.done('${id}')">✓ Followed up, with a note<small>What happened, e.g. SEN says report by Thursday</small></button>
@@ -771,7 +776,7 @@ function parseCSV(txt){const rows=[];let row=[],cell='',q=false;for(let i=0;i<tx
  if(cell||row.length){row.push(cell);rows.push(row)}const hd=(rows.shift()||[]).map(h=>h.trim().toLowerCase());return rows.filter(r=>r.some(Boolean)).map(r=>{const o={};hd.forEach((h,i)=>o[h]=(r[i]||'').trim());return o})}
 A.pImp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=()=>{let arr=[];try{if(/\.csv$/i.test(f.name))arr=parseCSV(r.result);else{const d=JSON.parse(r.result);arr=Array.isArray(d)?d:d.people}if(!Array.isArray(arr))throw 0}catch(e){return toast('Could not read this file')}
  let add=0,skip=0;snap();arr.forEach(x=>{if(!x||!x.name)return;const nm=String(x.name).trim();if(S.people.some(p=>p.name.toLowerCase()===nm.toLowerCase()&&(p.phone||'')===(x.phone||''))){skip++;return}
-  S.people.push({id:uid(),name:nm,parentage:x.parentage||'',designation:x.designation||'Other',sub:['K','I','B'].includes(x.sub)?x.sub:(SUB==='A'?'K':SUB),section:x.section||'',posting:x.posting||'',phone:x.phone||'',cnic:x.cnic||'',notes:x.notes||''});add++});
+  S.people.push({id:uid(),name:nm,parentage:x.parentage||'',designation:x.designation||'Other',sub:SUBK().concat('B').includes(x.sub)?x.sub:(defSub()),section:x.section||'',posting:x.posting||'',phone:x.phone||'',cnic:x.cnic||'',notes:x.notes||''});add++});
  log('Imported '+add+' people',{});save();render();toast(add+' added'+(skip?', '+skip+' already present':''),1)};r.readAsText(f)};
 A.vm=n=>{const [y,m]=VM.split('-').map(Number);const d=new Date(y,m-1+n,1);VM=d.getFullYear()+'-'+pad(d.getMonth()+1);render()};
 A.saveV=id=>{const g=k=>$('#v_'+k).value.trim();const e={date:g('date')||today(),open:g('open'),close:g('close'),route:g('route'),polL:g('polL'),polRs:g('polRs'),maintDesc:g('maintDesc'),maintRs:g('maintRs')};
@@ -784,7 +789,11 @@ A.saveVisit=(id,sub)=>{const cid=$('#vi_c')?$('#vi_c').value:'';const cn=$('#vi_
 A.delVisit=id=>{if(!confirm('Delete this inspection?'))return;snap();S.visits=S.visits.filter(v=>v.id!==id);save();location.replace('#insp');toast('Deleted',1)};
 A.inspNote=(s,ws)=>{snap();const k=s+'|'+ws;if(S.inspNotes[k]){delete S.inspNotes[k];log('Inspection note unmarked ('+subName(s)+')',{sub:s})}else{S.inspNotes[k]=today();log('Inspection note submitted to Division ('+subName(s)+')',{sub:s})}save();render()};
 A.logD=n=>{LOGD=addDays(LOGD,n);render()};
-A.subNames=()=>{S.settings.subs.K=$('#snK').value.trim()||'Kundian';S.settings.subs.I=$('#snI').value.trim()||'Isakhel';save();render();toast('Saved')};
+A.subRen=(k,v)=>{v=String(v||'').trim();if(!v)return render();S.settings.subs[k]=v;save();render();toast('Renamed')};
+A.subAdd=()=>{const v=$('#snNew').value.trim();if(!v)return toast('Enter the subdivision name');if(Object.values(S.settings.subs).some(x=>x.toLowerCase()===v.toLowerCase()))return toast('Already added');snap();let k;do{k='S'+Math.random().toString(36).slice(2,6)}while(S.settings.subs[k]||k==='A'||k==='B');S.settings.subs[k]=v;['Check gauge proforma','Check eFOES','Check SEN activity on WhatsApp group'].forEach(t=>S.routines.push({id:uid(),sub:k,title:t}));log('Subdivision added: '+v,{});save();render();toast(v+' added',1)};
+A.subDel=k=>{const n=S.items.filter(x=>x.sub===k).length+S.people.filter(x=>x.sub===k).length+S.canals.filter(x=>x.sub===k).length+S.visits.filter(x=>x.sub===k).length;if(n)return toast(subName(k)+' has '+n+' records. Move or delete them first.');if(SUBK().length<2)return toast('Keep at least one subdivision');if(!confirm('Remove '+subName(k)+'?'))return;snap();const nm=subName(k);delete S.settings.subs[k];S.routines=S.routines.filter(r=>r.sub!==k);if(SUB===k){SUB='A';try{localStorage.setItem('sdodesk.sub','A')}catch(e){}}log('Subdivision removed: '+nm,{});save();render();toast('Removed',1)};
+function subsHTML(){const cnt=k=>S.items.filter(x=>x.sub===k).length+S.people.filter(x=>x.sub===k).length+S.canals.filter(x=>x.sub===k).length+S.visits.filter(x=>x.sub===k).length;
+ return `<h2>Subdivisions (${SUBK().length})</h2><div class="card"><p class="meta" style="margin-top:0">Your regular and additional charges. Rename by editing a name. A subdivision can be removed only when it has no records.</p>${SUBK().map((k,i)=>`<div class="row" style="gap:6px;margin-bottom:6px"><input value="${esc(subName(k))}" onchange="A.subRen('${k}',this.value)" aria-label="Subdivision ${i+1}"><span class="meta" style="white-space:nowrap">${cnt(k)} rec.</span><button class="btn s d" onclick="A.subDel('${k}')">✕</button></div>`).join('')}<div class="row mt" style="gap:6px"><input id="snNew" placeholder="Add subdivision (e.g. additional charge)"><button class="btn" onclick="A.subAdd()">Add</button></div></div>`}
 A.rtAdd=()=>{const tx=$('#rtN').value.trim();if(!tx)return;snap();S.routines.push({id:uid(),sub:$('#rtS')?$('#rtS').value:SUB,title:tx});save();render()};
 A.rtDel=id=>{snap();S.routines=S.routines.filter(r=>r.id!==id);save();render();toast('Removed',1)};
 A.cnAdd=s=>{const e=$('#cn_'+s);const tx=e?e.value.trim():'';if(!tx)return;snap();S.canals.push({id:uid(),sub:s,name:tx});save();render()};
@@ -992,7 +1001,7 @@ function ppList(){const e=$('#ppq');const q=(e?e.value:'').toLowerCase().split(/
  if(!S.people.length)return '<p class="meta">No people saved yet. Add one below, or import your staff file from ☰ → Records & files → People.</p>';
  return l.map(p=>`<div class="lrow" onclick="A.ppSet('${p.id}')"><b>${esc(p.name)}</b> <span class="meta">${esc([p.designation,p.section].filter(Boolean).join(' · '))}</span></div>`).join('')||'<p class="empty">No match.</p>'}
 A.ppSet=id=>{const f=$('#'+PPK),b=$('#'+PPK+'_b');if(f)f.value=id;const p=person(id);if(b)b.innerHTML=p?esc(p.name)+' <span class="meta">'+esc(p.designation)+'</span>':'<span class="meta">Tap to choose a person…</span>';closeSheet()};
-A.ppNew=()=>{const n=$('#ppn').value.trim();if(!n)return toast('Enter a name');const p={id:uid(),name:n,designation:$('#ppd').value.trim()||'Other',sub:SUB==='A'?'K':SUB,section:'',posting:'',phone:'',cnic:'',notes:''};S.people.push(p);log('Added person: '+n,{sub:p.sub});save();A.ppSet(p.id);toast('Added '+n)};
+A.ppNew=()=>{const n=$('#ppn').value.trim();if(!n)return toast('Enter a name');const p={id:uid(),name:n,designation:$('#ppd').value.trim()||'Other',sub:defSub(),section:'',posting:'',phone:'',cnic:'',notes:''};S.people.push(p);log('Added person: '+n,{sub:p.sub});save();A.ppSet(p.id);toast('Added '+n)};
 A.renLink=(id,i)=>{const it=get(id);const l=it.links[i];const v=prompt('New name for this document',l.label||l.name||'');if(v===null||!v.trim())return;snap();l.label=v.trim();save();render()};
 
 /* ================= reminders ================= */
@@ -1024,7 +1033,7 @@ function pmList(){const e=$('#pmq');const q=(e?e.value:'').toLowerCase().split(/
  const l=S.people.filter(p=>!q.length||q.every(w=>[p.name,p.designation,p.section,p.posting].join(' ').toLowerCase().includes(w))).sort((a,b)=>(pScope(b)-pScope(a))||dIdx(a)-dIdx(b)||a.name.localeCompare(b.name)).slice(0,80);
  return `<div class="list">${l.map(p=>`<label class="chk"><input type="checkbox" ${PPM.sel.has(p.id)?'checked':''} onchange="A.pmTog('${p.id}',this.checked)"><span><b style="font-weight:600">${esc(p.name)}</b> <span class="meta">${esc([p.designation,p.section].filter(Boolean).join(' · '))}</span></span></label>`).join('')||'<p class="empty">No match.</p>'}</div>`}
 A.pmTog=(id,on)=>{if(on)PPM.sel.add(id);else PPM.sel.delete(id)};
-A.pmNew=()=>{const n=$('#ppn').value.trim();if(!n)return toast('Enter a name');const p={id:uid(),name:n,designation:$('#ppd').value.trim()||'Other',sub:SUB==='A'?'K':SUB,section:'',posting:'',phone:'',cnic:'',notes:''};S.people.push(p);log('Added person: '+n,{sub:p.sub});save();PPM.sel.add(p.id);$('#ppn').value='';$('#ppd').value='';$('#pmr').innerHTML=pmList();toast('Added '+n)};
+A.pmNew=()=>{const n=$('#ppn').value.trim();if(!n)return toast('Enter a name');const p={id:uid(),name:n,designation:$('#ppd').value.trim()||'Other',sub:defSub(),section:'',posting:'',phone:'',cnic:'',notes:''};S.people.push(p);log('Added person: '+n,{sub:p.sub});save();PPM.sel.add(p.id);$('#ppn').value='';$('#ppd').value='';$('#pmr').innerHTML=pmList();toast('Added '+n)};
 A.pmDone=()=>{const ids=[...PPM.sel];const f=$('#'+PPM.fid),b=$('#'+PPM.fid+'_b');if(f)f.value=ids.join(',');if(b)b.innerHTML=ids.length?ids.map(i=>esc(pShort(i))).join(', '):'<span class="meta">Tap to choose one or more…</span>';closeSheet()};
 A.asgSet=(id,i,s)=>{const it=get(id);snap();it.asg=asgOf(it).map(x=>Object.assign({},x));const a=it.asg[i];a.st=a.st===s?'Pending':s;
  if(a.st==='Submitted'){a.d=today();const due=it.type==='wire'?wireDue(it):it.due;a.late=!!(due&&a.d>due)}else{delete a.d;delete a.late}
@@ -1246,7 +1255,7 @@ function migrateV12(){let ch=false;S.items.forEach(it=>{if(it.type==='estimate'&
 
 /* ---------- reminders inside the app (no Google Calendar) ---------- */
 let BGST='checking';
-async function pushAlarmState(){if(!('caches' in window))return;try{const t=today(),ws=weekStart(t);const subs={};['K','I'].forEach(s=>{const x=inspStat(s,ws);subs[s]={name:subName(s),n:x.n,sub:x.sub}});
+async function pushAlarmState(){if(!('caches' in window))return;try{const t=today(),ws=weekStart(t);const subs={};SUBK().forEach(s=>{const x=inspStat(s,ws);subs[s]={name:subName(s),n:x.n,sub:x.sub}});
  const dates=S.items.filter(it=>isOpen(it)&&it.type!=='event').map(keyDate).filter(Boolean);
  const ev=S.items.filter(it=>it.type==='event'&&!it.resolved&&it.due).map(it=>({d:it.due,tm:it.time||'',t:it.title})).concat(S.items.filter(it=>it.type==='court'&&!it.resolved&&it.hearing).map(it=>({d:it.hearing,tm:it.attendTime||'',t:'Court: '+it.title})));
  const st={ws,subs,dates,ev,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()};
@@ -1261,6 +1270,20 @@ function remindersHTML(){const np=('Notification' in window)?Notification.permis
  <label class="chk" style="padding-left:0"><input type="checkbox" ${on?'checked':''} onchange="S.settings.bgRem=this.checked;save();render()"><span>Daily reminder on</span></label>
  <label class="fld"><span>Not before</span><select onchange="S.settings.remHour=+this.value;save();render()">${[6,7,8,9,10,11].map(x=>`<option value="${x}" ${x===h?'selected':''}>${x}:00 am</option>`).join('')}</select></label>
  <p class="meta">While the app is open you also get an alert 2 hours before a timed meeting or hearing. Exact timing in the background is decided by Android, so the alert may come later in the morning than the hour set.</p></div>`}
+
+/* ---------- Home tabs: Overdue / Due today / Next 2 days / Custom ---------- */
+let HT=null,HTU=null,HC={k:'7d',f:'',t:''};
+function custRange(){const t=today();if(HC.k==='week'){const w=weekStart(t);return [w,addDays(w,6),'This week']}if(HC.k==='month'){const m=t.slice(0,7);const e=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();return [m+'-01',m+'-'+pad(e),'This month']}if(HC.k==='pick'&&HC.f&&HC.t)return [HC.f<=HC.t?HC.f:HC.t,HC.f<=HC.t?HC.t:HC.f,'Dates'];return [t,addDays(t,7),'Next 7 days']}
+function custItems(){const [f,e]=custRange();return S.items.filter(it=>inScope(it)&&(isOpen(it)||(it.type==='event'&&!it.resolved))).map(it=>{const ds=datesOf(it).map(x=>x.d).concat(it.followUp?[it.followUp]:[]).filter(d=>d>=f&&d<=e).sort();return ds.length?{it,d:ds[0]}:null}).filter(Boolean).sort((a,b)=>a.d.localeCompare(b.d)||priRank(a.it)-priRank(b.it)).map(x=>x.it)}
+function homeTabs(g){const no=g.over.length+g.overF.length,nt=g.today.length+g.fu.length,ns=g.soon.length;HT=HTU||(no?'over':nt?'today':ns?'soon':'custom');
+ const tb=(k,n,l,c)=>`<button class="${HT===k?'on':''} ${c||''}" onclick="HTU='${k}';render()"><b>${n}</b>${l}</button>`;
+ return `<div class="htabs">${tb('over',no,'Overdue',no?'rd':'')}${tb('today',nt,'Due today',nt?'am':'')}${tb('soon',ns,'Next 2 days')}${tb('custom',HT==='custom'?custItems().length:'⋯','Custom')}</div>`}
+function homeTabBody(g){const L=a=>`<div class="list" style="margin-top:8px">${a.map(trow).join('')}</div>`;
+ if(HT==='over'){const n=g.over.length+g.overF.length;return n?`<div class="list" style="margin-top:8px">${g.over.map(trow).join('')}${g.overF.length?`<div class="subh">Being followed (${g.overF.length})</div>`+g.overF.map(trow).join(''):''}</div>`:'<p class="empty">Nothing overdue.</p>'}
+ if(HT==='today')return g.today.length||g.fu.length?`<div class="list" style="margin-top:8px">${g.today.map(trow).join('')}${g.fu.length?`<div class="subh">Follow up today (${g.fu.length})</div>`+g.fu.map(trow).join(''):''}</div>`:'<p class="empty">Nothing due today.</p>';
+ if(HT==='soon')return g.soon.length?L(g.soon):'<p class="empty">Nothing in the next 2 days.</p>';
+ const [f,e,lbl]=custRange();const it=custItems();const ch=(k,l)=>`<button class="pill ${HC.k===k?'on':''}" onclick="HC.k='${k}';render()">${l}</button>`;
+ return `<div class="cust">${ch('week','This week')}${ch('7d','Next 7 days')}${ch('month','This month')}${ch('pick','Pick dates')}</div>${HC.k==='pick'?`<div class="grid2"><input type="date" value="${HC.f}" onchange="HC.f=this.value;render()"><input type="date" value="${HC.t}" onchange="HC.t=this.value;render()"></div>`:''}<div class="meta">${esc(lbl)}: ${fmtD(f)} – ${fmtD(e)} · ${it.length} item${it.length===1?'':'s'}</div>${it.length?L(it):'<p class="empty">Nothing in this period.</p>'}`}
 /* ================= start ================= */
 $('#desigs').innerHTML=DESIGS.map(d=>`<option value="${esc(d)}">`).join('');
 window.addEventListener('hashchange',render);
