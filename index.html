@@ -190,7 +190,7 @@ if(!S||!Array.isArray(S.items))S=DEF();
 function fillDefaults(){const d=DEF();for(const k in d)if(S[k]===undefined)S[k]=d[k];if(!S.settings.subs)S.settings.subs=d.settings.subs}
 fillDefaults();
 let SUB='A';try{SUB=localStorage.getItem('sdodesk.sub')||'A'}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save. Storage blocked or full.')}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save. Storage blocked or full.')}clearTimeout(save._a);save._a=setTimeout(()=>{try{pushAlarmState()}catch(e){}},1500)}
 let UNDO=null;
 function snap(){UNDO=JSON.stringify(S)}
 function undo(){if(!UNDO)return;S=JSON.parse(UNDO);UNDO=null;save();render();toast('Undone')}
@@ -471,11 +471,11 @@ function vCal(){const t=today();if(!CAL){const d=new Date();CAL={y:d.getFullYear
  const ev=calEvents();const first=new Date(CAL.y,CAL.m,1);const lead=(first.getDay()+6)%7;const dim=new Date(CAL.y,CAL.m+1,0).getDate();
  let cells='';for(let i=0;i<lead;i++)cells+='<div></div>';
  for(let d=1;d<=dim;d++){const ds=CAL.y+'-'+pad(CAL.m+1)+'-'+pad(d);const n=(ev[ds]||[]).length;cells+=`<div class="cd ${ds===t?'td':''} ${ds===CAL.sel?'sel':''}" onclick="A.calSel('${ds}')">${d}${n?`<i class="${ds<t?'r':''}">${n}</i>`:''}</div>`}
- const list=ev[CAL.sel]||[];const isSun=new Date(CAL.sel+'T00:00:00').getDay()===0;
+ const list=ev[CAL.sel]||[];const dw=new Date(CAL.sel+'T00:00:00').getDay();const isSun=dw===5||dw===6;const wsS=weekStart(CAL.sel);const inspTxt=scopeSubs().map(s=>{const x=inspStat(s,wsS);return subName(s)+' '+x.n+'/3 inspected, '+x.sub+'/3 notes'}).join(' · ');
  return `<div class="row between"><button class="btn" onclick="A.calM(-1)">‹</button><b>${first.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</b><button class="btn" onclick="A.calM(1)">›</button></div>
  <div class="cal head mt">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div>${x}</div>`).join('')}</div><div class="cal">${cells}</div>
  <h2>${new Date(CAL.sel+'T00:00:00').toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}${CAL.sel===t?' · today':''}</h2>
- ${isSun?'<div class="card" onclick="go(\'#insp\')"><div class="ct">Weekly inspection note due to Division</div></div>':''}
+ ${isSun?`<div class="card ${dw===6?'over':'warn'}" onclick="go('#insp')"><div class="ct">${dw===5?'Target: 3 inspection notes to Division':'Final day: inspection notes to Division'}</div><div class="meta">${esc(inspTxt)}</div></div>`:''}
  ${list.map(x=>`<div class="card" onclick="go('#item/${x.it.id}')"><div class="tags"><span class="chip g">${T[x.it.type].n}</span><span class="chip a">${esc(x.l)}</span>${SUB==='A'?`<span class="chip">${esc(subName(x.it.sub))}</span>`:''}</div><div class="ct">${esc(x.it.title)}</div></div>`).join('')}
  ${!list.length&&!isSun?'<p class="empty">Nothing on this day. Tap + to add a meeting.</p>':''}`}
 
@@ -646,7 +646,7 @@ function vSettings(){const lb=S.settings.lastBackup;
  setTimeout(async()=>{try{const all=await fAll();const sz=all.reduce((s,r)=>s+(r.size||0),0);const e=$('#stInfo');if(e)e.textContent=`${S.items.length} items · ${S.people.length} people · ${all.length} files (${fsize(sz)}) · ${S.log.length} log entries`}catch(x){}},0);
  return `${backHome}<h1 class="pt">Settings & backup</h1>
  <h2>Backup</h2><div class="card"><p class="meta" style="margin-top:0">Last backup: ${lb?fmtD(lb):'never'}. Everything (including uploaded files) is stored on this device only. Back up daily: tap Back up now, choose Drive. On a laptop or new phone, open the app and restore the latest file.</p><div class="acts"><button class="btn p" onclick="A.exp()">Back up now</button><label class="btn">Restore from file<input type="file" hidden onchange="A.imp(this)"></label></div></div>
- <h2>Notifications</h2><div class="card"><p class="meta" style="margin-top:0">${notifState()}</p><button class="btn" onclick="A.notif()">Enable notifications</button></div>
+ ${remindersHTML()}
  ${rulesHTML()}
  <h2>Subdivisions</h2><div class="card"><label class="fld"><span>Regular charge</span><input id="snK" value="${esc(S.settings.subs.K)}"></label><label class="fld"><span>Additional charge</span><input id="snI" value="${esc(S.settings.subs.I)}"></label><button class="btn" onclick="A.subNames()">Save names</button></div>
  <h2>Stored on this device</h2><div class="card meta" id="stInfo">…</div>`}
@@ -798,7 +798,7 @@ A.imp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const r=ne
  if(!confirm('Replace ALL data on this device with this backup ('+d.items.length+' items, '+(d.people||[]).length+' people, '+((d._files||[]).length)+' files)?'))return;
  const files=d._files||[];delete d._files;for(const x of files){try{const b=await (await fetch(x.data)).blob();await fPut({id:x.id,name:x.name,type:x.type,size:x.size,blob:b,ts:Date.now(),text:x.text||''})}catch(e){}}
  snap();S=d;fillDefaults();save();await loadTexts();render();toast('Restored',1)};r.readAsText(f)};
-A.notif=async()=>{if(!('Notification' in window))return toast('Not supported in this browser');await Notification.requestPermission();render();if(Notification.permission==='granted'){S.settings.lastNotify=null;dailyNotify()}};
+A.notif=async()=>{if(!('Notification' in window))return toast('Not supported in this browser');await Notification.requestPermission();BGST=await regBg();render();if(Notification.permission==='granted'){S.settings.lastNotify=null;dailyNotify()}};
 
 /* ================= v5: offence register, PMIU, templates, police lookup ================= */
 let TEXTS={};
@@ -997,7 +997,7 @@ A.renLink=(id,i)=>{const it=get(id);const l=it.links[i];const v=prompt('New name
 
 /* ================= reminders ================= */
 async function notify(title,body){try{const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'});else new Notification(title,{body})}catch(e){}}
-function dailyNotify(){if(!('Notification' in window)||Notification.permission!=='granted')return;const t=today();if(S.settings.lastNotify===t)return;const c=counts(true);S.settings.lastNotify=t;save();const ia=inspAlarms();if(c.over||c.today||ia.length)notify('SDO Desk',[c.over||c.today?c.over+' overdue, '+c.today+' due today':'',...ia.map(a=>a.t)].filter(Boolean).join(' · '))}
+async function dailyNotify(){if(!('Notification' in window)||Notification.permission!=='granted'||S.settings.bgRem===false)return;const t=today();if(S.settings.lastNotify===t||await notifiedToday())return;const c=counts(true);const ia=inspAlarms();const evs=S.items.filter(it=>!it.resolved&&((it.type==='event'&&it.due===t)||(it.type==='court'&&it.hearing===t)));S.settings.lastNotify=t;save();if(c.over||c.today||ia.length||evs.length){notify('SDO Desk',[c.over||c.today?c.over+' overdue, '+c.today+' due today':'',...ia.map(a=>a.t),...evs.map(x=>'Today: '+(x.time||x.attendTime?(x.time||x.attendTime)+' ':'')+x.title)].filter(Boolean).join(' · '));markNotified()}}
 function checkSoon(){if(!('Notification' in window)||Notification.permission!=='granted')return;const t=today(),now=new Date();let ch=false;
  S.items.forEach(it=>{if(!isOpen(it))return;let d=null,tm=null,l='';if(it.type==='court'){d=it.hearing;tm=it.attendTime;l='Court'}else if(it.type==='event'){d=it.due;tm=it.time;l='Event'}
   if(d!==t||!tm||it._nt===t)return;const hm=tm.split(':').map(Number);const mins=hm[0]*60+hm[1]-(now.getHours()*60+now.getMinutes());
@@ -1243,6 +1243,24 @@ function prepOf(L){const pr={id:uid(),type:'prep',createdAt:Date.now()+1,stages:
 A.prepFrom=id=>{const L=get(id);snap();const pr=prepOf(L);save();go('#item/'+pr.id);toast('Added to To prepare',1)};
 
 function migrateV12(){let ch=false;S.items.forEach(it=>{if(it.type==='estimate'&&!it.ch){it.ch={rcv:{date:it.estDate||ymd(new Date(it.createdAt||Date.now())),no:it.estNo||''}};ch=true}if(it.type==='inquiry'&&!it.role){it.role=inqRole(it);ch=true}});if(ch)save()}
+
+/* ---------- reminders inside the app (no Google Calendar) ---------- */
+let BGST='checking';
+async function pushAlarmState(){if(!('caches' in window))return;try{const t=today(),ws=weekStart(t);const subs={};['K','I'].forEach(s=>{const x=inspStat(s,ws);subs[s]={name:subName(s),n:x.n,sub:x.sub}});
+ const dates=S.items.filter(it=>isOpen(it)&&it.type!=='event').map(keyDate).filter(Boolean);
+ const ev=S.items.filter(it=>it.type==='event'&&!it.resolved&&it.due).map(it=>({d:it.due,tm:it.time||'',t:it.title})).concat(S.items.filter(it=>it.type==='court'&&!it.resolved&&it.hearing).map(it=>({d:it.hearing,tm:it.attendTime||'',t:'Court: '+it.title})));
+ const st={ws,subs,dates,ev,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()};
+ const c=await caches.open('sdo-alarm');await c.put('./__alarm.json',new Response(JSON.stringify(st),{headers:{'Content-Type':'application/json'}}))}catch(e){}}
+async function regBg(){try{if(!('serviceWorker' in navigator))return 'unsupported';const r=await navigator.serviceWorker.ready;if(!r.periodicSync)return 'unsupported';const p=await navigator.permissions.query({name:'periodic-background-sync'});if(p.state!=='granted')return 'not-installed';await r.periodicSync.register('sdo-check',{minInterval:3*3600*1000});return 'on'}catch(e){return 'unsupported'}}
+async function notifiedToday(){try{const c=await caches.open('sdo-alarm');const r=await c.match('./__last.txt');return r&&(await r.text())===today()}catch(e){return false}}
+async function markNotified(){try{const c=await caches.open('sdo-alarm');await c.put('./__last.txt',new Response(today()))}catch(e){}}
+function remindersHTML(){const np=('Notification' in window)?Notification.permission:'unsupported';const on=S.settings.bgRem!==false;const h=Number(S.settings.remHour||8);
+ const bg={on:'On. The phone checks a few times a day and alerts you once, from the hour below, if inspections or notes are behind, items are overdue, or a meeting or hearing is today.','not-installed':'Install the app to get alerts while it is closed: open the link in Chrome, ⋮ → Install app (or Add to Home screen), then open it from the icon.',unsupported:'This browser cannot check in the background. Alerts appear when you open the app.',checking:'Checking…'}[BGST]||'';
+ return `<h2>Reminders</h2><div class="card"><div class="ct">Phone notifications</div><p class="meta" style="margin-top:2px">${np==='granted'?'Allowed.':np==='denied'?'Blocked. Allow notifications for this app in phone settings.':np==='unsupported'?'Not supported in this browser.':'Not allowed yet.'}</p>${np==='default'?'<button class="btn p" onclick="A.notif()">Allow notifications</button>':''}
+ <div class="ct mt">Background check</div><p class="meta" style="margin-top:2px">${bg}</p>
+ <label class="chk" style="padding-left:0"><input type="checkbox" ${on?'checked':''} onchange="S.settings.bgRem=this.checked;save();render()"><span>Daily reminder on</span></label>
+ <label class="fld"><span>Not before</span><select onchange="S.settings.remHour=+this.value;save();render()">${[6,7,8,9,10,11].map(x=>`<option value="${x}" ${x===h?'selected':''}>${x}:00 am</option>`).join('')}</select></label>
+ <p class="meta">While the app is open you also get an alert 2 hours before a timed meeting or hearing. Exact timing in the background is decided by Android, so the alert may come later in the morning than the hour set.</p></div>`}
 /* ================= start ================= */
 $('#desigs').innerHTML=DESIGS.map(d=>`<option value="${esc(d)}">`).join('');
 window.addEventListener('hashchange',render);
@@ -1250,7 +1268,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 (()=>{const h=location.hash;if(!/(access_token|error|state)=/.test(h)&&!(history.state&&(history.state.root||history.state.ov))){if(h&&h!=='#home'&&h!=='#'){history.replaceState({root:1},'','#home');history.pushState(null,'',h)}else history.replaceState({root:1},'',location.href)}})();
-migrateV12();prune();render();loadTexts();dailyNotify();checkSoon();setInterval(checkSoon,300000);setTimeout(fileGC,4000);
+migrateV12();prune();render();loadTexts();pushAlarmState();regBg().then(x=>{BGST=x;if(curView()==='settings')render()});dailyNotify();checkSoon();setInterval(checkSoon,300000);setTimeout(fileGC,4000);
 </script>
 <script src="drive.js"></script>
 </body>
