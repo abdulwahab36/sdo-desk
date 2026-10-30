@@ -581,7 +581,7 @@ function peopleList(){const q=PQ.toLowerCase().split(/\s+/).filter(Boolean);
  if(!l.length)return '<p class="empty">No people found. Add one, or import your staff file from Settings or the button above.</p>';
  let h='',sec=null;l.forEach(p=>{if(p.section!==sec){sec=p.section;h+=`<h2>${esc(sec||'No section')}</h2>`}h+=personCard(p)});return h}
 function vPeople(){const secs=[...new Set(S.people.filter(pScope).map(p=>p.section).filter(Boolean))].sort();
- return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden onchange="A.pImp(this)"></label></div>
+ return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden accept=".xlsx,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json,application/octet-stream" onchange="A.pImp(this)"></label></div>
  <input type="search" placeholder="Search name, designation, section, phone" value="${esc(PQ)}" oninput="PQ=this.value;$('#pres').innerHTML=peopleList()" style="margin-bottom:8px">
  <div class="fchips">${[['all','All']].concat(secs.map(s=>[s,s])).map(([v,l])=>`<button class="${PSEC===v?'on':''}" onclick="PSEC=this.dataset.v;render()" data-v="${esc(v)}">${esc(l)}</button>`).join('')}</div><div id="pres">${peopleList()}</div>`}
 function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#people">‹ People</a><p class="empty">Not found.</p>';
@@ -778,10 +778,48 @@ A.saveP=id=>{const g=k=>$('#p_'+k).value.trim();const name=g('name');if(!name)re
 A.delP=id=>{if(!confirm('Delete this person?'))return;snap();S.people=S.people.filter(p=>p.id!==id);save();location.replace('#people');toast('Deleted',1)};
 function parseCSV(txt){const rows=[];let row=[],cell='',q=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(q){if(c==='"'&&txt[i+1]==='"'){cell+='"';i++}else if(c==='"')q=false;else cell+=c}else if(c==='"')q=true;else if(c===','){row.push(cell);cell=''}else if(c==='\n'||c==='\r'){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);rows.push(row);row=[];cell=''}else cell+=c}
  if(cell||row.length){row.push(cell);rows.push(row)}const hd=(rows.shift()||[]).map(h=>h.trim().toLowerCase());return rows.filter(r=>r.some(Boolean)).map(r=>{const o={};hd.forEach((h,i)=>o[h]=(r[i]||'').trim());return o})}
-A.pImp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;const r=new FileReader();r.onload=()=>{let arr=[];try{if(/\.csv$/i.test(f.name))arr=parseCSV(r.result);else{const d=JSON.parse(r.result);arr=Array.isArray(d)?d:d.people}if(!Array.isArray(arr))throw 0}catch(e){return toast('Could not read this file')}
- let add=0,skip=0;snap();arr.forEach(x=>{if(!x||!x.name)return;const nm=String(x.name).trim();if(S.people.some(p=>p.name.toLowerCase()===nm.toLowerCase()&&(p.phone||'')===(x.phone||''))){skip++;return}
-  S.people.push({id:uid(),name:nm,parentage:x.parentage||'',designation:x.designation||'Other',sub:SUBK().concat('B').includes(x.sub)?x.sub:(defSub()),section:x.section||'',posting:x.posting||'',phone:x.phone||'',cnic:x.cnic||'',notes:x.notes||''});add++});
- log('Imported '+add+' people',{});save();render();toast(add+' added'+(skip?', '+skip+' already present':''),1)};r.readAsText(f)};
+/* ---------- people import: .xlsx staff statement, .csv or .json; merges with people already in the app ---------- */
+const DESMAP=[[/^s\.?\s*d\.?\s*o\.?$/,'SDO'],[/^s\.?\s*d\.?\s*c\.?$/,'Sub Divisional Clerk (SDC)'],[/^s\.?\s*d\.?\s*r\.?$/,'Sub Divisional Reader (SDR)'],[/sub\s*engineer|^s\.?\s*e\.?\s*n\.?$/,'Sub Engineer (SEN)'],[/zilladar/,'Zilladar'],[/patwari/,'Canal Patwari'],[/signal/,'Signaller'],[/earth\s*work\s*mistry/,'Earthwork Mistry'],[/mistry/,'Mistry'],[/^mate/,'Mate'],[/gauge|gage/,'Gauge Reader'],[/^r\.?\s*\/?\s*beldar|^reg\.?\s*beldar|regular\s*beldar/,'Regular Beldar'],[/beldar/,'Beldar'],[/artificer/,'Artificer'],[/telephone/,'Telephone Attendant'],[/naib|qasid/,'Naib Qasid'],[/dak/,'Dak Runner'],[/chowkidar.*cook/,'Chowkidar cum Cook'],[/chowkidar/,'Chowkidar'],[/cook/,'Cook'],[/sweeper/,'Sweeper']];
+const normDesig=d=>{const x=String(d||'').trim().toLowerCase().replace(/\s+/g,' ');if(!x)return 'Other';const m=DESMAP.find(([re])=>re.test(x));return m?m[1]:String(d).trim()};
+const dig=x=>String(x||'').replace(/\D/g,'');
+const fmtCnic=x=>{const d=dig(x);return d.length===13?d.slice(0,5)+'-'+d.slice(5,12)+'-'+d.slice(12):String(x||'').trim()};
+const tcase=x=>String(x||'').trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s\/(-])([a-z])/g,(a,b,c)=>b+c.toUpperCase());
+const nmKey=x=>String(x||'').toLowerCase().replace(/[^a-z\s]/g,' ').split(/\s+/).filter(w=>w&&!['muhammad','mohammad','muhammed','muhamamd','m','hafiz','syed','mian','main','sh'].includes(w)).join(' ');
+function splitName(raw){const t=String(raw||'').replace(/\s+/g,' ').trim();const m=t.match(/^(.*?)\s+[SDW]\s*\/\s*O\s+(.*)$/i)||t.match(/^(.*?)\s+\/\s+(.*)$/);return m?[m[1].trim(),m[2].trim()]:[t,'']}
+function staffFromRows(rows){const out=[];let hd=null,sec='';
+ rows.forEach(r=>{if(!r)return;const cells=r.map(c=>c==null?'':String(c).trim());const ne=cells.map((c,i)=>[c,i]).filter(x=>x[0]);if(!ne.length)return;
+  const hi=cells.findIndex(c=>/name\s*with\s*parentage|^name$/i.test(c));
+  if(hi>=0){const f=re=>cells.findIndex(c=>re.test(c));hd={nm:hi,ds:f(/designation/i),po:f(/posting|place|duty/i),ph:f(/contact|phone|mobile|cell/i),cn:f(/cnic/i),sc:f(/name\s*of\s*(sub\s*division|section)/i),sen:f(/under\s*which|uder\s*which/i)};if(!sec&&hd.sc>=0&&/sub\s*division/i.test(cells[hd.sc]))sec='Sub Division Office';return}
+  if(ne.length===1&&!/^\d+$/.test(ne[0][0])&&/section|office|zilladari|establishment/i.test(ne[0][0])){sec=/sub\s*division(al)?\s*office/i.test(ne[0][0])?'Sub Division Office':tcase(ne[0][0].replace(/\s+/g,' '));return}
+  if(!hd||!/^\d+(\.0)?$/.test(cells[0])||!cells[hd.nm])return;
+  const [name,parentage]=splitName(cells[hd.nm]);let section=sec;
+  if(/zilladari/i.test(sec)){const pl=cells[hd.sc]||'';section='Zilladari '+tcase(pl||sec.replace(/.*section\s*/i,''))}
+  const lk=x=>String(x||'').toLowerCase().replace(/divisional/g,'division').replace(/[^a-z]/g,'');let posting=hd.po>=0?cells[hd.po]:'';const a=lk(posting),b=lk(section);if(a&&b&&(a.includes(b)||b.includes(a)))posting='';
+  out.push({name:name.replace(/([a-z])([A-Z])/g,'$1 $2'),parentage,designation:normDesig(cells[hd.ds]),section,posting,phone:hd.ph>=0?cells[hd.ph]:'',cnic:hd.cn>=0?fmtCnic(cells[hd.cn]):'',notes:''})});
+ return out}
+function samePerson(p,x,strict){const pc=dig(p.cnic),xc=dig(x.cnic),pp=dig(p.phone),xp=dig(x.phone),pk=nmKey(p.name),xk=nmKey(x.name);
+ const nameOk=pk&&xk&&(pk===xk||pk.includes(xk)||xk.includes(pk));
+ if(pc.length===13&&pc===xc)return nameOk;if(pp.length>=10&&pp===xp)return nameOk;if(strict)return false;return !pc&&!pp&&pk===xk}
+A.pImp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;
+ const go2=arr=>{if(!arr.length)return toast('No staff rows found in this file');if(SUB!=='A')return pImpDo(arr,SUB);PIMP=arr;sheet(`<div class="ct">Add ${arr.length} people to which subdivision?</div><div class="grid2 mt">${SUBK().map(k=>`<button class="btn" onclick="closeSheet();pImpDo(PIMP,'${k}')">${esc(subName(k))}</button>`).join('')}</div>`)};
+ if(/\.xlsx$/i.test(f.name)){readXlsx(f).then(sh=>{let arr=[];sh.forEach(x=>{arr=arr.concat(staffFromRows(x.rows))});go2(arr)}).catch(()=>toast('Could not read this Excel file'));return}
+ const r=new FileReader();r.onload=()=>{let arr=[];try{if(/\.csv$/i.test(f.name))arr=parseCSV(r.result);else{const d=JSON.parse(r.result);arr=Array.isArray(d)?d:d.people}if(!Array.isArray(arr))throw 0}catch(e){return toast('Could not read this file')}go2(arr.filter(x=>x&&x.name))};r.readAsText(f)};
+let PIMP=null;
+function pImpDo(arr,sub){snap();const res={add:[],had:[],fill:0,self:[],warn:[]};const mine=[];
+ arr.forEach(x0=>{const x=Object.assign({},x0,{name:String(x0.name).trim(),designation:normDesig(x0.designation)});
+  if(x.designation==='SDO'){res.self.push(x.name);return}
+  const dup=mine.find(p=>samePerson(p,x,true));
+  if(dup){const both=[dup.designation,x.designation];if(both.includes('Sub Divisional Reader (SDR)')&&both.includes('Zilladar'))dup.designation='SDR / Zilladar';else if(dup.designation!==x.designation)dup.notes=((dup.notes?dup.notes+'\n':'')+'Also: '+x.designation+(x.section?' ('+x.section+')':'')).trim();if(x.posting&&!(dup.posting||'').includes(x.posting))dup.posting=[dup.posting,x.posting].filter(Boolean).join('; ');return}
+  const ex=S.people.find(p=>samePerson(p,x,false));
+  if(ex){res.had.push(ex.name);let ch=false;['parentage','section','posting','phone','cnic'].forEach(k=>{if(!ex[k]&&x[k]){ex[k]=x[k];ch=true}});if((!ex.designation||ex.designation==='Other')&&x.designation!=='Other'){ex.designation=x.designation;ch=true}if(ch)res.fill++;mine.push(ex);return}
+  const p={id:uid(),name:x.name,parentage:x.parentage||'',designation:x.designation||'Other',sub:SUBK().concat('B').includes(x0.sub)?x0.sub:sub,section:x.section||'',posting:x.posting||'',phone:x.phone||'',cnic:x.cnic||'',notes:x.notes||''};S.people.push(p);mine.push(p);res.add.push(p.name)});
+ const seen={};mine.forEach(p=>{const c=dig(p.cnic);if(p.cnic&&c.length!==13)res.warn.push(p.name+': CNIC has '+c.length+' digits');if(c.length===13){if(seen[c]&&nmKey(seen[c])!==nmKey(p.name))res.warn.push(p.name+' and '+seen[c]+' have the same CNIC');seen[c]=p.name}});
+ const ph={};mine.forEach(p=>{const d=dig(p.phone);if(d.length>=10){if(ph[d]&&nmKey(ph[d])!==nmKey(p.name))res.warn.push(p.name+' and '+ph[d]+' have the same phone');ph[d]=p.name}});
+ log('Imported people: '+res.add.length+' added, '+res.had.length+' already present',{sub});save();render();
+ sheet(`<div class="ct">Staff import</div><div class="meta mt">${res.add.length} added to ${esc(subName(sub))} · ${res.had.length} already in the app${res.fill?` (blank details filled in for ${res.fill})`:''}${res.self.length?' · SDO row skipped':''}</div>
+ ${res.had.length?`<details class="mt"><summary class="meta">Already in the app (${res.had.length})</summary><div class="meta">${res.had.map(esc).join(', ')}</div></details>`:''}
+ ${res.warn.length?`<div class="ct mt" style="color:var(--amb)">Check in the sheet (${res.warn.length})</div>${res.warn.map(w=>`<div class="meta">• ${esc(w)}</div>`).join('')}`:''}
+ <button class="btn p wide mt" onclick="closeSheet()">Done</button>`)}
 A.vm=n=>{const [y,m]=VM.split('-').map(Number);const d=new Date(y,m-1+n,1);VM=d.getFullYear()+'-'+pad(d.getMonth()+1);render()};
 A.saveV=id=>{const g=k=>$('#v_'+k).value.trim();const e={date:g('date')||today(),open:g('open'),close:g('close'),route:g('route'),polL:g('polL'),polRs:g('polRs'),maintDesc:g('maintDesc'),maintRs:g('maintRs')};
  if(e.open&&e.close&&+e.close<+e.open)return toast('Closing km is less than opening km');snap();let v=id?S.vehicle.find(x=>x.id===id):null;if(!v){v={id:uid()};S.vehicle.push(v)}Object.assign(v,e);
