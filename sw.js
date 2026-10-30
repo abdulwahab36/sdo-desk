@@ -1,4 +1,4 @@
-const C='sdo-desk-v18';
+const C='sdo-desk-v19';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./fflate.js','./drive.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='sdo-alarm').map(k=>caches.delete(k)))));self.clients.claim()});
@@ -15,7 +15,7 @@ function alarmLines(st,now){const t=ymdS(now),dow=(now.getDay()+6)%7,ws=addD(t,-
   else if(dow===4&&(n<3||s<3))out.push(n<3?nm+': only '+n+' of 3 inspected. Today is the target day.':nm+': '+s+' of 3 notes submitted. Submit today.');
   else if(dow===5&&(n<3||s<3))out.push('Final: '+nm+' '+n+'/3 inspected, '+s+'/3 notes to Division.')});
  const od=(st.dates||[]).filter(d=>d<t).length,dt=(st.dates||[]).filter(d=>d===t).length;if(od||dt)out.push(od+' overdue, '+dt+' due today');
- (st.ev||[]).filter(x=>x.d===t).forEach(x=>out.push('Today: '+(x.tm?x.tm+' ':'')+x.t));return out}
+ (st.ev||[]).filter(x=>x.d===t).forEach(x=>out.push('Today: '+(x.tm?x.tm+' ':'')+x.t));if(st.ib)out.push(st.ib+' quick note'+(st.ib>1?'s':'')+' to sort');return out}
 async function bgCheck(){try{const c=await caches.open('sdo-alarm');const r=await c.match('./__alarm.json');if(!r)return;const st=await r.json();if(st.on===false)return;
  const now=new Date(),h=now.getHours();if(h<(st.remHour||8)||h>=21)return;const t=ymdS(now);const l=await c.match('./__last.txt');if(l&&(await l.text())===t)return;
  const lines=alarmLines(st,now);if(!lines.length)return;await self.registration.showNotification('SDO Desk',{body:lines.join('\n'),icon:'icon-192.png',badge:'icon-192.png',tag:'sdo-daily'});await c.put('./__last.txt',new Response(t))}catch(e){}}
