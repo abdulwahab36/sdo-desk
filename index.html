@@ -801,7 +801,7 @@ function samePerson(p,x,strict){const pc=dig(p.cnic),xc=dig(x.cnic),pp=dig(p.pho
  const nameOk=pk&&xk&&(pk===xk||pk.includes(xk)||xk.includes(pk));
  if(pc.length===13&&pc===xc)return nameOk;if(pp.length>=10&&pp===xp)return nameOk;if(strict)return false;return !pc&&!pp&&pk===xk}
 A.pImp=inp=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;
- const go2=arr=>{if(!arr.length)return toast('No staff rows found in this file');if(SUB!=='A')return pImpDo(arr,SUB);PIMP=arr;sheet(`<div class="ct">Add ${arr.length} people to which subdivision?</div><div class="grid2 mt">${SUBK().map(k=>`<button class="btn" onclick="closeSheet();pImpDo(PIMP,'${k}')">${esc(subName(k))}</button>`).join('')}</div>`)};
+ const go2=arr=>{if(!arr.length)return toast('No staff rows found in this file');if(arr.every(x=>SUBK().includes(x.sub)))return pImpDo(arr,arr[0].sub);if(SUB!=='A')return pImpDo(arr,SUB);PIMP=arr;sheet(`<div class="ct">Add ${arr.length} people to which subdivision?</div><div class="grid2 mt">${SUBK().map(k=>`<button class="btn" onclick="closeSheet();pImpDo(PIMP,'${k}')">${esc(subName(k))}</button>`).join('')}</div>`)};
  if(/\.xlsx$/i.test(f.name)){readXlsx(f).then(sh=>{let arr=[];sh.forEach(x=>{arr=arr.concat(staffFromRows(x.rows))});go2(arr)}).catch(()=>toast('Could not read this Excel file'));return}
  const r=new FileReader();r.onload=()=>{let arr=[];try{if(/\.csv$/i.test(f.name))arr=parseCSV(r.result);else{const d=JSON.parse(r.result);arr=Array.isArray(d)?d:d.people}if(!Array.isArray(arr))throw 0}catch(e){return toast('Could not read this file')}go2(arr.filter(x=>x&&x.name))};r.readAsText(f)};
 let PIMP=null;
