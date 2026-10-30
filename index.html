@@ -679,10 +679,9 @@ const ADDG=[['Daily work',[['task','Follow-up','XEN / SE direction, anything to 
  ['Field',[['insp','Inspection','canal visit'],['vehicle','Vehicle / POL','km, litres, repair']]],
  ['Reference',[['person','Person','staff, officer, contact'],['place','Place','office, rest house, site'],['resource','Resource / file','manuals, notifications'],['template','Template','letter formats']]]];
 const ADDN={};ADDG.forEach(g=>g[1].forEach(([k,n])=>ADDN[k]=n));
-/* + shows the 6 forms used most (starts with these defaults, then learns from use); the rest sit under More */
-const ADDTOP=['task','prep','complaint','theft','letter','wire'];
-function topAdds(){const u=S.settings.addUse||{};const all=Object.keys(ADDN);
- return all.map((k,i)=>[k,(u[k]||0)+(ADDTOP.includes(k)?0.5-ADDTOP.indexOf(k)*0.01:0),i]).sort((a,b)=>b[1]-a[1]||a[2]-b[2]).slice(0,6).map(x=>x[0])}
+/* + always shows these 6, in this order (fixed so they never move); the rest sit under More */
+const ADDTOP=['task','prep','wire','estimate','court','insp'];
+function topAdds(){return ADDTOP.slice()}
 const addBtn=k=>{const h=ADDG.flatMap(g=>g[1]).find(x=>x[0]===k);return `<button class="btn" style="text-align:left;padding:12px" onclick="A.qaPick('${k}')"><b style="font-weight:600">${h[1]}</b><br><span class="meta">${h[2]}</span></button>`};
 A.add=()=>{const top=topAdds();sheet(`<div class="ct">Add</div>
  <div class="grid2 mt">${top.map(addBtn).join('')}</div>
