@@ -110,7 +110,7 @@ textarea{resize:vertical}
 .htabs button{flex:1;border:0;border-bottom:2px solid transparent;background:none;font:inherit;font-size:11.5px;color:var(--mute);padding:5px 2px 6px;line-height:1.2;cursor:pointer}
 .htabs button b{display:block;font-size:18px;color:var(--ink)}
 .htabs button.on{border-bottom-color:var(--acc);color:var(--acc);font-weight:600}
-.htabs button.rd b{color:var(--red)}.htabs button.am b{color:var(--amb)}
+.htabs button.rd b{color:var(--red)}.htabs .tsub{display:block;font-size:10.5px;font-weight:400;color:var(--mute);margin-top:1px}.rdt{color:var(--red)}.htabs button.am b{color:var(--amb)}
 .cust{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 .sum .nums a{flex:1;text-align:center;text-decoration:none;color:var(--mute);font-size:11.5px;line-height:1.2}
 .sum .nums a+a{border-left:1px solid var(--line)}
@@ -397,10 +397,10 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const ws=weekStart(t);const insp=scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=addDays(ws,6)&&isRoutineV(v)).length;const dn=S.inspNotes[s+'|'+ws];return `${esc(subName(s))}: ${n}/3 · ${dn?'note sent':(t===addDays(ws,6)?'<span class="rd">note due today</span>':'note due Sun')}`});
  const vh=S.vehicle.filter(v=>(v.date||'').startsWith(mo));let km=0,L=0,Rs=0;vh.forEach(v=>{const d=(+v.close||0)-(+v.open||0);if(v.open&&v.close&&d>0)km+=d;L+=+v.polL||0;Rs+=+v.polRs||0});
  const staff={};open.forEach(it=>{const ps=(it.type==='task'||it.type==='wire')&&asgOf(it).length?asgPend(it).map(a=>a.p):(it.owner?[it.owner]:[]);ps.forEach(pid=>{if(!person(pid))return;const s=staff[pid]=staff[pid]||{n:0,o:0};s.n++;if(ov(it))s.o++})});
- const staffL=Object.entries(staff).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
+ const staffL=Object.entries(staff).filter(([,x])=>x.o>0).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,6);
  const lb=S.settings.lastBackup;
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.overF.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
- let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div><div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div></div>${routinesBlock()}${inspHome()}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
+ let h=`<div class="hello"><div class="big">${new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div></div><div class="sum"><div class="top"><b>${leftT} left today</b><span class="meta">${doneT} done · ${pct}%</span></div><div class="prog"><i style="width:${pct}%"></i></div>${ibLine()}</div>${routinesBlock()}${inspHome()}${juneAlerts().map(x=>`<a class="card warn" href="#item/${x.it.id}" style="display:block;text-decoration:none;color:inherit;margin-top:8px"><b>${esc(x.t)}</b><div class="meta">${esc(x.it.title)}</div></a>`).join('')}
  <h2>Work by date</h2><div class="sum tabsonly"> ${homeTabs(g)}</div>${homeTabBody(g)}
  ${(S.items.length||S.people.length)&&(!lb||diffDays(t,lb)>=1)?`<div class="card warn" onclick="go('#settings')"><b>Backup ${lb?'last taken '+fmtD(lb):'never taken'}.</b> Tap to back up to Drive.</div>`:''}`;
  h+=todayBody(g);const lag2=lag.filter(x=>!x.od);
@@ -414,18 +414,17 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
   tile('list/prep','To prepare',by('prep').length,[R(by('prep').filter(ov).length,'overdue')]),
   tile('list/inquiry','Inquiries',iq.length,[`IO ${iq.filter(it=>inqRole(it)==='Inquiry Officer').length} · DR ${iq.filter(isDR).length} · Accused ${iq.filter(it=>inqRole(it)==='Accused').length}`,R(iq.filter(it=>inqReportDue(it)&&inqReportDue(it)<t).length,'report overdue'),nextOf(iq,it=>it.hearing)&&'Next '+nextOf(iq,it=>it.hearing),R(iq.filter(ov).length,'date passed')]),
   tile('list/task','Follow-ups',tk.length,[R(tk.filter(ov).length,'overdue'),`Due this week ${tk.filter(it=>it.due&&it.due>=t&&it.due<=wk).length}`,`From XEN ${tk.filter(it=>it.source==='XEN direction').length}`]),
-  tile('list/letter','Correspondence',lt.length,[`This month ${ltMo.length} (issued ${ltMo.filter(it=>it.dir==='Issued').length}, received ${ltMo.filter(it=>it.dir==='Received').length})`,`Awaiting reply ${ltAw.length}`,R(ltAw.filter(ov).length,'reply overdue'),`Canal wires this week ${its.filter(it=>it.type==='wire'&&(it.wireDate||'')>=ws).length}`]),
-  tile('vehicle','Vehicle & POL',num(km),['km this month',`POL ${num(L)} L · Rs ${num(Rs)}`],'full')
+  tile('list/letter','Correspondence',lt.length,[`This month ${ltMo.length} (issued ${ltMo.filter(it=>it.dir==='Issued').length}, received ${ltMo.filter(it=>it.dir==='Received').length})`,`Awaiting reply ${ltAw.length}`,R(ltAw.filter(ov).length,'reply overdue'),`Canal wires this week ${its.filter(it=>it.type==='wire'&&(it.wireDate||'')>=ws).length}`])
  ].join('')+(QUIET.length?`<div class="arow" style="font-size:12.5px;color:var(--mute)"><span class="an" style="white-space:normal">Nothing open: ${QUIET.join(', ')}</span></div>`:'')+'</div>';
- if(staffL.length)h+=`<h2>Pending with staff</h2><div class="list">${staffL.map(([id,s])=>`<a class="arow" href="#person/${id}"><span class="an"><b style="font-weight:600">${esc(pShort(id))}</b><div>${esc(person(id).designation)}${s.o?` · <span class="rd">${s.o} overdue</span>`:''}</div></span><span class="ac">${s.n}</span><span class="chev">›</span></a>`).join('')}</div>`;
+ if(staffL.length)h+=`<h2>Overdue with staff</h2><div class="list">${staffL.map(([id,s])=>`<a class="arow" href="#person/${id}"><span class="an"><b style="font-weight:600">${esc(pShort(id))}</b><div>${esc(person(id).designation)}${s.o?` · <span class="rd">${s.o} overdue</span>`:''}</div></span><span class="ac">${s.n}</span><span class="chev">›</span></a>`).join('')}</div>`;
  return h}
 
 function vLagging(){const l=lagging();return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">Lagging</h1><p class="meta">Overdue; stuck at one stage too long (complaint 2d, water theft 7d, estimate 20d); or no date and untouched ${UNTOUCHED}+ days. Worst first.</p>${l.map(x=>card(x.it,true)).join('')||'<p class="empty">Nothing lagging.</p>'}`}
 
 function vToday(){return vHome()}
+function ibLine(){const ib=S.inbox.filter(inScope);if(!ib.length)return '';const age=Math.floor((Date.now()-Math.min(...ib.map(x=>x.ts||Date.now())))/864e5);const c=age>=3?'var(--red)':age>=1?'var(--amb)':'var(--acc)';
+ return `<a href="#inbox" style="display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);text-decoration:none;color:${c};font-size:13.5px;font-weight:600"><span>${ib.length} quick note${ib.length>1?'s':''} to sort${age>=1?` · oldest ${age} day${age>1?'s':''}`:''}</span><span>›</span></a>`}
 function todayBody(g){let h='';
- const ib=S.inbox.filter(inScope).length;if(ib)h+=`<a class="arow list mt" href="#inbox" style="margin-top:10px"><span class="an">Inbox<div>${ib} note${ib>1?'s':''} to sort into tasks</div></span><span class="ac">${ib}</span><span class="chev">›</span></a>`;
- const shown=new Set([...g.over,...g.overF,...g.today].map(x=>x.id));const pw=S.items.filter(it=>it.type==='prep'&&inScope(it)&&isOpen(it)&&!shown.has(it.id)).sort((a,b)=>(a.due||'9').localeCompare(b.due||'9'));if(pw.length)h+=`<h2>You must write (${pw.length})</h2><div class="list">${pw.slice(0,5).map(trow).join('')}${pw.length>5?`<a class="arow" href="#list/prep"><span class="an">See all ${pw.length}</span><span class="chev">›</span></a>`:''}</div>`;
  if(g.later)h+=`<p class="meta center">${g.later} open item${g.later>1?'s are':' is'} waiting for a later date.</p>`;
  return h}
 function inspCards(pendingOnly){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
@@ -1014,7 +1013,7 @@ A.renLink=(id,i)=>{const it=get(id);const l=it.links[i];const v=prompt('New name
 
 /* ================= reminders ================= */
 async function notify(title,body){try{const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();if(r)await r.showNotification(title,{body,icon:'icon-192.png',badge:'icon-192.png'});else new Notification(title,{body})}catch(e){}}
-async function dailyNotify(){if(!('Notification' in window)||Notification.permission!=='granted'||S.settings.bgRem===false)return;const t=today();if(S.settings.lastNotify===t||await notifiedToday())return;const c=counts(true);const ia=inspAlarms();const evs=S.items.filter(it=>!it.resolved&&((it.type==='event'&&it.due===t)||(it.type==='court'&&it.hearing===t)));S.settings.lastNotify=t;save();if(c.over||c.today||ia.length||evs.length){notify('SDO Desk',[c.over||c.today?c.over+' overdue, '+c.today+' due today':'',...ia.map(a=>a.t),...evs.map(x=>'Today: '+(x.time||x.attendTime?(x.time||x.attendTime)+' ':'')+x.title)].filter(Boolean).join(' · '));markNotified()}}
+async function dailyNotify(){if(!('Notification' in window)||Notification.permission!=='granted'||S.settings.bgRem===false)return;const t=today();if(S.settings.lastNotify===t||await notifiedToday())return;const c=counts(true);const ia=inspAlarms();const evs=S.items.filter(it=>!it.resolved&&((it.type==='event'&&it.due===t)||(it.type==='court'&&it.hearing===t)));const ibn=S.inbox.length;S.settings.lastNotify=t;save();if(c.over||c.today||ia.length||evs.length||ibn){notify('SDO Desk',[c.over||c.today?c.over+' overdue, '+c.today+' due today':'',ibn?ibn+' quick note'+(ibn>1?'s':'')+' to sort':'',...ia.map(a=>a.t),...evs.map(x=>'Today: '+(x.time||x.attendTime?(x.time||x.attendTime)+' ':'')+x.title)].filter(Boolean).join(' · '));markNotified()}}
 function checkSoon(){if(!('Notification' in window)||Notification.permission!=='granted')return;const t=today(),now=new Date();let ch=false;
  S.items.forEach(it=>{if(!isOpen(it))return;let d=null,tm=null,l='';if(it.type==='court'){d=it.hearing;tm=it.attendTime;l='Court'}else if(it.type==='event'){d=it.due;tm=it.time;l='Event'}
   if(d!==t||!tm||it._nt===t)return;const hm=tm.split(':').map(Number);const mins=hm[0]*60+hm[1]-(now.getHours()*60+now.getMinutes());
@@ -1273,7 +1272,7 @@ let BGST='checking';
 async function pushAlarmState(){if(!('caches' in window))return;try{const t=today(),ws=weekStart(t);const subs={};SUBK().forEach(s=>{const x=inspStat(s,ws);subs[s]={name:subName(s),n:x.n,sub:x.sub}});
  const dates=S.items.filter(it=>isOpen(it)&&it.type!=='event').map(keyDate).filter(Boolean);
  const ev=S.items.filter(it=>it.type==='event'&&!it.resolved&&it.due).map(it=>({d:it.due,tm:it.time||'',t:it.title})).concat(S.items.filter(it=>it.type==='court'&&!it.resolved&&it.hearing).map(it=>({d:it.hearing,tm:it.attendTime||'',t:'Court: '+it.title})));
- const st={ws,subs,dates,ev,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()};
+ const st={ws,subs,dates,ev,ib:S.inbox.length,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()};
  const c=await caches.open('sdo-alarm');await c.put('./__alarm.json',new Response(JSON.stringify(st),{headers:{'Content-Type':'application/json'}}))}catch(e){}}
 async function regBg(){try{if(!('serviceWorker' in navigator))return 'unsupported';const r=await navigator.serviceWorker.ready;if(!r.periodicSync)return 'unsupported';const p=await navigator.permissions.query({name:'periodic-background-sync'});if(p.state!=='granted')return 'not-installed';await r.periodicSync.register('sdo-check',{minInterval:3*3600*1000});return 'on'}catch(e){return 'unsupported'}}
 async function notifiedToday(){try{const c=await caches.open('sdo-alarm');const r=await c.match('./__last.txt');return r&&(await r.text())===today()}catch(e){return false}}
@@ -1287,15 +1286,15 @@ function remindersHTML(){const np=('Notification' in window)?Notification.permis
  <p class="meta">While the app is open you also get an alert 2 hours before a timed meeting or hearing. Exact timing in the background is decided by Android, so the alert may come later in the morning than the hour set.</p></div>`}
 
 /* ---------- Home tabs: Overdue / Due today / Next 2 days / Custom ---------- */
-let HT=null,HTU=null,HC={k:'7d',f:'',t:''};
+let HOX=false,HT=null,HTU=null,HC={k:'7d',f:'',t:''};
 function custRange(){const t=today();if(HC.k==='week'){const w=weekStart(t);return [w,addDays(w,6),'This week']}if(HC.k==='month'){const m=t.slice(0,7);const e=new Date(+m.slice(0,4),+m.slice(5,7),0).getDate();return [m+'-01',m+'-'+pad(e),'This month']}if(HC.k==='pick'&&HC.f&&HC.t)return [HC.f<=HC.t?HC.f:HC.t,HC.f<=HC.t?HC.t:HC.f,'Dates'];return [t,addDays(t,7),'Next 7 days']}
 function custItems(){const [f,e]=custRange();return S.items.filter(it=>inScope(it)&&(isOpen(it)||(it.type==='event'&&!it.resolved))).map(it=>{const ds=datesOf(it).map(x=>x.d).concat(it.followUp?[it.followUp]:[]).filter(d=>d>=f&&d<=e).sort();return ds.length?{it,d:ds[0]}:null}).filter(Boolean).sort((a,b)=>a.d.localeCompare(b.d)||priRank(a.it)-priRank(b.it)).map(x=>x.it)}
-function homeTabs(g){const no=g.over.length+g.overF.length,nt=g.today.length+g.fu.length,ns=g.soon.length;HT=HTU||(no?'over':nt?'today':ns?'soon':'custom');
- const tb=(k,n,l,c)=>`<button class="${HT===k?'on':''} ${c||''}" onclick="HTU='${k}';render()"><b>${n}</b>${l}</button>`;
- return `<div class="htabs">${tb('over',no,'Overdue',no?'rd':'')}${tb('today',nt,'Due today',nt?'am':'')}${tb('soon',ns,'Next 2 days')}${tb('custom',HT==='custom'?custItems().length:'⋯','Custom')}</div>`}
+function homeTabs(g){const no=g.over.length+g.overF.length,nt=g.today.length+g.fu.length,ns=g.soon.length;if(HTU==='over')HTU='today';HT=HTU||(no||nt?'today':ns?'soon':'custom');
+ const tb=(k,n,l,c,sub)=>`<button class="${HT===k?'on':''} ${c||''}" onclick="HTU='${k}';render()"><b>${n}</b>${l}${sub?`<span class="tsub">${sub}</span>`:''}</button>`;
+ return `<div class="htabs">${tb('today',no+nt,'Today',no?'rd':nt?'am':'',no||nt?[no?`<span class="rdt">${no} overdue</span>`:'',nt?nt+' due':''].filter(Boolean).join(', '):'')}${tb('soon',ns,'Next 2 days')}${tb('custom',HT==='custom'?custItems().length:'⋯','Custom')}</div>`}
 function homeTabBody(g){const L=a=>`<div class="list" style="margin-top:8px">${a.map(trow).join('')}</div>`;
- if(HT==='over'){const n=g.over.length+g.overF.length;return n?`<div class="list" style="margin-top:8px">${g.over.map(trow).join('')}${g.overF.length?`<div class="subh">Being followed (${g.overF.length})</div>`+g.overF.map(trow).join(''):''}</div>`:'<p class="empty">Nothing overdue.</p>'}
- if(HT==='today')return g.today.length||g.fu.length?`<div class="list" style="margin-top:8px">${g.today.map(trow).join('')}${g.fu.length?`<div class="subh">Follow up today (${g.fu.length})</div>`+g.fu.map(trow).join(''):''}</div>`:'<p class="empty">Nothing due today.</p>';
+ if(HT==='today'){const ov=g.over.concat(g.overF),cap=HOX?ov.length:5,nt=g.today.length+g.fu.length;if(!ov.length&&!nt)return '<p class="empty">Nothing overdue or due today.</p>';
+  return `<div class="list" style="margin-top:8px">${ov.length?`<div class="subh" style="margin-top:0;color:var(--red)">Overdue (${ov.length})</div>`+ov.slice(0,cap).map(trow).join('')+(ov.length>cap?`<a class="arow" href="#" onclick="HOX=true;render();return false"><span class="an">See all ${ov.length} overdue</span><span class="chev">›</span></a>`:''):''}${nt?`<div class="subh" style="${ov.length?'':'margin-top:0'}">Due today (${nt})</div>`+g.today.map(trow).join('')+g.fu.map(trow).join(''):''}</div>`}
  if(HT==='soon')return g.soon.length?L(g.soon):'<p class="empty">Nothing in the next 2 days.</p>';
  const [f,e,lbl]=custRange();const it=custItems();const ch=(k,l)=>`<button class="pill ${HC.k===k?'on':''}" onclick="HC.k='${k}';render()">${l}</button>`;
  return `<div class="cust">${ch('week','This week')}${ch('7d','Next 7 days')}${ch('month','This month')}${ch('pick','Pick dates')}</div>${HC.k==='pick'?`<div class="grid2"><input type="date" value="${HC.f}" onchange="HC.f=this.value;render()"><input type="date" value="${HC.t}" onchange="HC.t=this.value;render()"></div>`:''}<div class="meta">${esc(lbl)}: ${fmtD(f)} – ${fmtD(e)} · ${it.length} item${it.length===1?'':'s'}</div>${it.length?L(it):'<p class="empty">Nothing in this period.</p>'}`}
