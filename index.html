@@ -204,6 +204,9 @@ details.sg .arow{border-radius:0}
 .ntph{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .ntph img{width:100%;height:auto;max-height:260px;object-fit:contain;border-radius:8px;background:var(--bg);display:block;margin-bottom:6px}
 .ntph input{margin-bottom:6px}
+.ntph img{cursor:zoom-in}
+.pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:55vh;overflow:auto}.pkgi{border:2px solid var(--line);border-radius:10px;padding:4px;opacity:.55}.pkgi.on{border-color:var(--acc);opacity:1}.pkgi img{width:100%;height:150px;object-fit:contain;background:var(--bg);border-radius:6px;display:block;cursor:zoom-in}.pkgi .ck{font-size:12px;margin-top:4px}
+#phv{position:fixed;inset:0;background:#000;z-index:200;display:flex;align-items:center;justify-content:center}#phv img{max-width:100%;max-height:100%;object-fit:contain}#phv span{position:absolute;top:12px;right:16px;color:#fff;font-size:15px;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:16px}
 .ntpv{background:#fff;color:#000;font-size:13px}
 .ntbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
 .ntbar .btn.p{grid-column:1/-1}
@@ -2074,7 +2077,7 @@ function vNote(id){const v=S.visits.find(x=>x.id===id);if(!v)return '<p class="e
  <h2>Rows in the note</h2><div class="card">${tog('out','1 · Outlets')}${tog('tail','2 · Tail')}${tog('staff','3 · Attendance and deployment of field staff')}${tog('reg','4 · Register and records')}${tog('gen','5 · General maintenance and supervision')}<div class="meta">Untick anything you did not check, so the note never says it was checked. <a href="#" onclick="A.ntWord();return false">Change the wording of a row</a></div></div>
  <h2>Added for this visit (${nt.ext.length})</h2><div class="card">${nt.ext.map((e,i)=>`<div class="ntext"><input value="${esc(e.h)}" placeholder="Heading" onchange="A.ntExt(${i},'h',this.value)"><textarea rows="2" onchange="A.ntExt(${i},'t',this.value)">${esc(e.t)}</textarea><button class="btn s d" onclick="A.ntExtDel(${i})">Remove</button></div>`).join('')||'<div class="meta">Lines you wrote in the inspection remarks appear here as extra rows.</div>'}<button class="btn s mt" onclick="A.ntExtAdd()">+ Add a row</button></div>
  <h2>CC</h2><div class="card"><input value="${esc(nt.cc)}" onchange="A.ntSet('cc',this.value.trim())"></div>
- <h2>Photos (${nt.photos.length})</h2><div class="card"><label class="fld"><span>Title for photos PDF</span><input value="${esc(nt.ptitle||ntPTitle(v))}" onchange="A.ntPT(this.value)"></label><div class="ntph">${nt.photos.map((p,i)=>`<div><img data-fid="${p.fid}" alt=""><button class="btn s d" onclick="A.ntPhDel(${i})">Remove</button></div>`).join('')}</div><label class="btn s mt">+ Add photos<input type="file" accept="image/*" multiple hidden onchange="A.ntPh(this)"></label></div>
+ <h2>Photos (${nt.photos.length})</h2><div class="card"><label class="fld"><span>Title for photos PDF</span><input value="${esc(nt.ptitle||ntPTitle(v))}" onchange="A.ntPT(this.value)"></label><div class="ntph">${nt.photos.map((p,i)=>`<div><img data-fid="${p.fid}" alt="" onclick="A.ntView(this.src)"><div class="row" style="gap:6px"><span class="meta">${i+1}</span>${i?`<button class="btn s" onclick="A.ntPhMv(${i},-1)" aria-label="Move earlier">↑</button>`:''}${i<nt.photos.length-1?`<button class="btn s" onclick="A.ntPhMv(${i},1)" aria-label="Move later">↓</button>`:''}<button class="btn s d" style="margin-left:auto" onclick="A.ntPhDel(${i})">Remove</button></div></div>`).join('')}</div>${nt.photos.length?'<div class="meta mt">Tap a photo to see it full size. Order here is the order in the PDF.</div>':''}<label class="btn p s mt">+ Choose from gallery<input type="file" accept="image/*" multiple hidden onchange="A.ntPick2(this)"></label></div>
  <h2>Preview</h2><div class="card ntpv"><div style="white-space:pre-line;text-align:center;font-weight:bold;font-family:'Times New Roman',serif">${esc(offFrom(v.sub))}</div><p style="text-align:center;font-weight:bold;text-decoration:underline;font-family:'Times New Roman',serif">${esc(ntOrder(v))}</p><div id="ntTbl" style="overflow-x:auto">${ntTableHTML(v)}</div><p style="font-family:'Times New Roman',serif;margin-top:10px"><b>CC:</b> ${esc(nt.cc)}</p></div>
  <div class="ntbar"><button class="btn" onclick="A.ntCopy('off')">Copy Office From</button><button class="btn" onclick="A.ntCopy('order')">Copy Order Text</button><button class="btn p" onclick="A.ntCopy('tbl')">Copy table for eFOES</button><button class="btn" onclick="A.ntDocx()">Word file</button><button class="btn" onclick="A.ntPdf()" ${nt.photos.length?'':'disabled'}>Photos PDF</button></div>
  ${v.noteSt==='Submitted'?`<div class="card mt row between"><b style="color:var(--ok)">✓ Uploaded on eFOES</b><button class="btn s" onclick="A.ntSt('Drafted')">Undo</button></div>`:`<button class="btn p wide mt" onclick="A.ntSt('Submitted')">Done: uploaded on eFOES</button>`}`}
@@ -2106,9 +2109,32 @@ A.ntCopy=async k=>{const v=ntV();let ok=false;
 
 /* ---------- photos: shrink on the phone before storing ---------- */
 function shrinkImg(file,max){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);cv.toBlob(b=>b?res({blob:b,w,h}):rej(new Error('encode')),'image/jpeg',0.82)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('read'))};im.src=u})}
-A.ntPh=async inp=>{const files=[...inp.files];inp.value='';const v=ntV();let n=0;toast('Adding '+files.length+' photo(s)…');
- for(const f of files){try{const r=await shrinkImg(f,1600);const fid=uid();await fPut({id:fid,name:(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:r.blob.size,blob:r.blob,ts:Date.now(),w:r.w,h:r.h});v.nt.photos.push({fid,cap:'',w:r.w,h:r.h});n++}catch(e){toast('Could not read '+(f.name||'a photo'))}}
- if(n){save();render();toast(n+' photo(s) added')}};
+async function ntAddFiles(files){const v=ntV();let n=0;toast('Adding '+files.length+' photo(s)…');
+ for(const x of files){const f=x.f||x;try{const r=await shrinkImg(f,1600);const fid=uid();await fPut({id:fid,name:(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:r.blob.size,blob:r.blob,ts:Date.now(),w:r.w,h:r.h});v.nt.photos.push({fid,cap:'',w:r.w,h:r.h,src:pkKey(f),tk:x.d||''});n++}catch(e){toast('Could not read '+(f.name||'a photo'))}}
+ if(n){save();render();toast(n+' photo(s) added')}}
+A.ntPh=inp=>{const files=[...inp.files];inp.value='';ntAddFiles(files)};
+/* date the photo was taken: EXIF first, file date as fallback */
+function exifDate(file){return file.slice(0,262144).arrayBuffer().then(buf=>{const d=new DataView(buf);if(d.byteLength<4||d.getUint16(0)!==0xFFD8)return null;let o=2;
+ while(o+4<=d.byteLength){const m=d.getUint16(o);if((m&0xFF00)!==0xFF00)return null;const L=d.getUint16(o+2);if(m===0xFFE1&&d.getUint32(o+4)===0x45786966){const t=o+10;const le=d.getUint16(t)===0x4949;const g16=p=>d.getUint16(p,le),g32=p=>d.getUint32(p,le);
+  const tags=(ifd,want)=>{const r={};const n=g16(t+ifd);for(let k=0;k<n;k++){const e=t+ifd+2+k*12;const tg=g16(e);if(want.includes(tg))r[tg]=e}return r};
+  const str=e=>{const p=t+g32(e+8);let x='';for(let k=0;k<19;k++)x+=String.fromCharCode(d.getUint8(p+k));return x};
+  const i0=tags(g32(t+4),[0x8769,0x0132]);let dt=null;if(i0[0x8769]){const ex=tags(g32(i0[0x8769]+8),[0x9003,0x9004]);dt=ex[0x9003]?str(ex[0x9003]):ex[0x9004]?str(ex[0x9004]):null}if(!dt&&i0[0x0132])dt=str(i0[0x0132]);
+  const mm=dt&&dt.match(/^(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d)/);return mm?{d:mm[1]+'-'+mm[2]+'-'+mm[3],t:mm[4]+':'+mm[5]}:null}
+  if(m===0xFFDA)return null;o+=2+L}return null}).catch(()=>null)}
+const pkKey=f=>[f.name||'',f.size||0,f.lastModified||0].join('|');
+let NTPK=[];
+A.ntPick2=async inp=>{const files=[...inp.files];inp.value='';if(!files.length)return;const v=ntV();const had=new Set(v.nt.photos.map(p=>p.src).filter(Boolean));NTPK.forEach(x=>URL.revokeObjectURL(x.url));NTPK=[];
+ for(const f of files){const e=await exifDate(f);let d='',t='';if(e){d=e.d;t=e.t}else if(f.lastModified){const x=new Date(f.lastModified);d=x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');t=String(x.getHours()).padStart(2,'0')+':'+String(x.getMinutes()).padStart(2,'0')}
+  const dup=had.has(pkKey(f));NTPK.push({f,url:URL.createObjectURL(f),d,t,dup,on:!dup&&(!d||d===v.date)})}
+ NTPK.sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));ntPkSheet()};
+function ntPkSheet(){const v=ntV();const off=NTPK.filter(x=>x.d&&x.d!==v.date).length,dup=NTPK.filter(x=>x.dup).length;
+ sheet(`<div class="ct">Check before adding</div><div class="meta">Inspection date <b>${fmtD(v.date)}</b>. ${off?`<b style="color:var(--red)">${off} taken on another day</b>, left unticked. `:''}${dup?`<b style="color:var(--amb)">${dup} already in this note</b>, left unticked. `:''}Tap a photo to see it full size.</div>
+ <div class="pkg mt">${NTPK.map((x,i)=>{const bad=x.d&&x.d!==v.date;return `<div class="pkgi ${x.on?'on':''}"><img src="${x.url}" alt="" onclick="A.ntView(this.src)"><label class="ck"><input type="checkbox" ${x.on?'checked':''} onchange="NTPK[${i}].on=this.checked;this.closest('.pkgi').classList.toggle('on',this.checked);A.ntPkN()"> <span style="${bad?'color:var(--red);font-weight:600':''}">${x.d?fmtD(x.d)+(x.t?' · '+x.t:''):'date not known'}${x.dup?' · already added':''}</span></label></div>`}).join('')}</div>
+ <button class="btn p wide mt" id="pkAdd" onclick="A.ntPkAdd()">Add ${NTPK.filter(x=>x.on).length} photo(s)</button><button class="btn wide mt" onclick="closeSheet()">Cancel</button>`)}
+A.ntPkN=()=>{const b=$('#pkAdd');if(b)b.textContent='Add '+NTPK.filter(x=>x.on).length+' photo(s)'};
+A.ntPkAdd=async()=>{const l=NTPK.filter(x=>x.on);if(!l.length)return toast('Tick at least one photo');closeSheet();await ntAddFiles(l);NTPK.forEach(x=>URL.revokeObjectURL(x.url));NTPK=[]};
+A.ntView=src=>{if(!src)return;const d=document.createElement('div');d.id='phv';d.innerHTML=`<img src="${src}" alt=""><span>✕ Close</span>`;d.onclick=()=>d.remove();document.body.appendChild(d)};
+A.ntPhMv=(i,dl)=>{const v=ntV();const a=v.nt.photos;const j=i+dl;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];ntSave()};
 
 /* ---------- small zip writer (stored, no compression) for the .docx ---------- */
 const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
