@@ -197,6 +197,16 @@ details.sg .arow{border-radius:0}
 .also{background:var(--bg);border-radius:10px;padding:10px 12px;margin-bottom:12px}
 .ck{display:flex;gap:10px;align-items:flex-start;padding:7px 0;font-size:14px}
 .ck input{width:20px;height:20px;flex:none;margin:1px 0 0}
+.ntout{display:grid;grid-template-columns:1.1fr .8fr 1.1fr auto;gap:6px;margin-bottom:6px}
+.ntout input{margin:0;min-width:0}
+.ntext{border-bottom:1px solid var(--line);padding:8px 0}
+.ntext input,.ntext textarea{margin-bottom:6px}
+.ntph{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ntph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:var(--bg);display:block;margin-bottom:6px}
+.ntph input{margin-bottom:6px}
+.ntpv{background:#fff;color:#000;font-size:13px}
+.ntbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.ntbar .btn.p{grid-column:1/-1}
 .prow>.an{flex:1;min-width:0}
 .tagl{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .tag{border:1px solid var(--line);border-radius:14px;padding:3px 10px;font-size:13px;text-decoration:none;color:var(--acc);background:var(--card)}
@@ -302,7 +312,7 @@ const fGet=id=>fTx('readonly',st=>st.get(id));
 const fAll=()=>fTx('readonly',st=>st.getAll());
 const fDel=id=>fTx('readwrite',st=>st.delete(id));
 const blobToB64=b=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(b)});
-async function fileGC(){try{const used=new Set();S.items.forEach(it=>(it.links||[]).forEach(l=>{if(l.fileId)used.add(l.fileId)}));(S.canals||[]).forEach(c=>{[c.hPhoto,c.tPhoto].forEach(x=>{if(x)used.add(x)});(c.outlets||[]).forEach(o=>{if(o.photo)used.add(o.photo)})});const all=await fAll();for(const r of all)if(!used.has(r.id))await fDel(r.id)}catch(e){}}
+async function fileGC(){try{const used=new Set();S.items.forEach(it=>(it.links||[]).forEach(l=>{if(l.fileId)used.add(l.fileId)}));(S.visits||[]).forEach(v=>((v.nt||{}).photos||[]).forEach(x=>used.add(x.fid)));(S.canals||[]).forEach(c=>{[c.hPhoto,c.tPhoto].forEach(x=>{if(x)used.add(x)});(c.outlets||[]).forEach(o=>{if(o.photo)used.add(o.photo)})});const all=await fAll();for(const r of all)if(!used.has(r.id))await fDel(r.id)}catch(e){}}
 
 /* ---------- model ---------- */
 const DESIGS=['XEN','SE','Chief Engineer','SDO','Sub Engineer (SEN)','Sub Divisional Clerk (SDC)','Sub Divisional Reader (SDR)','SDR / Zilladar','Zilladar','Canal Patwari','Signaller','Mate','Mistry','Earthwork Mistry','Gauge Reader','Regular Beldar','Beldar','Artificer','Telephone Attendant','Naib Qasid','Dak Runner','Chowkidar','Chowkidar cum Cook','Cook','Sweeper','Drawing Branch','NESPAK','AAG / Law Officer','Police (SHO)','Other'];
@@ -706,7 +716,7 @@ function vEditV(id){const v=id&&id!=='new'?S.vehicle.find(x=>x.id===id):null;con
 
 /* ---------- inspections ---------- */
 const canalLabel=v=>{const c=S.canals.find(x=>x.id===v.canalId);return c?c.name:(v.canalName||'Canal')};
-const visitRow=v=>`<div class="lrow" onclick="go('#editvisit/${v.id}')"><b>${esc(canalLabel(v))}</b> <span class="meta">${fmtD(v.date)}</span> ${!isRoutineV(v)?`<span class="chip">${esc(VKN[v.kind]||v.kind)}${v.estId&&get(v.estId)&&!canalLabel(v).startsWith(get(v.estId).title.slice(0,40))?': '+esc(get(v.estId).title.slice(0,30)):''}</span>`:`<span class="chip ${noteSub(v)?'g':v.noteSt==='Signed'||v.noteSt==='Drafted'?'a':'r'}" onclick="event.stopPropagation();A.noteSt('${v.id}')">Note: ${noteSub(v)?'submitted'+(v.noteNo?' No '+esc(v.noteNo):''):esc((v.noteSt||'not written').toLowerCase())}</span>`}${v.remarks?`<div class="meta clamp">${esc(v.remarks)}</div>`:''}${v.link?`<a href="${esc(v.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Document</a>`:''}</div>`;
+const visitRow=v=>`<div class="lrow" onclick="go('#editvisit/${v.id}')"><b>${esc(canalLabel(v))}</b> <span class="meta">${fmtD(v.date)}</span> ${!isRoutineV(v)?`<span class="chip">${esc(VKN[v.kind]||v.kind)}${v.estId&&get(v.estId)&&!canalLabel(v).startsWith(get(v.estId).title.slice(0,40))?': '+esc(get(v.estId).title.slice(0,30)):''}</span>`:`<span class="chip ${noteSub(v)?'g':v.noteSt==='Signed'||v.noteSt==='Drafted'?'a':'r'}" onclick="event.stopPropagation();go('#note/${v.id}')">Note: ${noteSub(v)?'submitted'+(v.noteNo?' No '+esc(v.noteNo):''):esc((v.noteSt||'not written').toLowerCase())}</span>`}${v.remarks?`<div class="meta clamp">${esc(v.remarks)}</div>`:''}${v.link?`<a href="${esc(v.link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Document</a>`:''}</div>`;
 let IALL={},IPAST={};
 const inspSec=(c,s)=>{const r=canalReaches(c).find(r=>r.sub===s&&r.section);return r?r.section:(c.section||'')};
 const inspPool=s=>S.canals.filter(c=>!isRiver(c)&&canalSubs(c).includes(s)&&!canalReaches(c).some(r=>r.sub==='X'));
@@ -739,7 +749,7 @@ function vEditVisit(a,b){const v=a&&a!=='new'?S.visits.find(x=>x.id===a):null;co
  <label class="fld"><span>Note / photos (Drive link)</span><input id="vi_l" inputmode="url" value="${esc(v?v.link||'':'')}"></label>
  <div id="vk_r"><label class="fld"><span>Inspection note</span><select id="vi_ns">${NOTE_ST.map(x=>`<option ${(v&&v.noteSt||'Not written')===x?'selected':''}>${x}</option>`).join('')}</select></label><div class="grid2"><label class="fld"><span>Note letter No</span><input id="vi_nn" value="${esc(v?v.noteNo||'':'')}"></label><label class="fld"><span>Submitted on</span><input type="date" id="vi_nd" value="${v&&v.noteDate||''}"></label></div></div>
  <div id="vk_o"><label class="fld"><span>Observations (one per line, used in punch list)</span><textarea id="vi_o" rows="3">${esc(v?v.obs||'':'')}</textarea></label>${v&&v.estId?`<button class="btn s" style="margin-bottom:8px" onclick="A.visitPunch('${v.id}')">Draft punch list</button>`:''}</div>
- <button class="btn p wide" onclick="A.saveVisit('${v?v.id:'new'}','${sub}')">Save</button>${v?`<button class="btn d wide mt" onclick="A.delVisit('${v.id}')">Delete</button>`:''}</div>`}
+ <button class="btn p wide" onclick="A.saveVisit('${v?v.id:'new'}','${sub}')">Save</button>${v&&isRoutineV(v)?`<button class="btn wide mt" onclick="go('#note/${v.id}')">Inspection note</button>`:''}${v?`<button class="btn d wide mt" onclick="A.delVisit('${v.id}')">Delete</button>`:''}</div>`}
 /* ---------- log / archive / settings ---------- */
 let LOGD=null;
 function vLog(){if(!LOGD)LOGD=today();const ev=S.log.filter(e=>e.date===LOGD&&(SUB==='A'||!e.sub||e.sub===SUB)).sort((a,b)=>a.ts-b.ts);
@@ -770,10 +780,10 @@ const curView=()=>(location.hash.slice(1)||'home').split('/')[0];
 function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');const v=p[0];if(v!=='edit')PREFILL=null;if(v!=='editvisit')VPRE=null;if(v!=='editcanal'){ECR=null;if(v!=='canals')ECP=null}if(v!=='editp')PPRE=null;if(v!=='editv')VEP=null;if(h!==LASTH)WKX=0;closeDrawer();
  if(SUB!=='A'&&!S.settings.subs[SUB])SUB='A';
  $('#seg').style.display=SUBK().length<2?'none':'';$('#seg').innerHTML=SUBK().length>2?`<select class="segsel" onchange="setSub(this.value)">${[['A','All']].concat(SUBK().map(k=>[k,subName(k)])).map(([k,l])=>`<option value="${k}" ${SUB===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`:SUBK().concat('A').map(k=>[k,k==='A'?'All':subName(k)]).map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
- const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),offences:vOffences,qlog:vQlog,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
+ const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),note:()=>vNote(p[1]),offences:vOffences,qlog:vQlog,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
  const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);$('#homeBtn').style.display=isHome?'none':'';$('header h1').style.display=isHome?'':'none';
- $('.fab').style.display=/^edit/.test(v)||v==='settings'||v==='log'||v==='qlog'?'none':'';
+ $('.fab').style.display=/^edit/.test(v)||v==='settings'||v==='log'||v==='qlog'||v==='note'?'none':'';
  if(h!==LASTH){window.scrollTo(0,0);LASTH=h;if(v==='search'){const e=$('#sq');if(e)e.focus()}}}
 function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}render()}
 
@@ -1981,17 +1991,156 @@ function estMarkField(it,date,note){it.ch=it.ch||{};it.ch.field={date,note:note|
 A.viAlso=()=>{const b=$('#vi_also');if(!b)return;const k=$('#vi_k')?$('#vi_k').value:'Routine';if(k==='Estimate'){b.innerHTML='';return}const cid=$('#vi_c')?$('#vi_c').value:'';const c=cid&&canal(cid);const sec=c&&linkSec(c,'');const h=sec&&secHead(sec.s,sec.g);
  const es=c?S.items.filter(it=>it.type==='estimate'&&isOpen(it)&&(iCanal(it)||{}).id===cid&&!(it.ch&&it.ch.field&&it.ch.field.date)&&!sancD(it)):[];
  b.innerHTML=`<div class="also"><div class="lb" style="margin-top:0">Also do with this save</div><label class="ck"><input type="checkbox" id="va_fu"> Make a follow-up from each remarks line${h?', assigned to '+esc(h.name)+' (SEN)':''}</label>${es.map(it=>`<label class="ck"><input type="checkbox" class="va_es" value="${it.id}" checked> Mark field check done: ${esc(it.title.slice(0,60))}</label>`).join('')}<label class="ck"><input type="checkbox" id="va_veh"> Add a vehicle trip for this visit</label></div>`};
-const saveVisit0=A.saveVisit;A.saveVisit=(id,sub)=>{const fu=$('#va_fu')&&$('#va_fu').checked,veh=$('#va_veh')&&$('#va_veh').checked,es=[...document.querySelectorAll('.va_es:checked')].map(x=>x.value);const cid=$('#vi_c')?$('#vi_c').value:'';const cn=$('#vi_cn')?$('#vi_cn').value.trim():'';const date=($('#vi_d')&&$('#vi_d').value)||today();const rem=$('#vi_r')?$('#vi_r').value:'';const n0=S.visits.length;
+const saveVisit0=A.saveVisit;A.saveVisit=(id,sub)=>{const kind=$('#vi_k')?$('#vi_k').value:'Routine';const fu=$('#va_fu')&&$('#va_fu').checked,veh=$('#va_veh')&&$('#va_veh').checked,es=[...document.querySelectorAll('.va_es:checked')].map(x=>x.value);const cid=$('#vi_c')?$('#vi_c').value:'';const cn=$('#vi_cn')?$('#vi_cn').value.trim():'';const date=($('#vi_d')&&$('#vi_d').value)||today();const rem=$('#vi_r')?$('#vi_r').value:'';const n0=S.visits.length;
  saveVisit0(id,sub);if(id==='new'&&S.visits.length===n0)return;let made=0;const c=cid&&canal(cid);
  if(fu)rem.split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{const rd=findRD(line);const sec=c?linkSec(c,rd):null;const p=findPerson(line,sec)||(sec&&secHead(sec.s,sec.g));const it=qlMake({title:line,ty:'task',cid:c?c.id:'',rd,sec,pid:p?p.id:'',due:addDays(date,3),sub:sec?sec.s:sub});it.details='From inspection'+(c?' of '+c.name:'')+' on '+fmtD(date);made++});
  es.forEach(eid=>{const it=get(eid);if(it)estMarkField(it,date,'Seen during inspection')});
  if(made||es.length)save();
- if(veh){VEP={date,route:'Inspection: '+(c?c.name:cn)};location.replace('#editv/new')}
+ if(veh){VEP={date,route:'Inspection: '+(c?c.name:cn)};location.replace('#editv/new')}else if(id==='new'&&kind==='Routine')location.replace('#note/'+S.visits[S.visits.length-1].id)
  if(made||es.length||veh)toast('Inspection saved'+(made?' · '+made+' follow-up'+(made>1?'s':''):'')+(es.length?' · field check marked':'')+(veh?' · now add the trip':''),1)};
 
 /* ---------- handover to the next SDO ---------- */
 A.handover=()=>{const o=JSON.parse(JSON.stringify(S));o.items=o.items.filter(it=>!it.personal);o.inbox=[];o.log=[];o.vehicle=[];o.routineDone={};o._handover={date:today(),subs:SUBK().map(subName)};
  const b=new Blob([JSON.stringify(o)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='SDO-Desk-handover-'+SUBK().map(subName).join('-').replace(/\s+/g,'')+'-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);log('Handover file made',{});save();toast('Handover file saved to Downloads')};
+
+/* ================= inspection note: eFOES text, Word file, photo annexure PDF ================= */
+const NT_ROWS=[
+ {k:'out',h:'{n} Outlets',p:['The outlets were checked and found according to the approved design.','@outlets','The concerned Sub Engineer was directed to check the outlets regularly and maintain their dimensions, levels, and regulation arrangements as per design.','The outlets and their approaches must be kept clean and free from weeds, silt, and other obstructions to ensure proper regulation and equitable distribution of canal water.']},
+ {k:'tail',h:'Tail',p:['@dis_tail','The tail of {ch} was inspected, and the concerned establishment was directed to expedite the work for improving the tail as per the authorized/design discharge.','The concerned Sub Engineer was directed to ensure the submission of an estimate for desilting, berm cutting, and repair of culverts and parapets.','Proper regulation of the distributary must be ensured, and the authorized discharge at the tail should be maintained for equitable distribution of canal water throughout the command area.','The tail discharge should be checked regularly. Any deviation from the authorized discharge must be immediately investigated and rectified.']},
+ {k:'staff',h:'Attendance and deployment of field staff',p:['The attendance and deployment of field staff were checked during the inspection.','The concerned Sub Engineer was directed to keep the attendance record properly maintained and up to date and ensure that staff remain available at their assigned places of duty.','All field staff should know their assigned duties and responsibilities and perform them properly and regularly.']},
+ {k:'reg',h:'Register and records',p:['The relevant registers and records maintained by the field staff were checked.','The concerned Sub Engineer was directed to ensure that all required registers are properly maintained, regularly updated, and available for inspection.','All entries regarding canal regulation, discharge, maintenance, and other field activities should be made accurately and on time.']},
+ {k:'gen',h:'General Maintenance and supervision',p:['@dis_head','The concerned Sub Engineer was directed to properly supervise the channel, outlets, and take timely action on any deficiencies found during routine inspections.','Proper regulation of {ch} should be ensured according to the authorized plan and supplies, with special attention to maintaining the authorized discharge at the tail.']}];
+const CTS={Distributary:'Disty',Minor:'Minor','Sub Minor':'Sub Minor'};
+function chTitle(c){if(!c)return '';const n=c.name.trim();if(/\b(disty|distributary|minor|branch|canal|escape|drain)\b/i.test(n))return n;const t=CTS[c.ctype]||'';return t?n+' '+t:n}
+const offFrom=s=>((S.settings.offFrom||{})[s])||('OFFICE OF THE\nSUB DIVISIONAL OFFICER\n'+String(subName(s)).toUpperCase()+' CANAL SUB DIVISION\n'+String(subName(s)).toUpperCase());
+const outNo=o=>{const r=String(o.rd||'').replace(/\+/g,'').replace(/^0+(?=\d)/,'');return (r||'?')+(o.side?'/'+o.side:'')};
+const dotD=d=>d?d.slice(8,10)+'.'+d.slice(5,7)+'.'+d.slice(0,4):'';
+function ntInit(v){if(v.nt)return v.nt;const c=canal(v.canalId);const sec=c&&linkSec(c,'');const h=sec&&secHead(sec.s,sec.g);
+ const ext=String(v.remarks||'').split('\n').map(x=>x.trim()).filter(Boolean).map(t=>({h:ntHead(t),t:ntSent(t)}));
+ v.nt={tpl:'sen',title:chTitle(c)||v.canalName||'',outs:[],aq:c&&c.q?String(c.q):'',oq:'',at:'tail',on:{out:1,tail:1,staff:1,reg:1,gen:1},txt:{},ext,photos:[],cc:h?h.name+', Sub Engineer, '+sec.g:'Sub Engineer concerned'};return v.nt}
+const NTH=[[/gauge|guage/i,'Gauge'],[/berm/i,'Berm'],[/outlet|mogha|moga/i,'Outlets'],[/silt|desilt/i,'Silting'],[/breach|bank/i,'Banks'],[/culvert|bridge|parapet/i,'Culverts and parapets'],[/theft|tamper|illegal/i,'Water theft'],[/weed|sarkanda|narki|grass/i,'Weeds'],[/tail/i,'Tail'],[/road|crossing/i,'Road crossing'],[/encroach/i,'Encroachment'],[/discharge|cusec|\bcs\b/i,'Discharge']];
+const ntHead=t=>(NTH.find(([re])=>re.test(t))||[0,'Site observation'])[1];
+const ntSent=t=>{t=t.trim().replace(/\s+/g,' ');t=t.charAt(0).toUpperCase()+t.slice(1);return /[.!?]$/.test(t)?t:t+'.'};
+function ntChannel(v){return (v.nt&&v.nt.title)||canalLabel(v)}
+function ntDisSent(nt,where){if(nt.at!==where||!nt.oq)return '';return 'Authorized discharge at '+(where==='tail'?'tail':'head')+(nt.aq?' is '+nt.aq+' Cs':'')+'; discharge observed at the time of inspection was '+nt.oq+' Cs.'}
+function ntRows(v){const nt=ntInit(v);const ch=ntChannel(v);const n=nt.outs.length;const R=[];
+ NT_ROWS.forEach(r=>{if(!nt.on[r.k])return;if(r.k==='out'&&!n)return;const custom=nt.txt[r.k];const ps=(custom?custom.split('\n'):r.p).map(p=>p.trim()).filter(Boolean).flatMap(p=>p==='@outlets'?['@outlets']:p==='@dis_tail'?[ntDisSent(nt,'tail')]:p==='@dis_head'?[ntDisSent(nt,'head')]:[p.replace(/\{ch\}/g,ch)]).filter(Boolean);
+  R.push({h:r.h.replace('{n}',String(n).padStart(2,'0')),ps})});
+ nt.ext.filter(e=>e.t.trim()).forEach(e=>R.push({h:e.h||'Site observation',ps:e.t.split('\n').map(x=>x.trim()).filter(Boolean)}));return R}
+function ntOrder(v){const nt=ntInit(v);const ch=ntChannel(v);return nt.order||('Inspection of '+ch+(nt.tpl==='xen'?' along with the Executive Engineer':''))}
+/* the table as styled HTML: what is copied into eFOES */
+const TB='border:1px solid #000;border-collapse:collapse;padding:4px 6px;vertical-align:top;font-family:\'Times New Roman\',serif;font-size:12pt';
+function ntTableHTML(v){const nt=ntInit(v);const rows=ntRows(v);const td=(x,w)=>`<td style="${TB}${w?';width:'+w:''}">${x}</td>`;
+ const outT=`<p style="margin:4px 0 2px;font-weight:bold;font-family:'Times New Roman',serif">Outlet-wise Details</p><table style="border-collapse:collapse;width:100%">`+`<tr>${['Outlet No.','Type','Design Data (Dia. / B × Y × H)'].map(x=>`<td style="${TB};font-weight:bold;background:#f2f2f2">${x}</td>`).join('')}</tr>`+nt.outs.map(o=>`<tr>${td(esc(o.no))}${td(esc(o.type))}${td(esc(o.des))}</tr>`).join('')+`</table>`;
+ return `<table style="border-collapse:collapse;width:100%"><tr>${['Sr No.','Name Of Channel','Observation'].map((x,i)=>`<td style="${TB};font-weight:bold;background:#f2f2f2;${i===0?'width:8%':i===1?'width:24%':''}">${x}</td>`).join('')}</tr>${rows.map((r,i)=>`<tr>${td(String(i+1),'8%')}${td(esc(r.h),'24%')}${td(r.ps.map(p=>p==='@outlets'?outT:`<p style="margin:0 0 4px;font-family:'Times New Roman',serif;font-size:12pt">${esc(p)}</p>`).join(''))}</tr>`).join('')}</table>`}
+
+let NTV=null,NTE=null;
+function vNote(id){const v=S.visits.find(x=>x.id===id);if(!v)return '<p class="empty">Inspection not found.</p>';const nt=ntInit(v);NTV=id;const c=canal(v.canalId);setTimeout(hydrateImgs,0);
+ const cos=(c&&c.outlets||[]).slice().sort((a,b)=>(rdV(a.rd)??0)-(rdV(b.rd)??0));
+ const tog=(k,l)=>`<label class="ck"><input type="checkbox" ${nt.on[k]?'checked':''} onchange="A.ntOn('${k}',this.checked)"> ${esc(l)}</label>`;
+ return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">Inspection note</h1><div class="meta" style="margin-top:-6px">${esc(canalLabel(v))} · ${fmtD(v.date)} · ${esc(subName(v.sub))}</div>
+ <div class="seg mt"><button class="${nt.tpl==='sen'?'on':''}" onclick="A.ntSet('tpl','sen')">With SEN</button><button class="${nt.tpl==='xen'?'on':''}" onclick="A.ntSet('tpl','xen')">With SEN and XEN</button></div>
+ <div class="card"><label class="fld"><span>Office From</span><textarea rows="4" onchange="A.ntOff('${v.sub}',this.value)">${esc(offFrom(v.sub))}</textarea></label>
+ <label class="fld"><span>Channel name with type</span><input value="${esc(nt.title)}" onchange="A.ntSet('title',this.value.trim())"></label>
+ <label class="fld"><span>Order Text</span><input value="${esc(ntOrder(v))}" onchange="A.ntSet('order',this.value.trim())"></label></div>
+ <h2>Outlets checked (${nt.outs.length})</h2><div class="card">${nt.outs.map((o,i)=>`<div class="ntout"><input value="${esc(o.no)}" placeholder="No e.g. 1536/R" onchange="A.ntOut(${i},'no',this.value)"><input value="${esc(o.type)}" placeholder="PIPE" list="olTypes" onchange="A.ntOut(${i},'type',this.value)"><input value="${esc(o.des)}" placeholder="DIA=4.5”" onchange="A.ntOut(${i},'des',this.value)"><button class="btn s d" onclick="A.ntOutDel(${i})" aria-label="Remove">✕</button></div>`).join('')||'<div class="meta">No outlets added. Row 1 is left out until you add at least one.</div>'}
+ <div class="acts">${cos.length?`<select onchange="if(this.value)A.ntOutAdd(this.value);this.value=''" style="flex:1"><option value="">Add from ${esc(c.name)} outlets (${cos.length})</option>${cos.map(o=>`<option value="${o.id}">${esc(outNo(o))} · ${esc(o.type||'')} ${esc(o.size||'')}</option>`).join('')}</select>`:''}<button class="btn s" onclick="A.ntOutAdd('')">+ Type one</button></div><datalist id="olTypes"><option value="PIPE"><option value="APM"><option value="OFRB"><option value="Open Flume"></datalist></div>
+ <h2>Discharge</h2><div class="card"><div class="grid2"><label class="fld"><span>Authorized (Cs)</span><input inputmode="decimal" value="${esc(nt.aq)}" onchange="A.ntSet('aq',this.value.trim())"></label><label class="fld"><span>Observed (Cs)</span><input inputmode="decimal" value="${esc(nt.oq)}" onchange="A.ntSet('oq',this.value.trim())"></label></div><div class="fchips"><button class="${nt.at==='tail'?'on':''}" onclick="A.ntSet('at','tail')">At tail</button><button class="${nt.at==='head'?'on':''}" onclick="A.ntSet('at','head')">At head</button></div><div class="meta">Left out of the note if Observed is empty.</div></div>
+ <h2>Rows in the note</h2><div class="card">${tog('out','1 · Outlets')}${tog('tail','2 · Tail')}${tog('staff','3 · Attendance and deployment of field staff')}${tog('reg','4 · Register and records')}${tog('gen','5 · General maintenance and supervision')}<div class="meta">Untick anything you did not check, so the note never says it was checked. <a href="#" onclick="A.ntWord();return false">Change the wording of a row</a></div></div>
+ <h2>Added for this visit (${nt.ext.length})</h2><div class="card">${nt.ext.map((e,i)=>`<div class="ntext"><input value="${esc(e.h)}" placeholder="Heading" onchange="A.ntExt(${i},'h',this.value)"><textarea rows="2" onchange="A.ntExt(${i},'t',this.value)">${esc(e.t)}</textarea><button class="btn s d" onclick="A.ntExtDel(${i})">Remove</button></div>`).join('')||'<div class="meta">Lines you wrote in the inspection remarks appear here as extra rows.</div>'}<button class="btn s mt" onclick="A.ntExtAdd()">+ Add a row</button></div>
+ <h2>CC</h2><div class="card"><input value="${esc(nt.cc)}" onchange="A.ntSet('cc',this.value.trim())"></div>
+ <h2>Photos (${nt.photos.length})</h2><div class="card"><div class="ntph">${nt.photos.map((p,i)=>`<div><img data-fid="${p.fid}" alt=""><input value="${esc(p.cap)}" placeholder="Caption, e.g. Tail RD 28+000" onchange="A.ntCap(${i},this.value)"><button class="btn s d" onclick="A.ntPhDel(${i})">Remove</button></div>`).join('')}</div><label class="btn s mt">+ Add photos<input type="file" accept="image/*" multiple hidden onchange="A.ntPh(this)"></label></div>
+ <h2>Preview</h2><div class="card ntpv"><div style="white-space:pre-line;text-align:center;font-weight:bold;font-family:'Times New Roman',serif">${esc(offFrom(v.sub))}</div><p style="text-align:center;font-weight:bold;text-decoration:underline;font-family:'Times New Roman',serif">${esc(ntOrder(v))}</p><div id="ntTbl" style="overflow-x:auto">${ntTableHTML(v)}</div><p style="font-family:'Times New Roman',serif;margin-top:10px"><b>CC:</b> ${esc(nt.cc)}</p></div>
+ <div class="ntbar"><button class="btn" onclick="A.ntCopy('off')">Copy Office From</button><button class="btn" onclick="A.ntCopy('order')">Copy Order Text</button><button class="btn p" onclick="A.ntCopy('tbl')">Copy table for eFOES</button><button class="btn" onclick="A.ntDocx()">Word file</button><button class="btn" onclick="A.ntPdf()" ${nt.photos.length?'':'disabled'}>Photos PDF</button></div>
+ <label class="fld mt"><span>Note status</span><select onchange="A.ntSt(this.value)">${NOTE_ST.map(x=>`<option ${(v.noteSt||'Not written')===x?'selected':''}>${x}</option>`).join('')}</select></label>`}
+const ntV=()=>S.visits.find(x=>x.id===NTV);
+const ntSave=(re)=>{save();if(re!==false)render()};
+A.ntSet=(k,val)=>{const v=ntV();snap();v.nt[k]=val;if(k==='tpl')delete v.nt.order;ntSave()};
+A.ntOff=(s,val)=>{snap();(S.settings.offFrom=S.settings.offFrom||{})[s]=val.trim();ntSave()};
+A.ntOn=(k,on)=>{const v=ntV();v.nt.on[k]=on?1:0;ntSave()};
+A.ntOut=(i,k,val)=>{const v=ntV();v.nt.outs[i][k]=val.trim();ntSave(false);const t=$('#ntTbl');if(t)t.innerHTML=ntTableHTML(v)};
+A.ntOutDel=i=>{const v=ntV();snap();v.nt.outs.splice(i,1);ntSave()};
+A.ntOutAdd=oid=>{const v=ntV();const c=canal(v.canalId);const o=oid&&c?(c.outlets||[]).find(x=>x.id===oid):null;v.nt.outs.push(o?{no:outNo(o),type:(o.type||'').toUpperCase(),des:o.size||''}:{no:'',type:'PIPE',des:''});ntSave()};
+A.ntExt=(i,k,val)=>{const v=ntV();v.nt.ext[i][k]=val.trim();ntSave(false);const t=$('#ntTbl');if(t)t.innerHTML=ntTableHTML(v)};
+A.ntExtDel=i=>{const v=ntV();snap();v.nt.ext.splice(i,1);ntSave()};
+A.ntExtAdd=()=>{const v=ntV();v.nt.ext.push({h:'',t:''});ntSave()};
+A.ntCap=(i,val)=>{const v=ntV();v.nt.photos[i].cap=val.trim();ntSave(false)};
+A.ntPhDel=i=>{const v=ntV();snap();v.nt.photos.splice(i,1);ntSave()};
+A.ntSt=val=>{const v=ntV();snap();v.noteSt=val;if(val==='Submitted'&&!v.noteDate)v.noteDate=today();log('Inspection note '+val.toLowerCase()+': '+canalLabel(v),{sub:v.sub});ntSave()};
+A.ntWord=()=>{const v=ntV();sheet(`<div class="ct">Wording of each row</div><p class="meta">One paragraph per line. {ch} becomes the channel name. Leave a box empty to go back to your standard wording. Changes apply to this note only.</p>${NT_ROWS.map(r=>`<label class="fld"><span>${esc(r.h.replace('{n} ',''))}</span><textarea rows="5" id="ntw_${r.k}">${esc(v.nt.txt[r.k]||r.p.join('\n'))}</textarea></label>`).join('')}<button class="btn p wide" onclick="A.ntWordSave()">Save</button>`)};
+A.ntWordSave=()=>{const v=ntV();snap();NT_ROWS.forEach(r=>{const t=$('#ntw_'+r.k).value.trim();if(!t||t===r.p.join('\n'))delete v.nt.txt[r.k];else v.nt.txt[r.k]=t});save();closeSheet();render();toast('Wording saved for this note',1)};
+const ntDrafted=v=>{if(!v.noteSt||v.noteSt==='Not written'){v.noteSt='Drafted';save()}};
+A.ntCopy=async k=>{const v=ntV();let ok=false;
+ if(k==='tbl'){const html=ntTableHTML(v);const plain=ntRows(v).map((r,i)=>(i+1)+'\t'+r.h+'\t'+r.ps.map(p=>p==='@outlets'?'Outlet-wise Details\n'+v.nt.outs.map(o=>[o.no,o.type,o.des].join('\t')).join('\n'):p).join('\n')).join('\n');
+  try{if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write){await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);ok=true}}catch(e){}
+  if(!ok){const d=document.createElement('div');d.contentEditable='true';d.style.cssText='position:fixed;left:-9999px;top:0';d.innerHTML=html;document.body.appendChild(d);const r=document.createRange();r.selectNodeContents(d);const s=getSelection();s.removeAllRanges();s.addRange(r);try{ok=document.execCommand('copy')}catch(e){}s.removeAllRanges();d.remove()}}
+ else{const t=k==='off'?offFrom(v.sub):ntOrder(v);try{await navigator.clipboard.writeText(t);ok=true}catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{ok=document.execCommand('copy')}catch(e2){}ta.remove()}}
+ if(ok&&k==='tbl')ntDrafted(v);toast(ok?(k==='tbl'?'Table copied. Paste it into eFOES.':'Copied'):'Could not copy on this phone. Use the Word file.')};
+
+/* ---------- photos: shrink on the phone before storing ---------- */
+function shrinkImg(file,max){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);cv.toBlob(b=>b?res({blob:b,w,h}):rej(new Error('encode')),'image/jpeg',0.72)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('read'))};im.src=u})}
+A.ntPh=async inp=>{const files=[...inp.files];inp.value='';const v=ntV();let n=0;toast('Adding '+files.length+' photo(s)…');
+ for(const f of files){try{const r=await shrinkImg(f,1400);const fid=uid();await fPut({id:fid,name:(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:r.blob.size,blob:r.blob,ts:Date.now(),w:r.w,h:r.h});v.nt.photos.push({fid,cap:'',w:r.w,h:r.h});n++}catch(e){toast('Could not read '+(f.name||'a photo'))}}
+ if(n){save();render();toast(n+' photo(s) added')}};
+
+/* ---------- small zip writer (stored, no compression) for the .docx ---------- */
+const CRCT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=b=>{let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRCT[(c^b[i])&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0};
+function zipStore(files){const enc=new TextEncoder();const parts=[],cen=[];let off=0;
+ const u16=n=>[n&255,(n>>8)&255],u32=n=>[n&255,(n>>8)&255,(n>>16)&255,(n>>>24)&255];
+ files.forEach(([name,data])=>{const nb=enc.encode(name),db=typeof data==='string'?enc.encode(data):data,cr=crc32(db);
+  const lh=new Uint8Array([0x50,0x4b,3,4,...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(cr),...u32(db.length),...u32(db.length),...u16(nb.length),...u16(0)]);
+  parts.push(lh,nb,db);cen.push(new Uint8Array([0x50,0x4b,1,2,...u16(20),...u16(20),...u16(0x0800),...u16(0),...u16(0),...u16(0x21),...u32(cr),...u32(db.length),...u32(db.length),...u16(nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(off)]),nb);off+=lh.length+nb.length+db.length});
+ const cs=cen.reduce((s,x)=>s+x.length,0);const end=new Uint8Array([0x50,0x4b,5,6,0,0,0,0,...u16(files.length),...u16(files.length),...u32(cs),...u32(off),0,0]);
+ return new Blob([...parts,...cen,end],{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})}
+const xe=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function wP(t,o){o=o||{};const r=`<w:r><w:rPr>${o.b?'<w:b/>':''}${o.u?'<w:u w:val="single"/>':''}${o.sz?`<w:sz w:val="${o.sz}"/>`:''}</w:rPr><w:t xml:space="preserve">${xe(t)}</w:t></w:r>`;return `<w:p><w:pPr>${o.c?'<w:jc w:val="center"/>':o.j?'<w:jc w:val="both"/>':''}<w:spacing w:before="0" w:after="${o.a==null?80:o.a}"/></w:pPr>${r}</w:p>`}
+const wBorders='<w:tblBorders><w:top w:val="single" w:sz="6" w:color="000000"/><w:left w:val="single" w:sz="6" w:color="000000"/><w:bottom w:val="single" w:sz="6" w:color="000000"/><w:right w:val="single" w:sz="6" w:color="000000"/><w:insideH w:val="single" w:sz="6" w:color="000000"/><w:insideV w:val="single" w:sz="6" w:color="000000"/></w:tblBorders>';
+function wTbl(widths,rows,head){return `<w:tbl><w:tblPr><w:tblW w:w="${widths.reduce((a,b)=>a+b,0)}" w:type="dxa"/>${wBorders}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>${rows.map((r,ri)=>`<w:tr>${ri===0&&head?'<w:trPr><w:tblHeader/></w:trPr>':''}${r.map((cell,ci)=>`<w:tc><w:tcPr><w:tcW w:w="${widths[ci]}" w:type="dxa"/>${ri===0&&head?'<w:shd w:val="clear" w:color="auto" w:fill="F2F2F2"/>':''}</w:tcPr>${cell}</w:tc>`).join('')}</w:tr>`).join('')}</w:tbl>`}
+function ntDocxXml(v){const nt=ntInit(v);const rows=ntRows(v);
+ const outT=wP('Outlet-wise Details',{b:1,a:40})+wTbl([1900,1500,2900],[['Outlet No.','Type','Design Data (Dia. / B × Y × H)'].map(x=>wP(x,{b:1,a:0}))].concat(nt.outs.map(o=>[o.no,o.type,o.des].map(x=>wP(x,{a:0})))),1)+wP('',{a:40});
+ const body=wTbl([800,2300,6500],[['Sr No.','Name Of Channel','Observation'].map(x=>wP(x,{b:1,a:0}))].concat(rows.map((r,i)=>[wP(String(i+1),{c:1,a:0}),wP(r.h,{a:0}),r.ps.map(p=>p==='@outlets'?outT:wP(p,{j:1})).join('')||wP('')])),1);
+ const head=offFrom(v.sub).split('\n').map(l=>wP(l.trim(),{b:1,c:1,a:0})).join('');
+ return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${head}${wP('',{a:0})}${wP(ntOrder(v),{b:1,u:1,c:1,a:60})}${wP('Date of inspection: '+dotD(v.date),{c:1,a:160})}${body}${wP('',{a:0})}${wP('CC: '+nt.cc,{a:0})}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1080" w:right="1080" w:bottom="1080" w:left="1080" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`}
+const ntFile=(v,ext)=>('Inspection note '+ntChannel(v)+' '+dotD(v.date)).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim()+ext;
+async function shareOrSave(blob,name,title){const f=new File([blob],name,{type:blob.type});try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title});return 'shared'}}catch(e){if(e&&e.name==='AbortError')return 'cancel'}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);return 'saved'}
+A.ntDocx=async()=>{const v=ntV();const files=[['[Content_Types].xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>'],
+ ['_rels/.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+ ['word/_rels/document.xml.rels','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+ ['word/styles.xml','<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="252" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults></w:styles>'],
+ ['word/document.xml',ntDocxXml(v)]];
+ const r=await shareOrSave(zipStore(files),ntFile(v,'.docx'),'Inspection note');if(r!=='cancel'){ntDrafted(v);toast(r==='shared'?'Word file shared':'Word file saved to Downloads')}};
+
+/* ---------- photo annexure PDF (A4, 4 photos per page, captions) ---------- */
+function pdfTxt(s){return String(s||'').replace(/·/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/×/g,'x').replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)')}
+const pdfW=(s,sz)=>String(s).length*sz*0.5;
+function pdfWrap(s,sz,w){const out=[];let line='';String(s||'').split(/\s+/).forEach(word=>{const t=line?line+' '+word:word;if(pdfW(t,sz)>w&&line){out.push(line);line=word}else line=t});if(line)out.push(line);return out}
+async function ntPdfBlob(v){const nt=ntInit(v);const imgs=[];for(const p of nt.photos){const r=await fGet(p.fid);if(!r)continue;imgs.push({b:new Uint8Array(await r.blob.arrayBuffer()),w:p.w||r.w||1000,h:p.h||r.h||750,cap:p.cap})}
+ if(!imgs.length)throw new Error('none');const W=595,Hh=842,M=36,G=16,cw=(W-2*M-G)/2,per=4,np=Math.ceil(imgs.length/per);
+ const enc=s=>{const b=new Uint8Array(s.length);for(let i=0;i<s.length;i++)b[i]=s.charCodeAt(i)&255;return b};
+ const chunks=[];let len=0;const off=[];const put=x=>{const b=typeof x==='string'?enc(x):x;chunks.push(b);len+=b.length};
+ put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');const nImg=imgs.length;const imgObj=i=>5+i,contObj=p=>5+nImg+p*2,pageObj=p=>6+nImg+p*2,total=4+nImg+np*2;
+ const obj=(n,s)=>{off[n]=len;put(n+' 0 obj\n'+s+'\nendobj\n')};
+ obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${Array.from({length:np},(_,p)=>pageObj(p)+' 0 R').join(' ')}] /Count ${np} >>`);
+ obj(3,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');obj(4,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>');
+ imgs.forEach((im,i)=>{off[imgObj(i)]=len;put(`${imgObj(i)} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.b.length} >>\nstream\n`);put(im.b);put('\nendstream\nendobj\n')});
+ const ch=ntChannel(v);
+ for(let p=0;p<np;p++){let c='';const T=(x,y,s,f,t)=>{c+=`BT /F${f} ${s} Tf ${x.toFixed(1)} ${y.toFixed(1)} Td (${pdfTxt(t)}) Tj ET\n`};const TC=(y,s,f,t)=>T((W-pdfW(t,s)*(f===4?1.08:1))/2,y,s,f,t);
+  let top=Hh-M;if(p===0){TC(top-14,15,4,'Annexure-A');TC(top-34,11,4,'Photographs: '+ntOrder(v));TC(top-50,10,3,'Date of inspection: '+dotD(v.date)+'   |   '+offFrom(v.sub).split('\n').slice(1).join(', ').replace(/\s+/g,' '));c+=`0.6 w ${M} ${top-60} m ${W-M} ${top-60} l S\n`;top-=72}else{TC(top-10,9,3,'Annexure-A (continued) - '+ch+' - '+dotD(v.date));top-=24}
+  const bottom=M+16;const rowH=(top-bottom-G)/2;
+  imgs.slice(p*per,p*per+per).forEach((im,k)=>{const col=k%2,row=Math.floor(k/2);const x0=M+col*(cw+G),yTop=top-row*(rowH+G);const capL=pdfWrap((p*per+k+1)+'. '+(im.cap||'Photo'),9,cw).slice(0,2);const boxH=rowH-capL.length*12-6;
+   const sc=Math.min(cw/im.w,boxH/im.h);const iw=im.w*sc,ih=im.h*sc;const ix=x0+(cw-iw)/2,iy=yTop-boxH+(boxH-ih)/2;
+   c+=`q ${iw.toFixed(2)} 0 0 ${ih.toFixed(2)} ${ix.toFixed(2)} ${iy.toFixed(2)} cm /Im${p*per+k} Do Q\n0.5 w ${ix.toFixed(2)} ${iy.toFixed(2)} ${iw.toFixed(2)} ${ih.toFixed(2)} re S\n`;
+   capL.forEach((l,j)=>T(x0+(cw-pdfW(l,9))/2,yTop-boxH-14-j*12,9,3,l))});
+  TC(M-6,8,3,'Page '+(p+1)+' of '+np);
+  const xo=imgs.slice(p*per,p*per+per).map((_,k)=>`/Im${p*per+k} ${imgObj(p*per+k)} 0 R`).join(' ');
+  off[contObj(p)]=len;put(`${contObj(p)} 0 obj\n<< /Length ${c.length} >>\nstream\n${c}endstream\nendobj\n`);
+  obj(pageObj(p),`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${Hh}] /Resources << /Font << /F3 3 0 R /F4 4 0 R >> /XObject << ${xo} >> >> /Contents ${contObj(p)} 0 R >>`)}
+ const xref=len;let x='xref\n0 '+(total+1)+'\n0000000000 65535 f \n';for(let n=1;n<=total;n++)x+=String(off[n]).padStart(10,'0')+' 00000 n \n';put(x+`trailer\n<< /Size ${total+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);
+ return new Blob(chunks,{type:'application/pdf'})}
+A.ntPdf=async()=>{const v=ntV();if(!v.nt.photos.length)return toast('Add photos first');toast('Making PDF…');let b;try{b=await ntPdfBlob(v)}catch(e){return toast('Photos not found on this phone')}
+ const r=await shareOrSave(b,ntFile(v,' - Annexure-A photos.pdf'),'Annexure-A photos');if(r!=='cancel')toast((r==='shared'?'PDF shared':'PDF saved to Downloads')+' · '+fsize(b.size))};
 
 /* ================= start ================= */
 $('#desigs').innerHTML=DESIGS.map(d=>`<option value="${esc(d)}">`).join('');
