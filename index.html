@@ -971,8 +971,9 @@ A.delV=id=>{if(!confirm('Delete this entry?'))return;snap();S.vehicle=S.vehicle.
 A.saveVisit=(id,sub)=>{const cid=$('#vi_c')?$('#vi_c').value:'';let v=id!=='new'?S.visits.find(x=>x.id===id):null;const keepOld=v&&!cid&&!(v.canalId&&canal(v.canalId))&&v.canalName;if(!cid&&!keepOld)return toast('Choose the canal');const lk=$('#vi_l').value.trim();if(lk&&!isUrl(lk))return toast('Link must start with https://');
  const eid=$('#vi_e').value,date=$('#vi_d').value||today(),rem=$('#vi_r').value.trim(),fu=$('#va_fu')&&$('#va_fu').checked,es=[...document.querySelectorAll('.va_es:checked')].map(x=>x.value);
  snap();const isNew=!v;if(!v){v={id:uid(),sub,noteSt:'Not written'};S.visits.push(v)}Object.assign(v,{canalId:cid||'',canalName:cid?'':keepOld,date,remarks:rem,link:lk,estId:eid||'',obs:$('#vi_o')?$('#vi_o').value.trim():(v.obs||''),kind:'Routine'});VPRE=null;
- const c=cid&&canal(cid);let made=0;
- if(fu)rem.split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{const rd=findRD(line);const sec=c?linkSec(c,rd):null;const p=findPerson(line,sec)||(sec&&secHead(sec.s,sec.g));const it=qlMake({title:line,ty:'task',cid:c?c.id:'',rd,sec,pid:p?p.id:'',due:addDays(date,3),sub:sec?sec.s:sub});it.details='From inspection'+(c?' of '+c.name:'')+' on '+fmtD(date);made++});
+ const c=cid&&canal(cid);let made=0;const fus=[];
+ if(fu)rem.split('\n').map(x=>x.trim()).filter(Boolean).forEach(line=>{const it=ptFollow(v,line,3);fus.push(it.id);made++});
+ if(isNew&&fus.length){ntInit(v);v.nt.ext.forEach((e,k)=>{if(fus[k]){e.id=e.id||uid();e.trk=1;e.fu=fus[k]}})}
  es.forEach(e=>{const it=get(e);if(it)estMarkField(it,date,'Seen during inspection')});
  log('Inspected '+canalLabel(v)+' ('+subName(v.sub)+')',{sub:v.sub});save();
  if(isNew)location.replace('#note/'+v.id);else location.replace('#insp');
@@ -1857,7 +1858,7 @@ function workCard(l,addJs,shareJs){l=sortW(l);const ov=overN(l);
  return `<div class="card"><div class="row between"><div class="ct">Open work <span class="meta">${l.length}${ov?` · <span class="rd">${ov} overdue</span>`:''}</span></div><span class="ibs">${shareJs&&l.length?`<button class="ib" onclick="${shareJs}" aria-label="Send list on WhatsApp" title="Send list on WhatsApp">${ICO.msg}</button>`:''}<button class="btn s p" onclick="${addJs}">+ Log</button></span></div>${l.length?`<div class="list" style="margin-top:8px">${l.slice(0,WKX?999:4).map(trow).join('')}</div>${l.length>4&&!WKX?`<button class="btn s wide mt" onclick="WKX=1;render()">Show all ${l.length}</button>`:''}`:'<div class="meta mt">Nothing open.</div>'}</div>`}
 A.secShare=(s,g)=>{const l=sortW(secWork(s,g));const h=secHead(s,g);const txt='Pending work · '+g+' · '+fmtD(today())+'\n'+l.map((it,i)=>(i+1)+'. '+it.title+(keyDate(it)?' (by '+fmtD(keyDate(it))+')':'')).join('\n')+'\n\nPlease update the status of each.';window.open('https://wa.me/'+(h&&h.phone?wa(h.phone):'')+'?text='+encodeURIComponent(txt),'_blank','noopener')};
 function linkRow(it){const c=iCanal(it),x=iSec(it);const ps=(asgOf(it).length?asgOf(it).map(a=>a.p):(it.owner?[it.owner]:[])).filter(person);
- const parts=[c?`<a href="#canal/${c.id}">${esc(c.name)}${it.rd?' · RD '+esc(it.rd):''}</a>`:'',x?`<a href="#sec/${x.s}/${encodeURIComponent(x.g)}">${esc(x.g)}</a>`:'',...ps.map(p=>`<a href="#person/${p}">${esc(pShort(p))}</a>`)].filter(Boolean);
+ const iv=it.vid&&S.visits.find(x=>x.id===it.vid);const parts=[iv?`<a href="#note/${iv.id}">Inspection ${fmtD(iv.date)}</a>`:'',c?`<a href="#canal/${c.id}">${esc(c.name)}${it.rd?' · RD '+esc(it.rd):''}</a>`:'',x?`<a href="#sec/${x.s}/${encodeURIComponent(x.g)}">${esc(x.g)}</a>`:'',...ps.map(p=>`<a href="#person/${p}">${esc(pShort(p))}</a>`)].filter(Boolean);
  return `<div class="lnk">${it.personal?'<span class="chip a">Personal</span>':''}${parts.length?parts.join('<span class="meta">·</span>'):'<span class="meta">Not linked to a canal, section or person</span>'}<button class="btn s" onclick="A.mv('${it.id}')">${parts.length||it.personal?'Move / reassign':'Link'}</button></div>`}
 
 /* ---------- missing details ---------- */
@@ -2026,7 +2027,7 @@ let VEP=null;
 function estMarkField(it,date,note){it.ch=it.ch||{};it.ch.field={date,note:note||''};it.stages.push({name:'Field check by SDO',date,note:note||''});it.doneOn=today();log('Stage: '+it.title+': Field check by SDO',it)}
 A.viAlso=()=>{const b=$('#vi_also');if(!b)return;const cid=$('#vi_c')?$('#vi_c').value:'';const c=cid&&canal(cid);const sec=c&&linkSec(c,'');const h=sec&&secHead(sec.s,sec.g);const pe=$('#vi_e')?$('#vi_e').value:'';
  const es=S.items.filter(it=>it.type==='estimate'&&isOpen(it)&&(it.id===pe||(c&&(iCanal(it)||{}).id===cid&&!(it.ch&&it.ch.field&&it.ch.field.date)&&!sancD(it))));
- b.innerHTML=`<div class="also"><div class="lb" style="margin-top:0">Also do with this save</div><label class="ck"><input type="checkbox" id="va_fu"> Make a follow-up from each remarks line${h?', assigned to '+esc(h.name)+' (SEN)':''}</label>${es.map(it=>`<label class="ck"><input type="checkbox" class="va_es" value="${it.id}" checked> Mark field check done: ${esc(it.title.slice(0,60))}</label>`).join('')}</div>`};
+ b.innerHTML=`<div class="also"><div class="lb" style="margin-top:0">Also do with this save</div><label class="ck"><input type="checkbox" id="va_fu"> Track each remarks line until rectified (follow-up${h?' for '+esc(h.name)+', SEN':''})</label>${es.map(it=>`<label class="ck"><input type="checkbox" class="va_es" value="${it.id}" checked> Mark field check done: ${esc(it.title.slice(0,60))}</label>`).join('')}</div>`};
 
 /* ---------- handover to the next SDO ---------- */
 A.handover=()=>{const o=JSON.parse(JSON.stringify(S));o.items=o.items.filter(it=>!it.personal);o.inbox=[];o.log=[];o.vehicle=[];o.routineDone={};o._handover={date:today(),subs:SUBK().map(subName)};
@@ -2093,15 +2094,25 @@ const oChkTxt=L=>{if(!L.length)return '<span style="color:var(--amb)">Never chec
 function ntPrevPts(v){if(!v.canalId)return [];const iv=S.visits.indexOf(v);const dec={};S.visits.forEach(x=>{if(x.id!==v.id&&x.nt&&x.nt.prev)Object.entries(x.nt.prev).forEach(([k,st])=>{if(st!=='skip')dec[k]=1})});const out=[];
  S.visits.forEach((w,iw)=>{if(w.canalId!==v.canalId||w.id===v.id||!w.nt)return;if(w.date>v.date||(w.date===v.date&&iw>iv))return;(w.nt.ext||[]).forEach(e=>{if(e.trk&&e.id&&String(e.t||'').trim()&&!dec[e.id])out.push({w,e})})});return out.sort((a,b)=>a.w.date.localeCompare(b.w.date))}
 function ntPrevCard(v){const L=ntPrevPts(v);if(!L.length)return '';const pv=v.nt.prev||{};
- return `<h2>Earlier points on this channel (${L.length})</h2><div class="card">${L.map(({w,e})=>{const st=pv[e.id];return `<div class="prv"><div class="meta">${dotD(w.date)} · ${esc(e.h||'Site observation')}${(e.n||1)>1?' · pointed out '+ordN(e.n)+' time':''}</div><div style="margin:2px 0 6px">${esc(e.t)}</div><div class="fchips">${[['ok','Rectified'],['rep','Not rectified'],['skip','Not checked']].map(([k,l])=>`<button class="${st===k?'on':''}" onclick="A.ntPrev('${e.id}','${k}')">${l}</button>`).join('')}</div></div>`}).join('')}<div class="meta">Rectified and Not rectified add a row to this note with a reference to the earlier note. Not checked keeps it open for next time.</div></div>`}
+ return `<h2>Earlier points on this channel (${L.length})</h2><div class="card">${L.map(({w,e})=>{const st=pv[e.id];return `<div class="prv"><div class="meta">${dotD(w.date)} · ${esc(e.h||'Site observation')}${(e.n||1)>1?' · pointed out '+ordN(e.n)+' time':''}</div><div style="margin:2px 0 2px">${esc(e.t)}</div>${ptFuTxt(e)}<div class="fchips" style="margin-top:6px">${[['ok','Rectified'],['rep','Not rectified'],['skip','Not checked']].map(([k,l])=>`<button class="${st===k?'on':''}" onclick="A.ntPrev('${e.id}','${k}')">${l}</button>`).join('')}</div></div>`}).join('')}<div class="meta">Rectified and Not rectified add a row to this note with a reference to the earlier note. Not checked keeps it open for next time.</div></div>`}
 function ntFindPt(id){for(const w of S.visits){const e=w.nt&&(w.nt.ext||[]).find(x=>x.id===id);if(e)return {w,e}}return null}
-A.ntPrev=(id,st)=>{const v=ntV();const f=ntFindPt(id);if(!f)return;snap();v.nt.prev=v.nt.prev||{};const was=v.nt.prev[id];v.nt.ext=v.nt.ext.filter(e=>e.ref!==id);delete v.nt.prev[id];
+A.ntPrev=(id,st)=>{const v=ntV();const f=ntFindPt(id);if(!f)return;snap();v.nt.prev=v.nt.prev||{};const was=v.nt.prev[id];v.nt.ext=v.nt.ext.filter(e=>e.ref!==id);delete v.nt.prev[id];ptFuUndo(v,id);
  if(was!==st){v.nt.prev[id]=st;const p=f.e;const rdt=p.rdt||f.w.date;
-  if(st==='rep')v.nt.ext.push({id:uid(),h:p.h,t:p.t,trk:1,ref:id,rdt,n:(p.n||1)+1});
+  if(st==='rep')v.nt.ext.push({id:uid(),h:p.h,t:p.t,trk:1,ref:id,rdt,n:(p.n||1)+1,fu:p.fu});ptFuSet(v,id,p,st);
   if(st==='ok')v.nt.ext.push({id:uid(),h:p.h,t:'The point regarding “'+String(p.t).replace(/\.$/,'')+'”, raised vide inspection note dated '+dotD(f.w.date)+', was found rectified at the time of this inspection.',ref:id,rdt:f.w.date,okRow:1})}
  ntSave()};
+/* the follow-up behind a tracked point follows what you find on site */
+function ptFuSet(v,id,p,st){const fu=p.fu&&get(p.fu);if(!fu||st==='skip')return;const ts=Date.now();v.nt.pfu=v.nt.pfu||{};v.nt.pfu[id]={fu:fu.id,ts,res:!!fu.resolved,resOn:fu.resolvedOn||null,due:fu.due};
+ if(st==='ok'){fu.notes.push({ts,text:'Found rectified at inspection on '+fmtD(v.date)});fu.resolved=true;fu.resolvedOn=v.date}
+ else{fu.notes.push({ts,text:'Not rectified at inspection on '+fmtD(v.date)+' ('+ordN((p.n||1)+1)+' time)'});fu.resolved=false;fu.resolvedOn=null;fu.doneOn=null;fu.due=addDays(v.date,7)}}
+function ptFuUndo(v,id){const x=v.nt.pfu&&v.nt.pfu[id];if(!x)return;const fu=get(x.fu);if(fu){fu.notes=fu.notes.filter(n=>n.ts!==x.ts);fu.resolved=x.res;fu.resolvedOn=x.resOn;fu.due=x.due}delete v.nt.pfu[id]}
+const ptFuTxt=e=>{const f=e.fu&&get(e.fu);if(!f)return '';const who=(asgOf(f)[0]||{}).p||f.owner;const last=(f.fus||[]).slice(-1)[0];return f.resolved?`<div class="meta" style="color:var(--ok)">Follow-up closed ${fmtD(f.resolvedOn)}: check it on site</div>`:`<div class="meta">Follow-up open${who&&person(who)?' with '+esc(pShort(who)):''}${last&&last.text?' · last: '+esc(last.text):''}</div>`};
 const ntRepSent=e=>'This point was earlier raised vide inspection note dated '+dotD(e.rdt)+((e.n||2)>2?' and in subsequent inspections':'')+' and was not found rectified at the time of this inspection; it is now being pointed out for the '+ordN(e.n||2)+' time. The concerned Sub Engineer is directed to get it rectified on priority.';
-A.ntTrk=(i,on)=>{const v=ntV();const e=v.nt.ext[i];if(!e.id)e.id=uid();e.trk=on?1:0;ntSave(false)};
+A.ntTrk=(i,on)=>{const v=ntV();const e=v.nt.ext[i];if(!e.id)e.id=uid();e.trk=on?1:0;
+ if(on&&!e.fu&&!e.ref&&String(e.t||'').trim()){const it=ptFollow(v,e.t,7);e.fu=it.id;toast('Tracked · follow-up made'+(asgOf(it).length||it.owner?' for '+pShort((asgOf(it)[0]||{}).p||it.owner):''),1)}
+ if(!on&&e.fu&&!e.ref){const f=get(e.fu);if(f&&!f.resolved&&!(f.notes||[]).length&&!(f.fus||[]).length){S.items=S.items.filter(x=>x.id!==f.id);delete e.fu;toast('No longer tracked · follow-up removed')}}
+ ntSave()};
+function ptFollow(v,line,days){const c=canal(v.canalId);const rd=findRD(line);const sec=c?linkSec(c,rd):null;const p=findPerson(line,sec)||(sec&&secHead(sec.s,sec.g));const it=qlMake({title:String(line).trim().slice(0,140),ty:'task',cid:c?c.id:'',rd,sec,pid:p?p.id:'',due:addDays(v.date,days),sub:sec?sec.s:v.sub});it.details='Tracked point from inspection'+(c?' of '+c.name:'')+' on '+fmtD(v.date);it.vid=v.id;return it}
 /* saved rows: your own headings and text, offered in the order you saved them */
 A.ntLibSave=i=>{const e=ntV().nt.ext[i];if(!String(e.t||'').trim())return toast('Write the text first');S.settings.ntLib=S.settings.ntLib||[];if(S.settings.ntLib.some(x=>x.h===e.h&&x.t===e.t))return toast('Already saved');S.settings.ntLib.push({id:uid(),h:e.h||'Site observation',t:e.t});save();render();toast('Saved for reuse',1)};
 A.ntLib=()=>{const L=S.settings.ntLib||[];sheet(`<div class="ct">Saved rows</div><div class="meta">Tap Add to put a row in this note. You can edit it there.</div>${L.map((x,i)=>`<div class="prv"><b>${i+1}. ${esc(x.h)}</b><div class="meta clamp">${esc(x.t)}</div><div class="row" style="gap:6px;margin-top:6px"><button class="btn s p" onclick="A.ntLibAdd(${i})">Add</button>${i?`<button class="btn s" onclick="A.ntLibMv(${i},-1)" aria-label="Move up">↑</button>`:''}<button class="btn s d" style="margin-left:auto" onclick="A.ntLibDel(${i})">Delete</button></div></div>`).join('')}`)};
@@ -2115,8 +2126,8 @@ A.ntOn=(k,on)=>{const v=ntV();v.nt.on[k]=on?1:0;ntSave()};
 A.ntOut=(i,k,val)=>{const v=ntV();v.nt.outs[i][k]=val.trim();ntSave(false);const t=$('#ntTbl');if(t)t.innerHTML=ntTableHTML(v)};
 A.ntOutDel=i=>{const v=ntV();snap();v.nt.outs.splice(i,1);ntSave()};
 A.ntOutAdd=oid=>{const v=ntV();const c=canal(v.canalId);const o=oid&&c?(c.outlets||[]).find(x=>x.id===oid):null;v.nt.outs.push(o?{no:outNo(o),type:(o.type||'').toUpperCase(),des:o.size||''}:{no:'',type:'PIPE',des:''});ntSave()};
-A.ntExt=(i,k,val)=>{const v=ntV();v.nt.ext[i][k]=val.trim();ntSave(false);const t=$('#ntTbl');if(t)t.innerHTML=ntTableHTML(v)};
-A.ntExtDel=i=>{const v=ntV();snap();const e=v.nt.ext[i];if(e&&e.ref&&v.nt.prev&&v.nt.prev[e.ref]!=='skip')delete v.nt.prev[e.ref];v.nt.ext.splice(i,1);ntSave()};
+A.ntExt=(i,k,val)=>{const v=ntV();v.nt.ext[i][k]=val.trim();{const e=v.nt.ext[i],f=e.fu&&get(e.fu);if(k==='t'&&f&&!f.resolved&&!e.ref&&val.trim())f.title=val.trim().slice(0,140)}ntSave(false);const t=$('#ntTbl');if(t)t.innerHTML=ntTableHTML(v)};
+A.ntExtDel=i=>{const v=ntV();snap();const e=v.nt.ext[i];if(e&&e.ref&&v.nt.prev&&v.nt.prev[e.ref]!=='skip'){delete v.nt.prev[e.ref];ptFuUndo(v,e.ref)}if(e&&e.fu&&!e.ref){const f=get(e.fu);if(f&&!f.resolved&&!(f.notes||[]).length&&!(f.fus||[]).length)S.items=S.items.filter(x=>x.id!==f.id)}v.nt.ext.splice(i,1);ntSave()};
 A.ntExtAdd=()=>{const v=ntV();v.nt.ext.push({h:'',t:''});ntSave()};
 A.ntCap=(i,val)=>{const v=ntV();v.nt.photos[i].cap=val.trim();ntSave(false)};
 const ntPTitle=v=>'Photographs: '+ntOrder(v);
