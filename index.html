@@ -202,7 +202,7 @@ details.sg .arow{border-radius:0}
 .ntext{border-bottom:1px solid var(--line);padding:8px 0}
 .ntext input,.ntext textarea{margin-bottom:6px}
 .ntph{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.ntph img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:var(--bg);display:block;margin-bottom:6px}
+.ntph img{width:100%;height:auto;max-height:260px;object-fit:contain;border-radius:8px;background:var(--bg);display:block;margin-bottom:6px}
 .ntph input{margin-bottom:6px}
 .ntpv{background:#fff;color:#000;font-size:13px}
 .ntbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
@@ -2074,7 +2074,7 @@ function vNote(id){const v=S.visits.find(x=>x.id===id);if(!v)return '<p class="e
  <h2>Rows in the note</h2><div class="card">${tog('out','1 · Outlets')}${tog('tail','2 · Tail')}${tog('staff','3 · Attendance and deployment of field staff')}${tog('reg','4 · Register and records')}${tog('gen','5 · General maintenance and supervision')}<div class="meta">Untick anything you did not check, so the note never says it was checked. <a href="#" onclick="A.ntWord();return false">Change the wording of a row</a></div></div>
  <h2>Added for this visit (${nt.ext.length})</h2><div class="card">${nt.ext.map((e,i)=>`<div class="ntext"><input value="${esc(e.h)}" placeholder="Heading" onchange="A.ntExt(${i},'h',this.value)"><textarea rows="2" onchange="A.ntExt(${i},'t',this.value)">${esc(e.t)}</textarea><button class="btn s d" onclick="A.ntExtDel(${i})">Remove</button></div>`).join('')||'<div class="meta">Lines you wrote in the inspection remarks appear here as extra rows.</div>'}<button class="btn s mt" onclick="A.ntExtAdd()">+ Add a row</button></div>
  <h2>CC</h2><div class="card"><input value="${esc(nt.cc)}" onchange="A.ntSet('cc',this.value.trim())"></div>
- <h2>Photos (${nt.photos.length})</h2><div class="card"><div class="ntph">${nt.photos.map((p,i)=>`<div><img data-fid="${p.fid}" alt=""><input value="${esc(p.cap)}" placeholder="Caption, e.g. Tail RD 28+000" onchange="A.ntCap(${i},this.value)"><button class="btn s d" onclick="A.ntPhDel(${i})">Remove</button></div>`).join('')}</div><label class="btn s mt">+ Add photos<input type="file" accept="image/*" multiple hidden onchange="A.ntPh(this)"></label></div>
+ <h2>Photos (${nt.photos.length})</h2><div class="card"><label class="fld"><span>Title for photos PDF</span><input value="${esc(nt.ptitle||ntPTitle(v))}" onchange="A.ntPT(this.value)"></label><div class="ntph">${nt.photos.map((p,i)=>`<div><img data-fid="${p.fid}" alt=""><button class="btn s d" onclick="A.ntPhDel(${i})">Remove</button></div>`).join('')}</div><label class="btn s mt">+ Add photos<input type="file" accept="image/*" multiple hidden onchange="A.ntPh(this)"></label></div>
  <h2>Preview</h2><div class="card ntpv"><div style="white-space:pre-line;text-align:center;font-weight:bold;font-family:'Times New Roman',serif">${esc(offFrom(v.sub))}</div><p style="text-align:center;font-weight:bold;text-decoration:underline;font-family:'Times New Roman',serif">${esc(ntOrder(v))}</p><div id="ntTbl" style="overflow-x:auto">${ntTableHTML(v)}</div><p style="font-family:'Times New Roman',serif;margin-top:10px"><b>CC:</b> ${esc(nt.cc)}</p></div>
  <div class="ntbar"><button class="btn" onclick="A.ntCopy('off')">Copy Office From</button><button class="btn" onclick="A.ntCopy('order')">Copy Order Text</button><button class="btn p" onclick="A.ntCopy('tbl')">Copy table for eFOES</button><button class="btn" onclick="A.ntDocx()">Word file</button><button class="btn" onclick="A.ntPdf()" ${nt.photos.length?'':'disabled'}>Photos PDF</button></div>
  ${v.noteSt==='Submitted'?`<div class="card mt row between"><b style="color:var(--ok)">✓ Uploaded on eFOES</b><button class="btn s" onclick="A.ntSt('Drafted')">Undo</button></div>`:`<button class="btn p wide mt" onclick="A.ntSt('Submitted')">Done: uploaded on eFOES</button>`}`}
@@ -2090,6 +2090,8 @@ A.ntExt=(i,k,val)=>{const v=ntV();v.nt.ext[i][k]=val.trim();ntSave(false);const 
 A.ntExtDel=i=>{const v=ntV();snap();v.nt.ext.splice(i,1);ntSave()};
 A.ntExtAdd=()=>{const v=ntV();v.nt.ext.push({h:'',t:''});ntSave()};
 A.ntCap=(i,val)=>{const v=ntV();v.nt.photos[i].cap=val.trim();ntSave(false)};
+const ntPTitle=v=>'Photographs: '+ntOrder(v);
+A.ntPT=val=>{const v=ntV();v.nt.ptitle=val.trim()===ntPTitle(v)?'':val.trim();ntSave(false)};
 A.ntPhDel=i=>{const v=ntV();snap();v.nt.photos.splice(i,1);ntSave()};
 A.ntSt=val=>{const v=ntV();snap();v.noteSt=val;v.noteDate=val==='Submitted'?today():'';log('Inspection note '+val.toLowerCase()+': '+canalLabel(v),{sub:v.sub});ntSave()};
 A.ntWord=()=>{const v=ntV();sheet(`<div class="ct">Wording of each row</div><p class="meta">One paragraph per line. {ch} becomes the channel name. Leave a box empty to go back to your standard wording. Changes apply to this note only.</p>${NT_ROWS.map(r=>`<label class="fld"><span>${esc(r.h.replace('{n} ',''))}</span><textarea rows="5" id="ntw_${r.k}">${esc(v.nt.txt[r.k]||r.p.join('\n'))}</textarea></label>`).join('')}<button class="btn p wide" onclick="A.ntWordSave()">Save</button>`)};
@@ -2103,9 +2105,9 @@ A.ntCopy=async k=>{const v=ntV();let ok=false;
  if(ok&&k==='tbl')ntDrafted(v);toast(ok?(k==='tbl'?'Table copied. Paste it into eFOES.':'Copied'):'Could not copy on this phone. Use the Word file.')};
 
 /* ---------- photos: shrink on the phone before storing ---------- */
-function shrinkImg(file,max){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);cv.toBlob(b=>b?res({blob:b,w,h}):rej(new Error('encode')),'image/jpeg',0.72)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('read'))};im.src=u})}
+function shrinkImg(file,max){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,max/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,w,h);x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);cv.toBlob(b=>b?res({blob:b,w,h}):rej(new Error('encode')),'image/jpeg',0.82)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('read'))};im.src=u})}
 A.ntPh=async inp=>{const files=[...inp.files];inp.value='';const v=ntV();let n=0;toast('Adding '+files.length+' photo(s)…');
- for(const f of files){try{const r=await shrinkImg(f,1400);const fid=uid();await fPut({id:fid,name:(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:r.blob.size,blob:r.blob,ts:Date.now(),w:r.w,h:r.h});v.nt.photos.push({fid,cap:'',w:r.w,h:r.h});n++}catch(e){toast('Could not read '+(f.name||'a photo'))}}
+ for(const f of files){try{const r=await shrinkImg(f,1600);const fid=uid();await fPut({id:fid,name:(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:r.blob.size,blob:r.blob,ts:Date.now(),w:r.w,h:r.h});v.nt.photos.push({fid,cap:'',w:r.w,h:r.h});n++}catch(e){toast('Could not read '+(f.name||'a photo'))}}
  if(n){save();render();toast(n+' photo(s) added')}};
 
 /* ---------- small zip writer (stored, no compression) for the .docx ---------- */
@@ -2137,7 +2139,7 @@ A.ntDocx=async()=>{const v=ntV();const files=[['[Content_Types].xml','<?xml vers
  ['word/document.xml',ntDocxXml(v)]];
  const r=await shareOrSave(zipStore(files),ntFile(v,'.docx'),'Inspection note');if(r!=='cancel'){ntDrafted(v);toast(r==='shared'?'Word file shared':'Word file saved to Downloads')}};
 
-/* ---------- photo annexure PDF (A4, 4 photos per page, captions) ---------- */
+/* ---------- photo annexure PDF (A4, 4 photos per page, whole photos, one title) ---------- */
 function pdfTxt(s){return String(s||'').replace(/·/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/×/g,'x').replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)')}
 const pdfW=(s,sz)=>String(s).length*sz*0.5;
 function pdfWrap(s,sz,w){const out=[];let line='';String(s||'').split(/\s+/).forEach(word=>{const t=line?line+' '+word:word;if(pdfW(t,sz)>w&&line){out.push(line);line=word}else line=t});if(line)out.push(line);return out}
@@ -2152,12 +2154,11 @@ async function ntPdfBlob(v){const nt=ntInit(v);const imgs=[];for(const p of nt.p
  imgs.forEach((im,i)=>{off[imgObj(i)]=len;put(`${imgObj(i)} 0 obj\n<< /Type /XObject /Subtype /Image /Width ${im.w} /Height ${im.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${im.b.length} >>\nstream\n`);put(im.b);put('\nendstream\nendobj\n')});
  const ch=ntChannel(v);
  for(let p=0;p<np;p++){let c='';const T=(x,y,s,f,t)=>{c+=`BT /F${f} ${s} Tf ${x.toFixed(1)} ${y.toFixed(1)} Td (${pdfTxt(t)}) Tj ET\n`};const TC=(y,s,f,t)=>T((W-pdfW(t,s)*(f===4?1.08:1))/2,y,s,f,t);
-  let top=Hh-M;if(p===0){TC(top-14,15,4,'Annexure-A');TC(top-34,11,4,'Photographs: '+ntOrder(v));TC(top-50,10,3,'Date of inspection: '+dotD(v.date)+'   |   '+offFrom(v.sub).split('\n').slice(1).join(', ').replace(/\s+/g,' '));c+=`0.6 w ${M} ${top-60} m ${W-M} ${top-60} l S\n`;top-=72}else{TC(top-10,9,3,'Annexure-A (continued) - '+ch+' - '+dotD(v.date));top-=24}
+  let top=Hh-M;if(p===0){TC(top-14,15,4,'Annexure-A');pdfWrap(nt.ptitle||ntPTitle(v),11,W-2*M).slice(0,2).forEach((l,j)=>TC(top-34-j*13,11,4,l));if(pdfWrap(nt.ptitle||ntPTitle(v),11,W-2*M).length>1)top-=13;TC(top-50,10,3,'Date of inspection: '+dotD(v.date)+'   |   '+offFrom(v.sub).split('\n').slice(1).join(', ').replace(/\s+/g,' '));c+=`0.6 w ${M} ${top-60} m ${W-M} ${top-60} l S\n`;top-=72}else{TC(top-10,9,3,'Annexure-A (continued) - '+ch+' - '+dotD(v.date));top-=24}
   const bottom=M+16;const rowH=(top-bottom-G)/2;
-  imgs.slice(p*per,p*per+per).forEach((im,k)=>{const col=k%2,row=Math.floor(k/2);const x0=M+col*(cw+G),yTop=top-row*(rowH+G);const capL=pdfWrap((p*per+k+1)+'. '+(im.cap||'Photo'),9,cw).slice(0,2);const boxH=rowH-capL.length*12-6;
-   const fw=cw,fh=Math.min(boxH,cw*0.75),fx=x0,fy=yTop-fh;const sc=Math.max(fw/im.w,fh/im.h);const iw=im.w*sc,ih=im.h*sc;const ix=fx+(fw-iw)/2,iy=fy+(fh-ih)/2;
-   c+=`q ${fx.toFixed(2)} ${fy.toFixed(2)} ${fw.toFixed(2)} ${fh.toFixed(2)} re W n ${iw.toFixed(2)} 0 0 ${ih.toFixed(2)} ${ix.toFixed(2)} ${iy.toFixed(2)} cm /Im${p*per+k} Do Q\n0.5 w ${fx.toFixed(2)} ${fy.toFixed(2)} ${fw.toFixed(2)} ${fh.toFixed(2)} re S\n`;
-   capL.forEach((l,j)=>T(x0+(cw-pdfW(l,9))/2,fy-14-j*12,9,3,l))});
+  imgs.slice(p*per,p*per+per).forEach((im,k)=>{const col=k%2,row=Math.floor(k/2);const x0=M+col*(cw+G),yTop=top-row*(rowH+G);
+   const sc=Math.min(cw/im.w,rowH/im.h);const iw=im.w*sc,ih=im.h*sc;const ix=x0+(cw-iw)/2,iy=yTop-rowH+(rowH-ih)/2;
+   c+=`q ${iw.toFixed(2)} 0 0 ${ih.toFixed(2)} ${ix.toFixed(2)} ${iy.toFixed(2)} cm /Im${p*per+k} Do Q\n0.5 w ${ix.toFixed(2)} ${iy.toFixed(2)} ${iw.toFixed(2)} ${ih.toFixed(2)} re S\n`});
   TC(M-6,8,3,'Page '+(p+1)+' of '+np);
   const xo=imgs.slice(p*per,p*per+per).map((_,k)=>`/Im${p*per+k} ${imgObj(p*per+k)} 0 R`).join(' ');
   off[contObj(p)]=len;put(`${contObj(p)} 0 obj\n<< /Length ${c.length} >>\nstream\n${c}endstream\nendobj\n`);
