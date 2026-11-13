@@ -8,6 +8,7 @@
   const DRV = 'https://www.googleapis.com/drive/v3';
   const UPL = 'https://www.googleapis.com/upload/drive/v3';
   const FOLDER = 'SDO Desk Backups';
+  const FFOLDER = 'Files';       // attachments and photos, uploaded once each
   const KEEP = 15;               // daily files kept in Drive
   const DKEY = 'sdodesk.drive';  // kept outside S so restores never overwrite it
 
@@ -67,20 +68,56 @@
     D.folderId = (await r.json()).id;
   }
   // Resumable upload works for any size (backups include attached PDFs).
-  async function upload(meta, blob, id) {
+  async function upload(meta, blob, id, ct) {
+    ct = ct || 'application/json';
     const url = id ? `${UPL}/files/${id}?uploadType=resumable&fields=id` : `${UPL}/files?uploadType=resumable&fields=id`;
-    const r = await api(id ? 'PATCH' : 'POST', url, JSON.stringify(id ? {} : meta), { 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': 'application/json' });
+    const r = await api(id ? 'PATCH' : 'POST', url, JSON.stringify(id ? {} : meta), { 'Content-Type': 'application/json; charset=UTF-8', 'X-Upload-Content-Type': ct });
     const loc = r.headers.get('Location');
-    if (loc) { const u = await fetch(loc, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: blob }); if (!u.ok) { const e = new Error('Upload failed ' + u.status); e.status = u.status; throw e; } return (await u.json()).id; }
-    if (id) { await api('PATCH', `${UPL}/files/${id}?uploadType=media`, blob, { 'Content-Type': 'application/json' }); return id; }
+    if (loc) { const u = await fetch(loc, { method: 'PUT', headers: { 'Content-Type': ct }, body: blob }); if (!u.ok) { const e = new Error('Upload failed ' + u.status); e.status = u.status; throw e; } return (await u.json()).id; }
+    if (id) { await api('PATCH', `${UPL}/files/${id}?uploadType=media`, blob, { 'Content-Type': ct }); return id; }
     const b = 'sdo' + uid();
-    const body = new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n`, blob, `\r\n--${b}--`]);
+    const body = new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: ${ct}\r\n\r\n`, blob, `\r\n--${b}--`]);
     return (await (await api('POST', `${UPL}/files?uploadType=multipart&fields=id`, body, { 'Content-Type': 'multipart/related; boundary=' + b })).json()).id;
   }
-  async function makeBlob() {
+  /* Each attachment or photo goes to Drive once, as its own file. The daily backup only lists them,
+     so it stays small however many photos are added. */
+  async function ensureFiles() {
+    if (D.filesId) return;
+    const j = await list(`name='${FFOLDER}' and '${D.folderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`, '&pageSize=1');
+    if (j.files && j.files[0]) { D.filesId = j.files[0].id; return; }
+    const r = await api('POST', DRV + '/files?fields=id', JSON.stringify({ name: FFOLDER, mimeType: 'application/vnd.google-apps.folder', parents: [D.folderId] }), { 'Content-Type': 'application/json' });
+    D.filesId = (await r.json()).id; saveD();
+  }
+  // drop entries whose Drive copy was deleted by hand (checked on "Back up now")
+  async function checkFiles() {
+    if (!D.filesId || !D.fmap) return;
+    const have = new Set(); let pt = '';
+    do {
+      const j = await list(`'${D.filesId}' in parents and trashed=false`, '&pageSize=1000&fields=' + encodeURIComponent('nextPageToken,files(id)') + (pt ? '&pageToken=' + encodeURIComponent(pt) : ''));
+      (j.files || []).forEach(f => have.add(f.id)); pt = j.nextPageToken || '';
+    } while (pt);
+    Object.keys(D.fmap).forEach(k => { if (!have.has(D.fmap[k].d)) delete D.fmap[k]; });
+    saveD();
+  }
+  async function makeBlob(onStep) {
     const files = [];
-    try { for (const r of await fAll()) files.push({ id: r.id, name: r.name, type: r.type, size: r.size, text: r.text || '', data: await blobToB64(r.blob) }); } catch (e) { /* no files */ }
-    return new Blob([JSON.stringify(Object.assign({}, S, { _files: files }))], { type: 'application/json' });
+    let all = [];
+    try { all = await fAll(); } catch (e) { /* no files */ }
+    D.fmap = D.fmap || {};
+    const todo = all.filter(r => !D.fmap[r.id]);
+    if (todo.length) await ensureFiles();
+    let k = 0;
+    for (const r of todo) {
+      k++; if (onStep) onStep(k, todo.length);
+      const did = await upload({ name: r.id + ' - ' + (r.name || 'file'), parents: [D.filesId], mimeType: r.type || 'application/octet-stream' }, r.blob, null, r.type || 'application/octet-stream');
+      D.fmap[r.id] = { d: did, on: today() }; saveD();   // kept even if the backup stops half way
+    }
+    const live = new Set(all.map(r => r.id));
+    for (const r of all) files.push({ id: r.id, name: r.name, type: r.type, size: r.size, text: r.text || '', drive: D.fmap[r.id].d });
+    // a file removed in the app is left in Drive: older backups, or another phone, may still need it
+    Object.keys(D.fmap).forEach(k => { if (!live.has(k)) delete D.fmap[k]; });
+    D.fcount = all.length; D.fbytes = all.reduce((a, r) => a + (r.size || 0), 0);
+    return new Blob([JSON.stringify(Object.assign({}, S, { _dfiles: files }))], { type: 'application/json' });
   }
   async function prune() {
     try {
@@ -88,10 +125,11 @@
       for (const f of (j.files || []).slice(KEEP)) await api('DELETE', `${DRV}/files/${f.id}`);
     } catch (e) { if (e instanceof AuthErr) throw e; }
   }
-  async function backupOnce() {
+  async function backupOnce(manual) {
     const day = today(), seq = D.seq || 0;
     await ensureFolder();
-    const blob = await makeBlob();
+    if (manual) await checkFiles();
+    const blob = await makeBlob(manual ? (k, n) => toast('Uploading file ' + k + ' of ' + n + '…') : null);
     let done = false;
     if (D.lastFile && D.lastFile.date === day && D.lastFile.id) {
       try { await upload(null, blob, D.lastFile.id); done = true; } catch (e) { if (e.status !== 404) throw e; }
@@ -103,12 +141,13 @@
     if (S.settings.lastBackup !== day) { S.settings.lastBackup = day; plainSave(); }
   }
   let running = false, again = false;
+  let RFM = null;   // file map from a Drive restore, kept so the same files are not uploaded again
   async function backup(manual) {
     if (!tokOk()) return 'noauth';
     if (running) { again = true; return 'queued'; }
     running = true; let res = 'ok';
     try {
-      do { again = false; try { await backupOnce(); } catch (e) { if (e.status === 404) { D.folderId = ''; D.lastFile = null; await backupOnce(); } else throw e; } } while (again && tokOk());
+      do { again = false; try { await backupOnce(manual); } catch (e) { if (e.status === 404) { D.folderId = ''; D.filesId = ''; D.lastFile = null; D.fmap = {}; await backupOnce(manual); } else throw e; } } while (again && tokOk());
       if (manual) toast('Backed up to Google Drive');
     } catch (e) {
       if (e instanceof AuthErr) res = 'noauth';
@@ -129,7 +168,7 @@
     toast('Backing up to Google Drive…');
     setTimeout(() => { if (!busy()) auth('backup', false); }, 800);
   }
-  window.save = function () { origSave.apply(this, arguments); if (D.connected) { D.dirty = true; D.seq = (D.seq || 0) + 1; saveD(); autoSync(); } };
+  window.save = function () { origSave.apply(this, arguments); if (RFM) { D.fmap = Object.assign(D.fmap || {}, RFM); RFM = null; saveD(); } if (D.connected) { D.dirty = true; D.seq = (D.seq || 0) + 1; saveD(); autoSync(); } };
 
   /* ---------- restore ---------- */
   async function openRestore() {
@@ -148,7 +187,20 @@
   A.drivePick = async (id, name) => {
     try {
       toast('Downloading backup…');
-      const blob = await (await api('GET', `${DRV}/files/${encodeURIComponent(id)}?alt=media`)).blob();
+      let blob = await (await api('GET', `${DRV}/files/${encodeURIComponent(id)}?alt=media`)).blob();
+      const d = JSON.parse(await blob.text());
+      if (Array.isArray(d._dfiles)) {
+        const L = d._dfiles; delete d._dfiles; d._files = []; let miss = 0, k = 0;
+        const fm = {};
+        for (const x of L) {
+          k++; toast('Downloading file ' + k + ' of ' + L.length + '…');
+          try { const b = await (await api('GET', `${DRV}/files/${encodeURIComponent(x.drive)}?alt=media`)).blob(); d._files.push({ id: x.id, name: x.name, type: x.type, size: x.size, text: x.text || '', data: await blobToB64(b) }); fm[x.id] = { d: x.drive, on: today() }; }
+          catch (e) { if (e instanceof AuthErr) throw e; miss++; }
+        }
+        if (miss) toast(miss + ' file(s) could not be downloaded. The rest will be restored.');
+        blob = new Blob([JSON.stringify(d)], { type: 'application/json' });
+        RFM = fm;
+      }
       closeSheet();
       A.imp({ files: [new File([blob], name, { type: 'application/json' })], value: '' });
     } catch (e) { if (e instanceof AuthErr) { closeSheet(); auth('restore', true); } else toast(e.message || 'Download failed'); }
@@ -169,7 +221,7 @@
   function card() {
     if (!D.connected) return `<h2>Google Drive</h2><div class="card"><p class="meta" style="margin-top:0">Connect once and the app backs up automatically to a "${FOLDER}" folder in your Drive after every change. The last ${KEEP} days are kept. The app can only see files it creates.</p><div class="acts"><button class="btn p" onclick="A.driveConnect()">Connect Google Drive</button></div></div>`;
     const st = D.paused ? '<span class="rd">Paused: sign in again</span>' : running ? 'Backing up…' : D.dirty ? 'Changes waiting to back up' : 'Up to date';
-    return `<h2>Google Drive</h2><div class="card"><div class="ct">${esc(D.email || 'Connected')}</div><div class="meta">${st}${D.last ? ' · last ' + fmtTs(D.last) : ''}${D.size ? ' · ' + fsize(D.size) : ''}</div>${D.err && D.dirty && !running ? `<div class="meta rd">${esc(D.err)}</div>` : ''}
+    return `<h2>Google Drive</h2><div class="card"><div class="ct">${esc(D.email || 'Connected')}</div><div class="meta">${st}${D.last ? ' · last ' + fmtTs(D.last) : ''}${D.size ? ' · ' + fsize(D.size) : ''}${D.fcount ? '<br>' + D.fcount + ' files and photos kept once in Drive (' + fsize(D.fbytes || 0) + ')' : ''}</div>${D.err && D.dirty && !running ? `<div class="meta rd">${esc(D.err)}</div>` : ''}
       <div class="acts">${D.paused ? '<button class="btn p" onclick="A.driveNow()">Sign in again</button>' : '<button class="btn p" onclick="A.driveNow()">Back up now</button>'}<button class="btn" onclick="A.driveRestore()">Restore from Drive</button><button class="btn d" onclick="A.driveOff()">Disconnect</button></div></div>`;
   }
   function decorate() {
