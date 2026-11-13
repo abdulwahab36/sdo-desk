@@ -1,4 +1,4 @@
-const C='sdo-desk-v58';
+const C='sdo-desk-v59';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./fflate.js','./drive.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='sdo-alarm').map(k=>caches.delete(k)))));self.clients.claim()});
@@ -10,6 +10,7 @@ const ymdS=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+Str
 function addD(s,n){const d=new Date(s+'T00:00:00');d.setDate(d.getDate()+n);return ymdS(d)}
 function alarmLines(st,now){const t=ymdS(now),dow=(now.getDay()+6)%7,ws=addD(t,-dow),out=[];
  Object.values(st.subs||{}).forEach(x=>{const n=st.ws===ws?x.n:0,s=st.ws===ws?x.sub:0,nm=x.name;
+  if(x.all){if(s>=3)return;const pm=n>s?' ('+(n-s)+' inspected, note not uploaded)':'';if(dow===2&&n===0)out.push('No inspection yet this week. 3 notes needed by Friday.');else if(dow===3&&s<2)out.push(s+' of 3 inspection notes submitted'+pm+'. Target Friday.');else if(dow===4)out.push(s+' of 3 inspection notes submitted'+pm+'. Today is the target day.');else if(dow===5)out.push('Final day: '+s+' of 3 inspection notes submitted'+pm+'.');return}
   if(dow===2&&n===0)out.push(nm+': no inspection yet this week. 3 needed by Friday.');
   else if(dow===3&&n<2)out.push(nm+': only '+n+' of 3 inspected. Notes due Friday.');
   else if(dow===4&&(n<3||s<3))out.push(n<3?nm+': only '+n+' of 3 inspected. Today is the target day.':nm+': '+s+' of 3 notes submitted. Submit today.');
