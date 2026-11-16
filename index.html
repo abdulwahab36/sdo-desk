@@ -258,7 +258,8 @@ main a{text-decoration:none}.list:empty{display:none}
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);max-width:720px;margin:0 auto}
 .tabs a,.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;border:0;background:none;color:var(--mute);font:inherit;font-size:11.5px;text-decoration:none;cursor:pointer}
 .tabs svg{width:22px;height:22px}.tabs .on{color:var(--acc);font-weight:600}
-body.hastabs .fab{bottom:calc(74px + env(safe-area-inset-bottom))}body.hastabs main{padding-bottom:150px}body.hastabs #toast{bottom:calc(140px + env(safe-area-inset-bottom))}
+body.hastabs main{padding-bottom:96px}body.hastabs #toast{bottom:calc(76px + env(safe-area-inset-bottom))}
+.tabs .tadd{color:var(--ink)}.tadd i{display:flex;align-items:center;justify-content:center;width:52px;height:32px;border-radius:16px;background:var(--acc);color:var(--card)}.tadd i svg{width:22px;height:22px}.tadd:active i{transform:scale(.94)}
 .trow .due{flex:none;text-align:right;max-width:38%}
 .msc{padding-top:12px}.msbar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin-bottom:4px}.msbar i{display:block;height:100%;background:var(--ok);border-radius:3px;transition:width .3s}
 .msr{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}.msr:last-child{border-bottom:0}
@@ -354,8 +355,7 @@ a{color:var(--acc)}
 <body>
 <header><h1 onclick="go('#home')" style="cursor:pointer;margin-right:auto">SDO Desk</h1><button class="ham" onclick="go('#search')" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button><div class="seg" id="seg"></div></header>
 <main id="main"></main>
-<button class="fab" onclick="A.fab()" aria-label="Add">+</button>
-<nav class="tabs" id="tabs"><a href="#home" data-t="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a><a href="#list/task" data-t="task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span>Follow-ups</span></a><a href="#insp" data-t="insp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Inspections</span></a><button onclick="openDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button></nav>
+<nav class="tabs" id="tabs"><a href="#home" data-t="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg><span>Home</span></a><a href="#list/task" data-t="task"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg><span>Follow-ups</span></a><button class="tadd" onclick="A.fab()" aria-label="Add new"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></i><span>Add</span></button><a href="#insp" data-t="insp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Inspections</span></a><button onclick="openDrawer()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span>Menu</span></button></nav>
 <div id="toast"></div>
 <datalist id="desigs"></datalist>
 <script src="fflate.js"></script>
@@ -842,7 +842,7 @@ function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');co
  const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),note:()=>vNote(p[1]),verify:()=>vVerify(p[1],p[2]),curtail:vCurtail,offences:vOffences,qlog:vQlog,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
  const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);
- $('.fab').style.display=/^edit/.test(v)||v==='settings'||v==='log'||v==='qlog'||v==='note'||v==='verify'?'none':'';tabsSync(v,p,isHome);
+ tabsSync(v,p,isHome);
  if(h!==LASTH){window.scrollTo(0,0);LASTH=h;if(v==='search'){const e=$('#sq');if(e)e.focus()}}}
 function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}render()}
 
