@@ -273,6 +273,10 @@ details.xmore{margin:4px 0 12px;border-top:1px solid var(--line);padding-top:4px
 .btn,.ibar button,.fab,.tick,.msd{transition:transform .08s}.btn:active,.ibar button:active,.fab:active,.msd:active{transform:scale(.96)}
 .mi:active,.irow.tap:active,.msr:active,.trow:active,.arow.tap:active,.ti.tap:active,.tabs a:active,.tabs button:active,.cps:active{background:var(--accs)}
 .qlfull{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.qlfull .pill{font-size:13.5px;padding:7px 11px}
+.tick.on{background:var(--acc);border-color:var(--acc);box-shadow:inset 0 0 0 3px var(--card)}.trow.sel{background:var(--accs)}
+.selbar{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:7;max-width:720px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -2px 8px rgba(0,0,0,.08)}.selbar span{flex:1;font-weight:600}.selbar button{height:42px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600}.selbar button.p{background:var(--acc);border-color:var(--acc);color:var(--card)}.selbar button:disabled{opacity:.45}
+#clO button{font-size:13px;padding:9px 2px}
+.msn{font-size:13.5px;color:var(--ink);opacity:.85;margin-top:3px;white-space:pre-wrap}
 .prv{padding:8px 0;border-bottom:1px solid var(--line)}.prv:last-of-type{border-bottom:0}
 .pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:55vh;overflow:auto}.pkgi{border:2px solid var(--line);border-radius:10px;padding:4px;opacity:.55}.pkgi.on{border-color:var(--acc);opacity:1}.pkgi img{width:100%;height:150px;object-fit:contain;background:var(--bg);border-radius:6px;display:block;cursor:zoom-in}.pkgi .ck{font-size:12px;margin-top:4px}
 #phv{position:fixed;inset:0;background:#000;z-index:200;display:flex;align-items:center;justify-content:center}#phv img{max-width:100%;max-height:100%;object-fit:contain}#phv span{position:absolute;top:12px;right:16px;color:#fff;font-size:15px;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:16px}
@@ -415,7 +419,7 @@ const PRI=['Normal','High','Low'];
 const LACTS=['Record only','Reply to write','Directions to act on','Awaiting their reply'];
 const actOf=it=>it.act||(it.replyDue?(it.dir==='Received'?'Reply to write':'Awaiting their reply'):'Record only');const priRank=it=>it.priority==='High'?0:it.priority==='Low'?2:1;
 const T={
- task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('priority','Priority','sel',PRI),F('assignees','Assigned to (one or more)','people'),F('due','Deadline','date'),F('details','Details','textarea')]},
+ task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('priority','Priority','sel',PRI),F('assignees','Assigned to (one or more)','people'),F('due','Deadline (optional)','date'),F('details','Details','textarea')]},
  complaint:{n:'Complaint',pl:'Complaints',daily:1,f:[F('source','Source','sel',['WRIMS (PMIU)','Ombudsman Punjab','Other']),F('refNo','Complaint No'),F('title','Subject (optional: made from type and name)'),F('received','Received on','date'),F('due','Reply due (blank: WRIMS 3 days, others 7)','date'),F('side','Side','sel',['Technical','Revenue']),F('owner','Report from','person'),F('details','Details','textarea')]},
  estimate:{n:'Estimate',pl:'Estimates',daily:0,f:[F('scheme','M&R or ADP','sel',['M&R Work','ADP Scheme']),F('closure','Closure work or other than closure','sel',['Closure work','Other than closure']),F('wtype','Nature of work','sel',['Desilting','Other than desilting','Building work']),F('title','Name of work (as submitted)'),F('wpName','Name in work plan (if different, e.g. full canal)'),F('canal','Canal / channel','list','canals'),F('reaches','Reaches (e.g. 0+000-12+000, 23+000-34+000)'),F('xsInt','Cross-section every','sel',['1000 ft','500 ft']),F('amount','Amount submitted (Rs)','num'),F('authority','Sanctioning authority','sel',['Auto','XEN','SE','Chief Engineer']),F('owner','Sub Engineer','person'),F('estNo','Estimate No'),F('estDate','Received from SEN on','date'),F('items','Items included','textarea'),F('due','Target date','date'),F('details','Details','textarea')]},
  theft:{n:'Water theft',pl:'Water theft',daily:1,f:[F('title','Location (canal / RD / outlet)'),F('canal','Canal / channel','list','canals'),F('reportedOn','Reported on','date'),F('owner','Reported by (SEN)','person'),F('zildar','Zilladar','person'),F('culprits','Culprits (Fard-e-Qasran)','textarea'),F('hearing','Hearing date','date'),F('decision','Decision','sel',['Pending','Fine','Robkar / FIR']),F('fineAmount','Fine (Rs)','num'),F('receiptNo','Receipt No'),F('robkarNo','Robkar No / date'),F('policeStation','Police station'),F('firNo','FIR No'),F('tawanStatus','Tawan case','sel',['Not started','Case submitted by Zilladar','Notice issued (SDR)','Decided']),F('tawanHearing','Tawan hearing date','date'),F('tawanAmount','Tawan (Rs)','num'),F('details','Details','textarea')]},
@@ -585,7 +589,7 @@ function vHome(){const t=today(),wk=addDays(t,7),mo=t.slice(0,7);const its=S.ite
  const oa=scopeSubs().map(offA).filter(Boolean);const pmw=by('pmiu');const pmMiss=pmw.reduce((x,it)=>x+(it.pmOff||[]).filter(r=>['late','none'].includes(pmMatch(it,r).st)).length,0);
  const ws=weekStart(t);const insp=scopeSubs().map(s=>{const n=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=addDays(ws,6)&&isRoutineV(v)).length;const dn=S.inspNotes[s+'|'+ws];return `${esc(subName(s))}: ${n}/3 · ${dn?'note sent':(t===addDays(ws,6)?'<span class="rd">note due today</span>':'note due Sun')}`});
  const vh=S.vehicle.filter(v=>(v.date||'').startsWith(mo));let km=0,L=0,Rs=0;vh.forEach(v=>{const d=(+v.close||0)-(+v.open||0);if(v.open&&v.close&&d>0)km+=d;L+=+v.polL||0;Rs+=+v.polRs||0});
- const staff={};open.forEach(it=>{const ps=(it.type==='task'||it.type==='wire')&&asgOf(it).length?asgPend(it).map(a=>a.p):(it.owner?[it.owner]:[]);ps.forEach(pid=>{if(!person(pid))return;const s=staff[pid]=staff[pid]||{n:0,o:0};s.n++;if(ov(it))s.o++})});
+ const staff={};open.forEach(it=>{const ps=it.type==='task'?(h=>h.hk==='staff'?h.pids:[])(holder(it)):(it.type==='wire'&&asgOf(it).length?asgPend(it).map(a=>a.p):(it.owner?[it.owner]:[]));ps.forEach(pid=>{if(!person(pid))return;const s=staff[pid]=staff[pid]||{n:0,o:0};s.n++;if(ov(it))s.o++})});
  const staffL=Object.entries(staff).filter(([,x])=>x.o>0).sort((a,b)=>b[1].o-a[1].o||b[1].n-a[1].n).slice(0,3);
  const lb=S.settings.lastBackup;
  const doneT=its.filter(it=>it.doneOn===t||it.resolvedOn===t).length+rs.filter(r=>rd[r.id]).length;const leftT=g.over.length+g.overF.length+g.today.length+g.fu.length+rs.filter(r=>!rd[r.id]).length;const pct=doneT+leftT?Math.round(doneT*100/(doneT+leftT)):100;
@@ -750,7 +754,7 @@ function vPeople(){const secs=[...new Set(S.people.filter(pScope).map(p=>p.secti
  return `<div class="row between"><h1 class="pt">People <span class="meta">${S.people.filter(pScope).length}</span></h1><label class="btn s">Import file<input type="file" hidden accept=".xlsx,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json,application/octet-stream" onchange="A.pImp(this)"></label></div>
  ${dupCard()}<div class="frow"><input type="search" placeholder="Search people" value="${esc(PQ)}" oninput="PQ=this.value;$('#pres').innerHTML=peopleList()"><select onchange="PSEC=this.value;$('#pres').innerHTML=peopleList()" aria-label="Section"><option value="all">All sections</option>${secs.map(x=>`<option value="${esc(x)}" ${PSEC===x?'selected':''}>${esc(x.replace(/ Section$/,''))} (${S.people.filter(pScope).filter(p=>p.section===x).length})</option>`).join('')}</select></div><div id="pres">${peopleList()}</div>`}
 function vPerson(id){const p=person(id);if(!p)return '<a class="back" href="#people">‹ People</a><p class="empty">Not found.</p>';
- const its=pWork(id);const pss=pSec(p);
+ const its=pNow(id);const pss=pSec(p);
  const row=(l,v)=>v?`<dt>${l}</dt><dd>${esc(v)}</dd>`:'';
  return `<div class="itop"><a class="back" href="javascript:goBack()">‹ Back</a><button class="more" onclick="A.pMenu('${id}')" aria-label="More actions">⋯</button></div><h1 class="pt">${esc(p.name)}</h1><div class="card"><dl class="kv">${row('Parentage',p.parentage)}${row('Designation',p.designation)}${row('Section',p.section)}${row('Posting',p.posting)}${row('Subdivision',subName(p.sub))}${row('CNIC',p.cnic)}</dl>${phonesOf(p).length?`<div class="mt">${phShow(p)}</div>`:''}${p.notes?`<p class="det">${esc(p.notes)}</p>`:''}</div>
  ${(()=>{const ds=(p.duty||[]).filter(d=>canal(d.c));const sec=p.section&&!isZil(p.section)&&secNames(p.sub).includes(p.section);return ds.length||sec?`<h2>Duty</h2><div class="card">${ds.map(d=>`<div style="padding:4px 0"><a href="#canal/${d.c}">${esc(dutyTxt(d))}</a></div>`).join('')||'<div class="meta">No duty set.</div>'}${sec?`<button class="btn s mt" onclick="A.dutyEd('${id}','${p.sub}',this.dataset.g)" data-g="${esc(p.section)}">Edit duty</button>`:''}</div>`:''})()}
@@ -895,12 +899,14 @@ A.saveItem=(ty,id)=>{const it0=id?get(id):null;const vals={};T[ty].f.forEach(f=>
  if(ty==='pmiu'&&!vals.title)vals.title='PMIU C.W '+(vals.refNo||'')+(vals.canal?' · '+vals.canal:'');
  if(ty!=='complaint'&&!vals.title&&!(it0&&it0.title)){toast('Title / subject is required');return}
  if(ty==='complaint'&&!vals.refNo&&!(it0&&it0.refNo)){toast('Complaint No is required');return}
- if((ty==='task'||ty==='prep')&&!vals.due){toast('Deadline is required');return}
+ if(ty==='prep'&&!vals.due){toast('Deadline is required');return}
  if(ty==='letter'){if(vals.act==='Record only')vals.replyDue='';else if(!vals.replyDue&&vals.act!=='Reply to write'){toast(vals.act==='Awaiting their reply'?'Enter the date their reply is expected':'Enter the deadline for the directions');return}}
  const prevA=it0?asgOf(it0).map(x=>Object.assign({},x)):[];
  snap();const it=it0||{id:uid(),type:ty,createdAt:Date.now(),stages:[],notes:[],links:[]};Object.assign(it,vals);it.sub=$('#f_sub').value;
  if(ty==='task'||ty==='wire'){const ids=idsOf(ty==='task'?it.assignees:it.recips);if(ids.length||it.asg)it.asg=ids.map(p=>prevA.find(a=>a.p===p)||{p,st:'Pending'});if(ty==='task')it.owner=ids[0]||''}
  if(ty==='task'&&$('#f_pers')){if($('#f_pers').checked){it.personal=true;const ph=phRead('pc');const ct=Object.assign({name:$('#f_pc').value.trim()},ph);if(ct.name||ct.phone)it.contact=ct;else delete it.contact;it.source='Other';it.asg=[];it.owner='';it.assignees=''}else{delete it.personal;delete it.contact}}
+ if(ty==='task'&&$('#f_hk')){const hk=$('#f_hk').value;if(hk)it.hk=hk;else delete it.hk;const wt=$('#f_wt').value.trim();if(/up|dept/.test(hk)&&wt)it.wt=wt;else delete it.wt;const rp=$('#f_rep').value;if(rp)it.rep=rp;else delete it.rep;const am=Number(String($('#f_amt').value).replace(/[^0-9.]/g,''));if(am>0)it.amt=am;else delete it.amt;if($('#f_rb').checked)it.rb=1;else delete it.rb}
+ if(ty==='task'&&!it.due&&!(it.followUp&&it.followUp>today()))it.followUp=addDays(today(),7);
  if(ty==='task'&&$('#f_ms')){const L=$('#f_ms').value.split('\n').map(x=>x.trim()).filter(Boolean);if(L.length)it.ms=(it.ms||[]).concat(L.map(n=>({id:uid(),n})))}
  if(ty==='complaint'&&!it.due&&it.received&&/^WRIMS/.test(it.source))it.due=addDays(it.received,3);
  if(ty==='complaint'){cpFormSave(it);if(!it0&&!it.due)it.due=addDays(it.received||today(),7);cpMigrate(it);if(it0){const r=(it.steps||[])[0];if(r&&r.st==='rcv'&&it.received)r.date=it.received}cpSync(it)}
@@ -1902,7 +1908,7 @@ const overN=l=>l.filter(it=>{const k=keyDate(it);return k&&k<today()}).length;
 let WKX=0,SSO=false;
 function workCard(l,addJs,shareJs){if(!l.length)return '';l=sortW(l);const ov=overN(l);
  return `<div class="card"><div class="row between"><div class="ct">Open work <span class="meta">${l.length}${ov?` · <span class="rd">${ov} overdue</span>`:''}</span></div><span class="ibs">${shareJs&&l.length?`<button class="ib" onclick="${shareJs}" aria-label="Send list on WhatsApp" title="Send list on WhatsApp">${ICO.msg}</button>`:''}</span></div>${l.length?`<div class="list" style="margin-top:8px">${l.slice(0,WKX?999:4).map(trow).join('')}</div>${l.length>4&&!WKX?`<button class="btn s wide mt" onclick="WKX=1;render()">Show all ${l.length}</button>`:''}`:'<div class="meta mt">Nothing open.</div>'}</div>`}
-A.secShare=(s,g)=>{const l=sortW(secWork(s,g));const h=secHead(s,g);const txt='Pending work · '+g+' · '+fmtD(today())+'\n'+l.map((it,i)=>(i+1)+'. '+it.title+(keyDate(it)?' (by '+fmtD(keyDate(it))+')':'')).join('\n')+'\n\nPlease update the status of each.';window.open('https://wa.me/'+(h&&h.phone?wa(h.phone):'')+'?text='+encodeURIComponent(txt),'_blank','noopener')};
+A.secShare=(s,g)=>{const l=sortW(secWork(s,g));const h=secHead(s,g);const txt='Pending work · '+g+' · '+fmtD(today())+'\n'+l.map((it,i)=>(i+1)+'. '+it.title+(it.type==='task'&&msNext(it)?' – step: '+msNext(it).n:'')+(keyDate(it)?' (by '+fmtD(keyDate(it))+')':'')+(it.type==='task'&&holderLine(it)?' – '+holderLine(it):'')).join('\n')+'\n\nPlease update the status of each.';window.open('https://wa.me/'+(h&&h.phone?wa(h.phone):'')+'?text='+encodeURIComponent(txt),'_blank','noopener')};
 function linkRow(it){const c=iCanal(it),x=iSec(it);const ps=(asgOf(it).length?asgOf(it).map(a=>a.p):(it.owner?[it.owner]:[])).filter(person);
  const iv=it.vid&&S.visits.find(x=>x.id===it.vid);const parts=[iv?`<a href="#note/${iv.id}">Inspection ${fmtD(iv.date)}</a>`:'',c?`<a href="#canal/${c.id}">${esc(c.name)}${it.rd?' · RD '+esc(it.rd):''}</a>`:'',x?`<a href="#sec/${x.s}/${encodeURIComponent(x.g)}">${esc(x.g)}</a>`:'',...ps.map(p=>`<a href="#person/${p}">${esc(pShort(p))}</a>`)].filter(Boolean);
  return `<div class="lnk">${it.personal?'<span class="chip a">Personal</span>':''}${parts.length?parts.join('<span class="meta">·</span>'):'<span class="meta">Not linked to a canal, section or person</span>'}<button class="btn s" onclick="A.mv('${it.id}')">${parts.length||it.personal?'Move / reassign':'Link'}</button></div>`}
@@ -2043,20 +2049,10 @@ A.mvAllDo=pid=>{const to=$('#mva').value;if(!to||to===pid)return toast('Choose a
 
 /* ---------- follow-ups: one list ---------- */
 let TF={f:'open',sec:'',q:''};
-function tRows(){const t=today();const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
- if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(it=>{const k=keyDate(it);return k&&k<t})}
- if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
- const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));
- if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
- return l.length?(q.length?`<div class="list">${sortW(l).map(trow).join('')}</div>`:tGroups(sortW(l))):`<p class="empty">${TF.f==='pers'?'No personal items.':'Nothing here.'}</p>`}
 function secSummary(){const t=today();const m={};S.items.filter(it=>inScope(it)&&isWork(it)&&isOpen(it)).forEach(it=>{const x=iSec(it);if(!x)return;const k=x.s+'|'+x.g;const o=m[k]=m[k]||{n:0,ov:0,old:''};o.n++;const kd=keyDate(it);if(kd&&kd<t){o.ov++;if(!o.old||kd<o.old)o.old=kd}});
  const rows=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>Object.assign({s,g},m[s+'|'+g]||{n:0,ov:0,old:''})));if(!rows.some(r=>r.n))return '';
  return `<details class="card sumsec" ${SSO?'open':''} ontoggle="SSO=this.open"><summary><span><b style="font-weight:600">All open work by section</b><span class="meta"> · ${rows.filter(r=>r.ov).length} with overdue</span></span><span class="chev">▾</span></summary>${rows.map(r=>{const h=secHead(r.s,r.g);return `<a class="srow" href="#sec/${r.s}/${encodeURIComponent(r.g)}"><span><b style="font-weight:600">${esc(secShort(r.g))}</b><small>${h?esc(h.name):'SEN not set'}</small></span><span>${r.n} open</span><span class="${r.ov?'rd':'meta'}">${r.ov?r.ov+' overdue · oldest '+diffDays(t,r.old)+'d':'none overdue'}</span></a>`}).join('')}</details>`}
-function vTasks(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));const op=base.filter(it=>isOpen(it)&&!it.personal);const t=today();
- const n={open:op.length,over:op.filter(it=>{const k=keyDate(it);return k&&k<t}).length,pers:base.filter(it=>it.personal&&isOpen(it)).length};
- const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
- const fb=(k,l,c)=>`<button class="${TF.f===k?'on':''}" onclick="TF.f='${k}';render()">${l}${c!=null?' '+c:''}</button>`;
- return `<h1 class="pt">Follow-ups</h1><div class="frow"><input type="search" placeholder="Search" value="${esc(TF.q)}" oninput="TF.q=this.value;$('#tres').innerHTML=tRows()"><select onchange="TF.sec=this.value;render()" aria-label="Section"><option value="">All sections</option>${secs.map(([v,l])=>`<option value="${esc(v)}" ${TF.sec===v?'selected':''}>${esc(l)}</option>`).join('')}<option value="-" ${TF.sec==='-'?'selected':''}>Not linked</option></select></div><div class="fchips">${fb('open','Open',n.open)}${fb('over','Overdue',n.over)}${n.pers||TF.f==='pers'?fb('pers','Personal',n.pers):''}${fb('closed','Closed')}</div>${TF.f!=='pers'&&TF.f!=='closed'?secSummary():''}<div id="tres">${tRows()}</div>`}
+
 
 /* ---------- link old records once ---------- */
 function lfSug(it){const tx=[it.title,it.details].filter(Boolean).join(' ');const s={};if(it.type==='task'&&PERS_RE.test(it.title)){s.pers=1;return s}const L=findLink(tx);if(L&&L.c)s.cid=L.c.id;else if(L&&L.sec)s.sec=L.sec;s.rd=findRD(tx);return s}
@@ -2443,7 +2439,7 @@ const outRem=o=>{const r=String(o.rem||'').trim();return o.bad?'Not as per desig
 function ntOutFirst(nt){const bad=nt.outs.filter(x=>x.bad);let s;if(!bad.length)s='The outlets were checked and found according to the approved design.';else if(bad.length===nt.outs.length)s='The outlets were checked and were not found according to the approved design.';else s='The outlets were checked. Outlet No. '+bad.map(x=>x.no).join(', ')+(bad.length>1?' were':' was')+' not found according to the approved design; the remaining outlets were found according to the approved design.';
  const rep=nt.outs.filter(x=>x.bad&&(x.pb||[]).length),fixd=nt.outs.filter(x=>!x.bad&&(x.pb||[]).length);rep.forEach(x=>{s+=' Outlet No. '+x.no+' was also found not according to the approved design earlier on '+x.pb.map(dotD).join(', ')+' (now '+ordN(x.pb.length+1)+' time).'});fixd.forEach(x=>{s+=' Outlet No. '+x.no+', found not according to the approved design on '+dotD(x.pb[x.pb.length-1])+', was found as per design at the time of this inspection.'});return s}
 
-const persRe=()=>new RegExp(PERS_RE.source.replace('utility bills?','utility bills?|house|home|electrician|plumber|carpenter|painter|mechanic|car repair|bike|rent|kids?|family'),'i');
+const persRe=()=>new RegExp(PERS_RE.source.replace('utility bills?','utility bills?|(?<!rest )house|home|electrician|plumber|carpenter|painter|mechanic|car repair|bike|(?<!land |lease |shop |canal )rent|kids?|family'),'i');
 A.persT=()=>{const on=$('#f_pers')&&$('#f_pers').checked;if(on&&$('#tkMore'))$('#tkMore').open=true;const c=$('#persC');if(c)c.style.display=on?'':'none';['source','assignees'].forEach(k=>{const e=$('#f_'+k);const w=e&&e.closest('.fld');if(w)w.style.display=on?'none':''})};
 A.phAdd=pre=>{const d=document.createElement('div');d.innerHTML=phRow(pre,{n:'',l:'Mobile'});$('#'+pre+'_phl').appendChild(d.firstChild)};
 /* ================= complaints: timeline of steps you add ================= */
@@ -2709,8 +2705,6 @@ const inits=n=>String(n||'').split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]
 function dueChip(it){if(!isOpen(it))return '';const kd=keyDate(it);if(!kd)return '';const n=diffDays(kd,today());const l=(datesOf(it).find(x=>x.d===kd)||{}).l||'Due';
  return n<0?`<span class="chip ${quiet(it)>=7?'r':'a'}">${esc(l)} · ${-n}d overdue</span>`:n===0?`<span class="chip a">${esc(l)} today</span>`:n===1?`<span class="chip a">${esc(l)} tomorrow</span>`:`<span class="chip">${esc(l)} ${fmtD(kd)}</span>`}
 function iRow(l,v,href,on){const tap=href||on;const tag=href?'a':'div';return `<${tag} class="irow${tap?' tap':''}"${href?` href="${href}"`:''}${on?` onclick="${on}"`:''}><div class="ilb">${esc(l)}</div><div class="iv">${v}</div>${tap?'<span class="chev">›</span>':''}</${tag}>`}
-function pRow(pid,label,it){const p=person(pid);if(!p)return '';const ph=p.phone;const msg=it?'?text='+encodeURIComponent('Reminder: '+it.title+'. Please update the status.'):'';
- return `<div class="irow ip tap" onclick="go('#person/${p.id}')"><div class="ilb">${esc(label)}</div><div class="ipv"><div class="av">${esc(inits(p.name))}</div><div class="ipn"><div>${esc(p.name)}</div><div class="meta">${esc([p.designation,p.section||p.posting].filter(Boolean).join(' · '))}</div></div>${ph?`<a class="ic" href="tel:${esc(ph)}" onclick="event.stopPropagation()" aria-label="Call ${esc(p.name)}">${ICO.call}</a><a class="ic" href="https://wa.me/${wa(ph)}${msg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" aria-label="WhatsApp ${esc(p.name)}">${ICO.msg}</a>`:''}</div></div>`}
 function histBlock(it){const id=it.id;const E=[];const fus=it.fus||[];
  fus.forEach((x,i)=>E.push({k:(x.d||'')+'T2'+String(i).padStart(5,'0'),d:x.d,t:[x.text,x.next?'Look again '+fmtD(x.next):'',x.reason?'Reason: '+x.reason:''].filter(Boolean).join(' · ')||'Followed up',ed:`A.fuEd('${id}',${i})`}));
  const fk=new Set(fus.map(x=>x.d+'|'+(x.text||'')));const hasH=(it.hears||[]).length;
@@ -2730,11 +2724,11 @@ function filesBlock(it,kids){const id=it.id;const L=it.links||[];const n=L.lengt
 A.docMenu=(id,i)=>{const l=get(id).links[i];sheet(`<div class="ct">${esc(l.label||l.name||'Document')}</div><div class="mt"><div class="mi" onclick="closeSheet();A.openDoc('${id}',${i})"><span class="e">↗</span>Open</div><div class="mi" onclick="closeSheet();A.renLink('${id}',${i})"><span class="e">✎</span>Rename</div><div class="mi red" onclick="closeSheet();A.rmLink('${id}',${i})"><span class="e">🗑</span>Remove</div></div>`)};
 A.itMenu=(id,onlyAdd)=>{const it=get(id);if(!it)return;const relIt=it.rel&&get(it.rel);const kids=S.items.filter(x=>x.rel===id);const add=[],chg=[];
  const mi=(e,l,on,cls)=>`<div class="mi${cls?' '+cls:''}" onclick="closeSheet();${on}"><span class="e">${e}</span>${esc(l)}</div>`;
- if(it.type!=='template'){add.push(`<label class="mi"><span class="e">📎</span>Attach file or photo<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="closeSheet();A.attachPick('${id}',this)"></label>`);add.push(mi('🔗','Google Drive link',`A.lkSheet('${id}')`))}
+ if(it.type!=='template')add.push(mi('📎','Attach file, photo or Drive link',`A.attachMenu('${id}')`));
  if(it.type==='letter'){add.push(mi('⤷','Link a resource',`A.linkDown('${id}','resource')`));if(!it.rel)add.push(mi('⤴','Link to a case',`A.linkUp('${id}')`))}
  else if(it.type==='resource'){if(!it.rel)add.push(mi('⤴','Link to a letter or case',`A.linkUp('${id}')`))}
  else if(it.type==='wire'){if(!(kids.some(x=>x.type==='task')||idsOf(it.recips).length))add.push(mi('＋','Create follow-up from this wire',`A.wireTask('${id}')`))}
- else if(it.type!=='place'&&it.type!=='template'){add.push(mi('✉','New letter',`A.relLetter('${id}')`));add.push(mi('⤷','Link existing letter',`A.linkDown('${id}','letter')`))}
+ else if(it.type!=='place'&&it.type!=='template')add.push(mi('✉','Letter: new or existing',`A.letterMenu('${id}')`));
  if(it.type==='letter'&&it.dir==='Received'&&!it.resolved){if(!S.items.some(x=>x.type==='prep'&&x.rel===id))add.push(mi('✍','Prepare reply',`A.prepFrom('${id}')`));if(!S.items.some(x=>x.type==='task'&&x.rel===id))add.push(mi('→','Directions → Follow-up',`A.dirFrom('${id}')`))}
  if(!LIB.includes(it.type)&&S.items.some(x=>x.type==='template'))add.push(mi('▤','Use a template',`A.useTpl('${id}')`));
  if(it.type==='court')add.push(mi('⚖','Record hearing',`A.hearAdd('${id}')`));
@@ -2748,10 +2742,6 @@ A.itMenu=(id,onlyAdd)=>{const it=get(id);if(!it)return;const relIt=it.rel&&get(i
  sheet(`${add.length?`<div class="grp">Add</div>${add.join('')}`:''}<div class="grp">Change</div>${chg.join('')}`)};
 A.attachPick=async(id,inp)=>{const fs=[...inp.files];inp.value='';if(!fs.length)return;const out=await pickReview(fs);if(!out||!out.length)return;await A.upload(id,{files:out,value:''})};
 /* one sheet for an update or a later date, with the phone's calendar */
-A.upd=id=>{const t=today(),it=get(id);const kd=keyDate(it);const od=kd&&kd<t;const def=it.followUp&&it.followUp>t?it.followUp:addDays(t,1);
- sheet(`<div class="ct">Update / Later</div><div class="meta">${esc(it.title)}</div><textarea id="fuN" rows="3" class="mt" placeholder="What happened? (optional)"></textarea><label class="fld"><span>Look at it again on</span><input type="date" id="fuD" value="${def}" min="${addDays(t,1)}"></label>${od?`<label class="fld"><span>Reason: deadline ${fmtD(kd)} has passed</span><input id="fuR" list="fuRl" placeholder="Pick or type a reason"></label><datalist id="fuRl">${REASONS.map(r=>`<option value="${esc(r)}">`).join('')}</datalist>`:''}<button class="btn p wide mt" onclick="A.updSave('${id}')">Save update</button>`)};
-A.updSave=id=>{const it=get(id);const t=today();const tx=$('#fuN').value.trim(),d=$('#fuD').value||addDays(t,1);const re=$('#fuR')?$('#fuR').value.trim():'';if(d<=t)return toast('Pick a date after today');if($('#fuR')&&!re)return toast('Give a reason: the deadline has passed');
- snap();it.doneOn=t;it.followUp=d;const e={d:t,next:d};if(tx)e.text=tx;if(re)e.reason=re;(it.fus=it.fus||[]).push(e);log('Followed up: '+it.title+(tx?' · '+tx:'')+' · next '+fmtD(d)+(re?' ('+re+')':''),it);save();closeSheet();render();toast('Saved · look again '+fmtD(d),1)};
 {const od=A.done;A.done=id=>{const it=get(id);if(it&&isOpen(it)&&!LIB.includes(it.type))return A.upd(id);od(id)}}
 A.fu=id=>A.upd(id);
 A.hearAdd=id=>{const it=get(id);sheet(`<div class="ct">Record hearing</div><div class="meta">${esc(it.title)}${it.hearing?' · hearing '+fmtD(it.hearing):''}</div><label class="fld mt"><span>What happened</span><textarea id="hOut" rows="3" placeholder="Adjourned, reply filed …"></textarea></label><label class="fld"><span>Next hearing</span><input type="date" id="hNext"></label><button class="btn p wide" onclick="A.hearAddSave('${id}')">Save hearing</button>`)};
@@ -2770,7 +2760,7 @@ function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Ite
  const rows=[];if(one)rows.push(pRow(ps[0],pf?pf.l.replace(/ \(.*\)$/,''):'Assigned to',isOpen(it)?it:null));
  if(it.type!=='estimate')ty.f.filter(f=>f.k!=='title'&&f.k!=='details'&&!(one&&(f.k==='owner'||f.k==='assignees'))&&!(ps.length>1&&it.type==='task'&&f.k==='assignees')&&!(c&&(f.k==='canal'||f.k==='rd'))&&!(it.type==='inquiry'&&f.k==='role')&&it[f.k]&&!(f.k==='decision'&&it[f.k]==='Pending')&&!(f.k==='priority'&&it[f.k]==='Normal')&&!(f.k==='tawanStatus'&&it[f.k]==='Not started'))
   .forEach(f=>rows.push(iRow(f.l.replace(/ \(.*\)$/,''),esc(dispVal(f,it[f.k]))+(f.t==='date'&&isOpen(it)&&['due','hearing','tawanHearing','replyDue'].includes(f.k)?` <span class="meta">(${esc(rel(it[f.k]))})</span>`:''))));
- if(iv)rows.push(iRow('Inspection',fmtD(iv.date)+' · '+esc(canalLabel(iv)),'#note/'+iv.id));
+ if(it.type==='task')tkRows(it,rows,ps);if(iv)rows.push(iRow('Inspection',fmtD(iv.date)+' · '+esc(canalLabel(iv)),'#note/'+iv.id));
  if(c)rows.push(iRow('Canal',esc(c.name)+(it.rd?' · RD '+esc(it.rd):''),'#canal/'+c.id));
  if(x)rows.push(iRow('Section',esc(x.g),'#sec/'+x.s+'/'+encodeURIComponent(x.g)));
  if(it.type==='task'&&!c&&!x&&!ps.length&&!it.personal)rows.push(iRow('Link','<span class="meta">Not linked to a canal, section or person</span>','',`A.mv('${id}')`));
@@ -2946,53 +2936,13 @@ const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
 function msOf(it){return (it&&it.ms)||[]}
 function msNext(it){return msOf(it).find(x=>!x.dn)||null}
 function msLine(it){const L=msOf(it);if(!L.length)return '';const k=L.findIndex(x=>!x.dn);return k<0?'All '+L.length+' steps done':'Step '+(k+1)+'/'+L.length+': '+L[k].n}
-const msWho=x=>x.who&&person(x.who)?pShort(x.who):(x.whoT||'');
-function msBlock(it){const L=msOf(it);if(!L.length)return '';const id=it.id;const t=today();const d=L.filter(x=>x.dn).length;const nx=L.findIndex(x=>!x.dn);const op=isOpen(it);
- return `<h2>Steps · ${d} of ${L.length} done</h2><div class="icard msc"><div class="msbar"><i style="width:${Math.round(d*100/L.length)}%"></i></div>${L.map((x,i)=>{const st=x.dn?'dn':i===nx?'nx':'';const late=!x.dn&&x.due&&x.due<t;
-  const sub=[msWho(x),x.dn?'Done '+fmtD(x.dn):x.due?'By '+fmtD(x.due):''].filter(Boolean).map(esc).join(' · ')+(late?' · <span class="rd">late</span>':'');
-  return `<div class="msr ${st}" onclick="A.msEd('${id}',${i})">${i===nx&&op?`<button class="msd" onclick="event.stopPropagation();A.msDone('${id}')" aria-label="Mark this step done"></button>`:`<span class="msd">${x.dn?'✓':i+1}</span>`}<div class="iv"><div>${esc(x.n)}</div>${sub?`<div class="meta">${sub}</div>`:''}</div><span class="chev">›</span></div>`}).join('')}${op?`<div class="msr add" onclick="A.msEd('${id}',-1)"><span class="msd">+</span><div class="iv">Add step</div></div>`:''}</div>`}
-A.msEd=(id,i)=>{const it=get(id);if(!it)return;const L=msOf(it);const x=i>=0?L[i]:{n:'',due:'',who:'',dn:''};
- const names=[...new Set(S.items.flatMap(y=>(y.ms||[]).map(z=>z.n)))].sort();const ppl=S.people.filter(pScope).map(p=>p.name).sort();
- const wv=x.who&&person(x.who)?person(x.who).name:(x.whoT||'');
- sheet(`<div class="ct">${i<0?'Add step':'Step '+(i+1)+' of '+L.length}</div><div class="meta">${esc(it.title)}</div>
- <label class="fld mt"><span>Step</span><input id="msN" list="msNl" value="${esc(x.n)}" placeholder="e.g. Report called from SEN"></label><datalist id="msNl">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
- <div class="grid2"><label class="fld"><span>By date (optional)</span><input type="date" id="msD" value="${esc(x.due||'')}"></label><label class="fld"><span>Who (optional)</span><input id="msW" list="msWl" value="${esc(wv)}" placeholder="Same as follow-up"></label></div><datalist id="msWl">${ppl.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
- ${i>=0?`<label class="fld"><span>Done on (empty = not done yet)</span><input type="date" id="msX" value="${esc(x.dn||'')}"></label>`:''}
- <button class="btn p wide" onclick="A.msSave('${id}',${i})">Save</button>
- ${i>=0&&L.length>1?`<div class="acts">${i>0?`<button class="btn" onclick="A.msMv('${id}',${i},-1)">Move up</button>`:''}${i<L.length-1?`<button class="btn" onclick="A.msMv('${id}',${i},1)">Move down</button>`:''}</div>`:''}
- ${i>=0?`<button class="btn d wide mt" onclick="A.msDel('${id}',${i})">Delete step</button>`:''}`);if(i<0)setTimeout(()=>{const e=$('#msN');if(e)e.focus()},60)};
-A.msSave=(id,i)=>{const it=get(id);const n=$('#msN').value.trim();if(!n)return toast('Name the step');const wt=$('#msW').value.trim();const p=wt&&S.people.find(q=>q.name.toLowerCase()===wt.toLowerCase());
- snap();it.ms=it.ms||[];const x=i>=0?it.ms[i]:{id:uid()};x.n=n;x.due=$('#msD').value||'';if(p){x.who=p.id;delete x.whoT}else{x.who='';if(wt)x.whoT=wt;else delete x.whoT}
- if(i>=0)x.dn=$('#msX').value||'';else it.ms.push(x);['due','dn','who'].forEach(k=>{if(!x[k])delete x[k]});
- log((i<0?'Step added: ':'Step edited: ')+n+' · '+it.title,it);save();closeSheet();render();toast('Saved',1)};
 A.msMv=(id,i,d)=>{const it=get(id);const L=it.ms;const j=i+d;if(j<0||j>=L.length)return;snap();[L[i],L[j]]=[L[j],L[i]];save();closeSheet();render()};
 A.msDel=(id,i)=>{if(!confirm('Delete this step?'))return;const it=get(id);snap();it.ms.splice(i,1);if(!it.ms.length)delete it.ms;save();closeSheet();render();toast('Step deleted',1)};
-A.msDone=id=>{const it=get(id);const x=msNext(it);if(!x)return A.resolve(id);snap();const t=today();x.dn=t;it.doneOn=t;(it.fus=it.fus||[]).push({d:t,text:'Step done: '+x.n});log('Step done: '+x.n+' · '+it.title,it);buzz();save();render();
- const nx=msNext(it);toast(nx?'Step done · next: '+nx.n:'All steps done · tap ✓ Done to close it',1)};
 A.qdone=id=>{const it=get(id);if(it&&it.type==='task'&&msNext(it))return A.msDone(id);A.resolve(id)};
 {const o=A.tick;A.tick=id=>{buzz();o(id)}}
 {const o=A.resolve;A.resolve=id=>{buzz();o(id)}}
 
 /* ---------- the short follow-up form ---------- */
-function tkForm(src,it){const fv=k=>src[k]==null?'':src[k];const F_=k=>{const f=T.task.f.find(x=>x.k===k);return f&&fieldVisible('task',src,k)?fieldHTML(f,fv(k)):''};
- const main=['title','assignees','due'],more=['source','priority','details'];
- const extra=T.task.f.filter(f=>!main.includes(f.k)&&!more.includes(f.k)).map(f=>F_(f.k)).join('');
- return main.map(F_).join('')+extra+`<details class="xmore" id="tkMore" ${it?'open':''}><summary>More: source, priority, notes${it?'':', steps'}</summary>${more.map(F_).join('')}${it?'':`<label class="fld"><span>Steps (optional, one per line)</span><textarea id="f_ms" rows="3" placeholder="Report called from SEN&#10;Site visit&#10;Reply to XEN"></textarea></label>`}${persBlock(src)}</details>`}
-
-/* ---------- list rows: one tap target, colour only where it matters ---------- */
-const quiet=it=>diffDays(today(),lastAct(it));
-function trow(it){const t=today();const kd=keyDate(it);let cls='',due='',dc='';
- if(kd){const n=diffDays(kd,t);if(n<0&&it.followUp&&it.followUp>t){cls='fol';due=(-n)+'d over · next '+fmtD(it.followUp);dc=''}else if(n<0){const q=quiet(it);if(q>=7){cls='over';due=(-n)+'d overdue'+(q<-n?' · no update '+q+'d':'');dc='r'}else{due=(-n)+'d overdue';dc='a'}}else if(n===0){cls='today';due=it.type==='court'&&it.attendTime?it.attendTime:it.type==='event'&&it.time?it.time:'Today';dc='a'}else due=n===1?'Tomorrow':fmtD(kd)}
- else if(it.followUp)due='Follow-up';
- const one=/^#list\//.test(location.hash);
- const parts=[one&&!it.personal?'':(it.personal?'Personal':T[it.type].n),it.priority==='High'?'High':'',SUB==='A'?subName(it.sub):'',(it.type==='task'||it.type==='wire')&&asgOf(it).length?asgLine(it):pShort(it.owner),stageOf(it),msLine(it)||fuLine(it)].filter(Boolean);
- const meta=parts.map((x,i)=>i===0&&!(one&&!it.personal)?`<span class="ty">${esc(x)}</span>`:x==='High'?'<span class="rd">High</span>':esc(x)).join(' · ');
- return `<div class="trow ${cls}"><button class="tick" aria-label="Followed up today" onclick="A.tick('${it.id}')"></button><div class="bd" onclick="go('#item/${it.id}')"><div class="tt">${esc(it.title)}</div>${meta?`<div class="mt2">${meta}</div>`:''}</div><div class="due ${dc}">${esc(due)}</div></div>`}
-function tGroups(l){const t=today(),w=addDays(t,7);const G=[['Overdue',[]],['Today',[]],['Next 7 days',[]],['Later',[]],['No date',[]]];
- l.forEach(it=>{const k=keyDate(it);G[!k?4:k<t?0:k===t?1:k<=w?2:3][1].push(it)});const used=G.filter(g=>g[1].length);
- if(used.length<2)return `<div class="list">${l.map(trow).join('')}</div>`;
- return used.map(([n,L])=>`<div class="grp">${n} · ${L.length}</div><div class="list">${L.map(trow).join('')}</div>`).join('')}
-
 /* ---------- item page: the bar carries the next action ---------- */
 function ibarP(it){const id=it.id;
  if(it.type==='task'){const n=msNext(it);if(n)return {l:'✓ '+n.n,on:`A.msDone('${id}')`}}
@@ -3011,12 +2961,6 @@ function itemBar(it){const id=it.id;let b;
  else b=[`<button onclick="A.done('${id}')">Add note</button>`,`<button class="p" onclick="A.reopen('${id}')">Reopen</button>`];
  return `<div class="ibar">${b.join('')}</div>`}
 /* extra entries for the ⋯ menu, so the page itself stays free of buttons */
-function itMenuX(it,mi,add){const id=it.id;
- if(it.type==='task'&&isOpen(it))add.push(mi('☰',msOf(it).length?'Add a step':'Break into steps',`A.msEd('${id}',-1)`));
- if(it.type==='inquiry'){add.push(mi('⚖','Record hearing',`A.hrEdit('${id}','')`));if(inqAccused(it).length)add.push(mi('▤','Attendance sheet',`A.attSheet('${id}')`));const role=inqRole(it);
-  if(role==='Inquiry Officer')add.push(mi('✓',it.report&&it.report.date?'Edit report details':'Report submitted',`A.inqDone('${id}','report')`));
-  if(role==='Accused'){add.push(mi('✓',it.replyD?'Edit reply date':'Reply submitted',`A.inqDone('${id}','reply')`));add.push(mi('✎',it.outcome?'Edit decision':'Record decision',`A.inqDone('${id}','outcome')`))}}
- if(it.type==='complaint')add.push(mi('⛓',it.grp?'Change linked complaints':'Link complaints about the same issue',`A.cpLink('${id}')`))}
 function hearBlock(it){const H=it.hears||[];if(!H.length)return '';return `<h2>Hearings · ${H.length}</h2><div class="list">${H.slice().reverse().map(x=>`<div class="arow tap" onclick="A.hrEd('${it.id}','${x.id}')"><span class="an"><b style="font-weight:600">${fmtD(x.d)}</b>${x.next?' → next '+fmtD(x.next):''}${x.out?`<div>${esc(x.out)}</div>`:''}</span><span class="chev">›</span></div>`).join('')}</div>`}
 
 /* ---------- person page: one ⋯ menu ---------- */
@@ -3027,8 +2971,222 @@ A.pMenu=id=>{const n=pWork(id).length;const mi=(e,l,on,cls)=>`<div class="mi${cl
 function phNorm(v){const s=String(v||'').trim();const d=s.replace(/[\s\-().]/g,'');let m=d.match(/^(?:\+92|0092|92)(3\d{9})$/)||d.match(/^0?(3\d{9})$/);if(m)return '0'+m[1].slice(0,3)+'-'+m[1].slice(3);return s}
 
 /* ---------- bottom tabs ---------- */
-function tabsSync(v,p,isHome){const tb=$('#tabs');if(!tb)return;const hide=/^edit/.test(v)||['item','note','verify','qlog'].includes(v);tb.style.display=hide?'none':'';document.body.classList.toggle('hastabs',!hide);
+function tabsSync(v,p,isHome){if(!(v==='list'&&p[1]==='task'))TSEL=null;const tb=$('#tabs');if(!tb)return;const hide=/^edit/.test(v)||['item','note','verify','qlog'].includes(v);tb.style.display=hide?'none':'';document.body.classList.toggle('hastabs',!hide);
  const k=v==='list'&&p[1]==='task'?'task':v==='insp'?'insp':isHome?'home':'';tb.querySelectorAll('[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===k))}
+
+/* ================= v65: follow-ups A to Z ================= */
+/* ---------- who holds it now ---------- */
+const HKL={staff:'My staff',me:'Me',up:'Higher office',dept:'Other department'};
+const HKO=[['','Auto'],['staff','My staff'],['me','Me'],['up','Higher office (XEN, SE …)'],['dept','Other department']];
+const pByName=s=>{const k=String(s||'').trim().toLowerCase();return k?S.people.find(p=>p.name.toLowerCase()===k):null};
+const pHk=pid=>{const p=person(pid);return p&&/\b(xen|s\.?e|executive engineer|superintending|chief engineer)\b/i.test(p.designation||'')?'up':'staff'};
+const guessHk=t=>/\b(xen|s\.?e|circle|chief|secretar|director|commissioner|division office|head ?office)\b/i.test(t||'')?'up':'dept';
+function holder(it){const n=it.type==='task'?msNext(it):null;
+ if(n&&(n.who||n.whoT||n.hk)){const hk=n.hk||(n.who?pHk(n.who):guessHk(n.whoT));return {hk,pids:n.who&&person(n.who)?[n.who]:[],name:n.who&&person(n.who)?pShort(n.who):(n.whoT||''),step:n}}
+ if(it.personal)return {hk:'me',pids:[],name:''};
+ const hk=it.hk||'';if(hk==='up'||hk==='dept')return {hk,pids:[],name:it.wt||''};if(hk==='me')return {hk,pids:[],name:''};
+ const a=asgOf(it);const pend=a.length?(asgPend(it).length?asgPend(it):a):[];const pids=(pend.length?pend.map(x=>x.p):(it.owner?[it.owner]:[])).filter(person);
+ return {hk:pids.length?'staff':'me',pids,name:pids.map(pShort).join(', ')}}
+function holderLine(it){if(it.type!=='task')return '';const h=holder(it);if(h.hk==='staff')return h.name;if(h.hk==='me')return it.personal?'':'With me';return 'With '+(h.name||(h.hk==='up'?'higher office':'other department'))}
+const pNow=pid=>S.items.filter(it=>isOpen(it)&&!LIB.includes(it.type)&&(it.type==='task'?holder(it).pids.includes(pid):(it.owner===pid||it.zildar===pid||asgOf(it).some(a=>a.p===pid))));
+const recv=it=>(it.fus||[]).reduce((s,x)=>s+(+x.rs||0),0);
+const chL=it=>(it.fus||[]).map((x,i)=>Object.assign({i},x)).filter(x=>x.how);
+const dmy=d=>d?d.split('-').reverse().join('.'):'';
+const hkSel=(id,v)=>`<select id="${id}">${HKO.map(([k,l])=>`<option value="${k}" ${(v||'')===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+const pplList=id=>`<datalist id="${id}">${S.people.filter(pScope).map(p=>p.name).sort().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>`;
+/* set who holds a step; a new name with a phone goes into People */
+function whoSet(x,txt,hk,ph,sub){txt=String(txt||'').trim();let p=pByName(txt);
+ if(!p&&txt&&ph){p={id:uid(),name:txt,parentage:'',designation:hk==='up'?'Officer':'Other',sub:sub&&sub!=='B'?sub:defSub(),section:'',posting:'',phone:phNorm(ph),cnic:'',notes:'Added from a follow-up step'};S.people.push(p)}
+ if(p){x.who=p.id;delete x.whoT}else{delete x.who;if(txt)x.whoT=txt;else delete x.whoT}
+ if(hk)x.hk=hk;else delete x.hk}
+A.whoChk=(inp,box)=>{const v=inp.value.trim();const b=$('#'+box);if(b)b.style.display=v&&!pByName(v)?'':'none'};
+const whoFields=(pre,x,sub)=>{const wv=x.who&&person(x.who)?person(x.who).name:(x.whoT||'');
+ return `<div class="grid2"><label class="fld"><span>Who holds it</span><input id="${pre}W" list="${pre}Wl" value="${esc(wv)}" placeholder="Name or office" oninput="A.whoChk(this,'${pre}Pw')"></label><label class="fld"><span>Holder is</span>${hkSel(pre+'K',x.hk)}</label></div>${pplList(pre+'Wl')}
+ <label class="fld" id="${pre}Pw" style="display:${wv&&!pByName(wv)?'':'none'}"><span>Phone (optional, saves this name to People)</span><input id="${pre}P" inputmode="tel" placeholder="03xx-xxxxxxx"></label>`};
+
+/* ---------- steps ---------- */
+const msWho=x=>x.who&&person(x.who)?pShort(x.who):(x.whoT||(x.hk?HKL[x.hk]:''));
+function msBlock(it){const L=msOf(it);if(!L.length)return '';const id=it.id;const t=today();const d=L.filter(x=>x.dn).length;const nx=L.findIndex(x=>!x.dn);const op=isOpen(it);
+ return `<h2>Steps · ${d} of ${L.length} done</h2><div class="icard msc"><div class="msbar"><i style="width:${Math.round(d*100/L.length)}%"></i></div>${L.map((x,i)=>{const st=x.dn?'dn':i===nx?'nx':'';const late=!x.dn&&x.due&&x.due<t;
+  const sub=[msWho(x),x.dn?'Done '+fmtD(x.dn):x.due?'By '+fmtD(x.due):''].filter(Boolean).map(esc).join(' · ')+(late?' · <span class="rd">late</span>':'');
+  return `<div class="msr ${st}" onclick="A.msEd('${id}',${i})">${i===nx&&op?`<button class="msd" onclick="event.stopPropagation();A.msDone('${id}')" aria-label="Mark this step done"></button>`:`<span class="msd">${x.dn?'✓':i+1}</span>`}<div class="iv"><div>${esc(x.n)}</div>${sub?`<div class="meta">${sub}</div>`:''}${x.note?`<div class="msn">${esc(x.note)}</div>`:''}</div><span class="chev">›</span></div>`}).join('')}${op?`<div class="msr add" onclick="A.msEd('${id}',-1)"><span class="msd">+</span><div class="iv">Add step</div></div>`:''}</div>`}
+A.msEd=(id,i)=>{const it=get(id);if(!it)return;const L=msOf(it);const x=i>=0?L[i]:{n:'',due:''};
+ const names=[...new Set(S.items.flatMap(y=>(y.ms||[]).map(z=>z.n)))].sort();
+ sheet(`<div class="ct">${i<0?'Add step':'Step '+(i+1)+' of '+L.length}</div><div class="meta">${esc(it.title)}</div>
+ <label class="fld mt"><span>Step</span><input id="msN" list="msNl" value="${esc(x.n)}" placeholder="e.g. Report called from SEN"></label><datalist id="msNl">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+ ${whoFields('ms',x,it.sub)}
+ <div class="grid2"><label class="fld"><span>By date (optional)</span><input type="date" id="msD" value="${esc(x.due||'')}"></label>${i>=0?`<label class="fld"><span>Done on</span><input type="date" id="msX" value="${esc(x.dn||'')}"></label>`:''}</div>
+ <label class="fld"><span>Note (optional)</span><textarea id="msO" rows="2" placeholder="e.g. Cheque No 1234, letter No 56">${esc(x.note||'')}</textarea></label>
+ <button class="btn p wide" onclick="A.msSave('${id}',${i})">Save</button>
+ ${i>=0&&L.length>1?`<div class="acts">${i>0?`<button class="btn" onclick="A.msMv('${id}',${i},-1)">Move up</button>`:''}${i<L.length-1?`<button class="btn" onclick="A.msMv('${id}',${i},1)">Move down</button>`:''}</div>`:''}
+ ${i>=0?`<button class="btn d wide mt" onclick="A.msDel('${id}',${i})">Delete step</button>`:''}`);if(i<0)setTimeout(()=>{const e=$('#msN');if(e)e.focus()},60)};
+A.msSave=(id,i)=>{const it=get(id);const n=$('#msN').value.trim();if(!n)return toast('Name the step');
+ snap();it.ms=it.ms||[];const x=i>=0?it.ms[i]:{id:uid()};x.n=n;x.due=$('#msD').value||'';whoSet(x,$('#msW').value,$('#msK').value,$('#msP')?$('#msP').value:'',it.sub);
+ const no=$('#msO').value.trim();if(no)x.note=no;else delete x.note;
+ if(i>=0)x.dn=$('#msX').value||'';else it.ms.push(x);['due','dn'].forEach(k=>{if(!x[k])delete x[k]});
+ if(x.due&&it.due&&x.due>it.due&&!x.dn){(it.fus=it.fus||[]).push({d:today(),text:'Deadline moved from '+fmtD(it.due)+' to '+fmtD(x.due)});it.due=x.due}
+ log((i<0?'Step added: ':'Step edited: ')+n+' · '+it.title,it);save();closeSheet();render();toast('Saved',1)};
+A.msDone=id=>{const it=get(id);const x=msNext(it);if(!x)return A.resolve(id);snap();const t=today();x.dn=t;it.doneOn=t;(it.fus=it.fus||[]).push({d:t,text:'Step done: '+x.n});log('Step done: '+x.n+' · '+it.title,it);buzz();save();render();
+ const nx=msNext(it);if(!nx)return toast('All steps done · tap ✓ Done to close it',1);
+ if(!nx.due||!(nx.who||nx.whoT||nx.hk))return A.msNextAsk(id);toast('Step done · next: '+nx.n,1)};
+/* after a step is done: who takes the next one, and by when */
+A.msNextAsk=id=>{const it=get(id);const nx=msNext(it);if(!nx)return;const i=it.ms.indexOf(nx);
+ sheet(`<div class="ct">✓ Step done</div><div class="meta">Next: <b>${esc(nx.n)}</b></div><div class="mt">${whoFields('nq',nx,it.sub)}</div>
+ <label class="fld"><span>By date</span><input type="date" id="nqD" value="${esc(nx.due||'')}"></label>
+ <div class="acts"><button class="btn p" style="flex:2" onclick="A.msNextSave('${id}',${i})">Save</button><button class="btn" style="flex:1" onclick="closeSheet()">Skip</button></div>`)};
+A.msNextSave=(id,i)=>{const it=get(id);const x=it.ms[i];whoSet(x,$('#nqW').value,$('#nqK').value,$('#nqP')?$('#nqP').value:'',it.sub);const d=$('#nqD').value;if(d)x.due=d;
+ if(x.due&&it.due&&x.due>it.due){(it.fus=it.fus||[]).push({d:today(),text:'Deadline moved from '+fmtD(it.due)+' to '+fmtD(x.due)});it.due=x.due}save();closeSheet();render();toast('Next step set',1)};
+
+/* ---------- the follow-up form ---------- */
+const REPL={w:'every week',m:'every month',q:'every 3 months',y:'every year'};
+function tkForm(src,it){const fv=k=>src[k]==null?'':src[k];const F_=k=>{const f=T.task.f.find(x=>x.k===k);return f&&fieldVisible('task',src,k)?fieldHTML(f,fv(k)):''};
+ const main=['title','assignees','due'],more=['source','priority','details'];
+ const extra=T.task.f.filter(f=>!main.includes(f.k)&&!more.includes(f.k)).map(f=>F_(f.k)).join('');
+ const hk=src.hk||'';const rb=src.rb!=null?!!src.rb:(!it&&/direction/i.test(src.source||'XEN direction'));
+ setTimeout(()=>{const so=$('#f_source'),cb=$('#f_rb');if(so&&cb)so.addEventListener('change',()=>{if(!cb.dataset.man)cb.checked=/direction/i.test(so.value)})},0);
+ return main.map(F_).join('')+extra+`<details class="xmore" id="tkMore" ${it?'open':''}><summary>More: source, holder, repeat, amount${it?'':', steps'}</summary>${more.map(F_).join('')}
+ <div class="grid2"><label class="fld"><span>Who holds it</span><select id="f_hk" onchange="$('#f_wtw').style.display=/up|dept/.test(this.value)?'':'none'">${HKO.map(([k,l])=>`<option value="${k}" ${hk===k?'selected':''}>${esc(l)}</option>`).join('')}</select></label><label class="fld" id="f_wtw" style="display:${/up|dept/.test(hk)?'':'none'}"><span>Which office</span><input id="f_wt" value="${esc(src.wt||'')}" placeholder="e.g. XEN office"></label></div>
+ <div class="grid2"><label class="fld"><span>Repeats</span><select id="f_rep"><option value="">Never</option>${Object.entries(REPL).map(([k,l])=>`<option value="${k}" ${src.rep===k?'selected':''}>${l[0].toUpperCase()+l.slice(1)}</option>`).join('')}</select></label><label class="fld"><span>Amount, Rs (optional)</span><input id="f_amt" inputmode="numeric" value="${esc(src.amt||'')}" placeholder="e.g. 100000"></label></div>
+ <label class="ck"><input type="checkbox" id="f_rb" ${rb?'checked':''} onchange="this.dataset.man=1"> Report compliance to XEN when closing</label>
+ ${it?'':`<label class="fld mt"><span>Steps (optional, one per line)</span><textarea id="f_ms" rows="3" placeholder="Report called from SEN&#10;Site verification&#10;Reply to XEN"></textarea></label>`}${persBlock(src)}</details>`}
+
+/* ---------- list ---------- */
+let TSEL=null;
+const quiet=it=>diffDays(today(),lastAct(it));
+function tNext(it){const t=today();const kd=keyDate(it);const f=it.followUp&&isOpen(it)?it.followUp:'';
+ if(f&&f>t&&(!kd||kd<t||kd>=f))return {d:f,k:'look',late:!!(kd&&kd<t)};
+ if(kd)return {d:kd,k:'due'};if(f)return {d:f,k:'look'};return null}
+const tLate=it=>{const N=tNext(it);return !!N&&N.k==='due'&&N.d<today()};
+const tSort=L=>L.slice().sort((a,b)=>(b.priority==='High')-(a.priority==='High')||((tNext(a)||{}).d||'9').localeCompare((tNext(b)||{}).d||'9'));
+function trow(it){const t=today();const N=tNext(it);let cls='',due='',dc='';
+ if(N){const n=diffDays(N.d,t);
+  if(N.k==='look'){due=n<0?'Look again · '+(-n)+'d ago':n===0?'Look again today':'Look again '+fmtD(N.d);dc=n<=0||N.late?'a':''}
+  else if(n<0){const q=quiet(it);if(q>=7){cls='over';due=(-n)+'d overdue'+(q<-n?' · no update '+q+'d':'');dc='r'}else{due=(-n)+'d overdue';dc='a'}}
+  else if(n===0){cls='today';due=it.type==='court'&&it.attendTime?it.attendTime:it.type==='event'&&it.time?it.time:'Today';dc='a'}
+  else due=n===1?'Tomorrow':fmtD(N.d)}
+ const one=/^#list\//.test(location.hash);const sel=TSEL&&it.type==='task'&&/^#list\/task/.test(location.hash);
+ const parts=[one&&!it.personal?'':(it.personal?'Personal':T[it.type].n),it.priority==='High'?'High':'',SUB==='A'?subName(it.sub):'',it.type==='task'?holderLine(it):(it.type==='wire'&&asgOf(it).length?asgLine(it):pShort(it.owner)),stageOf(it),msLine(it)||(it.type==='task'?'':fuLine(it)),it.amt?'Rs '+num(recv(it))+' of '+num(it.amt):''].filter(Boolean);
+ const meta=parts.map((x,i)=>i===0&&!(one&&!it.personal)?`<span class="ty">${esc(x)}</span>`:x==='High'?'<span class="rd">High</span>':esc(x)).join(' · ');
+ return `<div class="trow ${cls}${sel&&TSEL.has(it.id)?' sel':''}"><button class="tick${sel&&TSEL.has(it.id)?' on':''}" aria-label="${sel?'Select':'Followed up today'}" onclick="${sel?`A.tsT('${it.id}')`:`A.tick('${it.id}')`}"></button><div class="bd" onclick="${sel?`A.tsT('${it.id}')`:`go('#item/${it.id}')`}"><div class="tt">${esc(it.title)}</div>${meta?`<div class="mt2">${meta}</div>`:''}</div><div class="due ${dc}">${esc(due)}</div></div>`}
+function tGroups(l){const t=today(),w=addDays(t,7);const G=[['Overdue',[]],['Today',[]],['Next 7 days',[]],['Later',[]],['No date',[]]];
+ l.forEach(it=>{const N=tNext(it);const k=N&&N.d;G[!k?4:k<t?0:k===t?1:k<=w?2:3][1].push(it)});const used=G.filter(g=>g[1].length);
+ if(used.length<2)return `<div class="list">${tSort(l).map(trow).join('')}</div>`;
+ return used.map(([n,L])=>`<div class="grp">${n} · ${L.length}</div><div class="list">${tSort(L).map(trow).join('')}</div>`).join('')}
+function tRows(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
+ if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(tLate)}
+ if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
+ if(TF.w&&TF.f!=='closed')l=l.filter(it=>holder(it).hk===TF.w);
+ const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));
+ if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
+ return l.length?(q.length?`<div class="list">${tSort(l).map(trow).join('')}</div>`:tGroups(l)):`<p class="empty">${TF.f==='pers'?'No personal items.':'Nothing here.'}</p>`}
+function vTasks(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));const op=base.filter(it=>isOpen(it)&&!it.personal);
+ const n={open:op.length,over:op.filter(tLate).length,pers:base.filter(it=>it.personal&&isOpen(it)).length};const hc={};op.forEach(it=>{const k=holder(it).hk;hc[k]=(hc[k]||0)+1});
+ const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
+ const fb=(k,l,c)=>`<button class="${TF.f===k?'on':''}" onclick="TF.f='${k}';TSEL=null;render()">${l}${c!=null?' '+c:''}</button>`;
+ return `<div class="row between"><h1 class="pt">Follow-ups</h1>${TF.f==='closed'||!op.length?'':`<button class="pill" onclick="TSEL=TSEL?null:new Set();render()">${TSEL?'Cancel':'Select'}</button>`}</div>
+ <div class="frow"><input type="search" placeholder="Search" value="${esc(TF.q)}" oninput="TF.q=this.value;$('#tres').innerHTML=tRows()"></div>
+ <div class="frow"><select onchange="TF.sec=this.value;render()" aria-label="Section" style="flex:1"><option value="">All sections</option>${secs.map(([v,l])=>`<option value="${esc(v)}" ${TF.sec===v?'selected':''}>${esc(l)}</option>`).join('')}<option value="-" ${TF.sec==='-'?'selected':''}>Not linked</option></select><select onchange="TF.w=this.value;render()" aria-label="Who holds it" style="flex:1"><option value="">Anyone</option>${['staff','me','up','dept'].map(k=>`<option value="${k}" ${TF.w===k?'selected':''}>${k==='staff'?'With my staff':k==='me'?'With me':k==='up'?'With higher office':'With other dept'} (${hc[k]||0})</option>`).join('')}</select></div>
+ <div class="fchips">${fb('open','Open',n.open)}${fb('over','Overdue',n.over)}${n.pers||TF.f==='pers'?fb('pers','Personal',n.pers):''}${fb('closed','Closed')}</div>${TF.f!=='pers'&&TF.f!=='closed'&&!TSEL?secSummary():''}<div id="tres">${tRows()}</div>
+ ${TSEL?`<div class="selbar"><span>${TSEL.size} selected</span><button onclick="A.tsMove()" ${TSEL.size?'':'disabled'}>Move</button><button class="p" onclick="A.tsClose()" ${TSEL.size?'':'disabled'}>Close</button></div>`:''}`}
+A.tsT=id=>{if(!TSEL)return;TSEL.has(id)?TSEL.delete(id):TSEL.add(id);render()};
+A.tsMove=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;listSheet('Move '+ids.length+' to',S.people.filter(pScope).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>({v:p.id,l:p.name,sub:[p.designation,p.section].filter(Boolean).join(' · ')})),pid=>{if(!pid)return;snap();ids.forEach(id=>{const it=get(id);if(!it)return;it.assignees=pid;it.asg=[{p:pid,st:'Pending'}];it.owner=pid;log('Moved to '+pShort(pid)+': '+it.title,it)});TSEL=null;save();render();toast('Moved '+ids.length+' to '+pShort(pid),1)})};
+A.tsClose=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;sheet(`<div class="ct">Close ${ids.length} follow-up${ids.length>1?'s':''}</div>${outcSeg()}<label class="fld mt"><span>Closing note (optional)</span><textarea id="clN" rows="2"></textarea></label><button class="btn p wide mt" onclick="A.tsCloseSave()">Close ${ids.length}</button>`)};
+A.tsCloseSave=()=>{const ids=[...(TSEL||[])];const o={outc:segVal('clO'),note:$('#clN').value.trim()};snap();let r=0;ids.forEach(id=>{const it=get(id);if(it&&isOpen(it)&&tkClose(it,Object.assign({mk:1},o)))r++});TSEL=null;buzz();save();closeSheet();render();toast('Closed '+ids.length+(r?' · '+r+' repeat'+(r>1?'s':'')+' created':''),1)};
+
+/* ---------- update, partly done, amount ---------- */
+A.upd=id=>{const t=today(),it=get(id);const kd=keyDate(it);const od=kd&&kd<t;const def=it.followUp&&it.followUp>t?it.followUp:addDays(t,1);const tk=it.type==='task'&&isOpen(it);const left=it.amt?it.amt-recv(it):0;
+ sheet(`<div class="ct">Update / Later</div><div class="meta">${esc(it.title)}${it.amt?' · Rs '+num(recv(it))+' of '+num(it.amt)+' received':''}</div><textarea id="fuN" rows="3" class="mt" placeholder="What happened? (optional)"></textarea>
+ ${tk&&it.amt?`<label class="fld"><span>Received now, Rs (balance ${num(left)})</span><input id="fuRs" inputmode="numeric" oninput="A.updRs('${id}')"></label>`:''}
+ ${tk?`<label class="ck"><input type="checkbox" id="fuP" onchange="A.updP()"> Part of it is done</label><div id="fuPx" style="display:none"><div class="grid2"><label class="fld"><span>What is done</span><input id="fuPd"></label><label class="fld"><span>What is left</span><input id="fuPl"></label></div><label class="fld"><span>Who holds the rest (optional)</span><input id="fuPw" list="fuPwl" placeholder="Same as now"></label>${pplList('fuPwl')}</div>`:''}
+ <label class="fld"><span id="fuDl">Look at it again on</span><input type="date" id="fuD" value="${def}" min="${addDays(t,1)}"></label>
+ ${od?`<div id="fuRw"><label class="fld"><span>Reason: deadline ${fmtD(kd)} has passed</span><input id="fuR" list="fuRl" placeholder="Pick or type a reason"></label><datalist id="fuRl">${REASONS.map(r=>`<option value="${esc(r)}">`).join('')}</datalist></div>`:''}
+ <button class="btn p wide mt" onclick="A.updSave('${id}')">Save update</button>`)};
+A.updP=()=>{const on=$('#fuP').checked;$('#fuPx').style.display=on?'':'none';$('#fuDl').textContent=on?'The rest is due by':'Look at it again on';const r=$('#fuRw');if(r)r.style.display=on?'none':'';if(on&&!$('#fuPd').value)$('#fuPd').value=($('#fuN').value.trim().split('\n')[0]||'').slice(0,80)};
+A.updRs=id=>{const it=get(id);const rs=Number(String($('#fuRs').value).replace(/[^0-9.]/g,''))||0;const left=it.amt-recv(it)-rs;const P=$('#fuP');if(!P)return;
+ if(rs>0&&left>0){P.checked=true;A.updP();$('#fuPd').value='Received Rs '+num(rs);$('#fuPl').value='Balance Rs '+num(left)}else if(rs>0&&left<=0&&P.checked){P.checked=false;A.updP()}};
+A.updSave=id=>{const it=get(id);const t=today();const tx=$('#fuN').value.trim(),d=$('#fuD').value;const P=$('#fuP')&&$('#fuP').checked;const rs=$('#fuRs')?Number(String($('#fuRs').value).replace(/[^0-9.]/g,''))||0:0;
+ if(!d||d<=t)return toast('Pick a date after today');const re=!P&&$('#fuR')?$('#fuR').value.trim():'';if(!P&&$('#fuR')&&!re)return toast('Give a reason: the deadline has passed');
+ snap();it.doneOn=t;let e;
+ if(P){const dn=$('#fuPd').value.trim()||'Part done',lf=$('#fuPl').value.trim()||'Remaining work',wt=$('#fuPw').value.trim();it.ms=it.ms||[];const nx=msNext(it);const done={id:uid(),n:dn,dn:t,pt:1};if(tx)done.note=tx;
+  if(nx){it.ms.splice(it.ms.indexOf(nx),0,done);if(!nx.pt0)nx.pt0=nx.n;nx.n=lf;nx.due=d;if(wt)whoSet(nx,wt,nx.hk||'','',it.sub)}else{const rest={id:uid(),n:lf,due:d,pt:1};if(wt)whoSet(rest,wt,'','',it.sub);it.ms.push(done,rest)}
+  let mv='';if(it.due&&it.due<d){mv=' · deadline moved from '+fmtD(it.due);it.due=d}delete it.followUp;
+  e={d:t,text:'Part done: '+dn+' · left: '+lf+' by '+fmtD(d)+mv+(tx?' · '+tx:'')}}
+ else{it.followUp=d;e={d:t,next:d};if(tx)e.text=tx;if(re)e.reason=re}
+ if(rs)e.rs=rs;(it.fus=it.fus||[]).push(e);log('Followed up: '+it.title+(e.text?' · '+e.text:''),it);save();closeSheet();render();
+ toast(it.amt&&recv(it)>=it.amt?'Full amount received · tap ✓ Done to close it':P?'Saved · rest due '+fmtD(d):'Saved · look again '+fmtD(d),1)};
+
+/* ---------- reminders: log, letter drafts ---------- */
+A.chAuto=(id,how)=>{const it=get(id);if(!it)return;const t=today();if((it.fus||[]).some(x=>x.d===t&&x.how===how))return;snap();(it.fus=it.fus||[]).push({d:t,text:how+' reminder',how});it.doneOn=t;save();setTimeout(render,600);toast('Logged: '+how+' reminder',1)};
+A.chSheet=id=>{const it=get(id);const R=chL(it);
+ sheet(`<div class="ct">Reminders${R.length?' · '+R.length:''}</div><div class="meta">${esc(it.title)}</div>${R.length?`<div class="list mt">${R.slice().reverse().map(x=>`<div class="arow tap" onclick="A.fuEd('${id}',${x.i})"><span class="an"><b style="font-weight:600">${esc(x.how)}${x.no?' · No '+esc(x.no):''}</b><div class="meta">${fmtD(x.d)}</div></span><span class="chev">›</span></div>`).join('')}</div>`:''}
+ <div class="grp">Log a reminder</div><div class="qlfull">${['WhatsApp','Call','Letter','Explanation'].map(h=>`<button class="pill" onclick="A.chLog('${id}','${h}')">${h}</button>`).join('')}</div>
+ <div class="grp">Draft a letter</div><div class="mi" onclick="A.chDraft('${id}','rem')"><span class="e">✉</span>Reminder letter</div><div class="mi" onclick="A.chDraft('${id}','expl')"><span class="e">!</span>Explanation letter</div>`)};
+A.chLog=(id,how)=>{if(how==='Letter'||how==='Explanation')return sheet(`<div class="ct">${how==='Letter'?'Reminder letter issued':'Explanation called'}</div><div class="grid2 mt"><label class="fld"><span>Letter No</span><input id="chNo"></label><label class="fld"><span>Date</span><input type="date" id="chD" value="${today()}"></label></div><button class="btn p wide" onclick="A.chLogSave('${id}','${how}')">Save</button>`);A.chLogSave(id,how)};
+A.chLogSave=(id,how)=>{const it=get(id);const d=($('#chD')&&$('#chD').value)||today();const no=$('#chNo')?$('#chNo').value.trim():'';snap();const e={d,text:(how==='Explanation'?'Explanation called':how+' reminder')+(no?' · No '+no:''),how};if(no)e.no=no;(it.fus=it.fus||[]).push(e);it.doneOn=today();log('Reminder ('+how+'): '+it.title,it);save();closeSheet();render();toast('Logged: '+e.text,1)};
+function chText(it,kind){const h=holder(it);const p=h.pids[0]&&person(h.pids[0]);const to=p?[p.name,p.designation,p.section].filter(Boolean).join(', '):(h.name||'________');
+ const L=chL(it).filter(x=>x.how==='Letter'||x.how==='Explanation');const made=it.createdAt?ymd(new Date(it.createdAt)):today();
+ const refs=[(it.source&&/direction/i.test(it.source)?'This office direction':'This office letter')+' dated '+dmy(made)].concat(L.map(x=>(x.how==='Explanation'?'Explanation':'Reminder')+(x.no?' No '+x.no:'')+' dated '+dmy(x.d)));
+ const n=msNext(it);const what=n?n.n+' ('+it.title+')':it.title;const due=n&&n.due?n.due:it.due;
+ const body=kind==='expl'?`Despite the references cited above, the compliance regarding ${what}${due?', which was due on '+dmy(due):''}, has not been received in this office so far. You are directed to explain your position in writing within three days of the receipt of this letter.`
+  :`Please refer to the subject cited above. The compliance regarding ${what}${due?', due on '+dmy(due):''}, is still awaited in this office. You are directed to submit the same within three days positively.`;
+ return `To\n${to}\n\nSubject: ${kind==='expl'?'EXPLANATION':'REMINDER'} – ${it.title.toUpperCase()}\n\nRef: ${refs.join('; ')}.\n\n${body}\n\nSub Divisional Officer\n${subName(it.sub==='B'?defSub():it.sub)} Sub Division`}
+A.chDraft=(id,kind)=>{const it=get(id);const h=holder(it);const p=h.pids[0]&&person(h.pids[0]);
+ sheet(`<div class="ct">${kind==='expl'?'Explanation letter':'Reminder letter'}</div><div class="meta">Edit before you send. Nothing is sent from here.</div><textarea id="chTx" rows="14" class="mt">${esc(chText(it,kind))}</textarea>
+ <div class="acts"><button class="btn" style="flex:1" onclick="navigator.clipboard.writeText($('#chTx').value).then(()=>toast('Copied'))">Copy</button>${p&&p.phone?`<a class="btn" style="flex:1;text-align:center" target="_blank" rel="noopener" href="#" onclick="this.href='https://wa.me/${wa(p.phone)}?text='+encodeURIComponent($('#chTx').value)">WhatsApp</a>`:''}</div>
+ <button class="btn p wide mt" onclick="A.chLog('${id}','${kind==='expl'?'Explanation':'Letter'}')">Mark as issued…</button>`)};
+
+/* ---------- closing: result, report back, repeat ---------- */
+const OUTC=['Done','Not required','Merged','Handed over'];
+const outcSeg=()=>`<div class="lb mt">Result</div><div class="seg3" id="clO">${OUTC.map((o,i)=>`<button class="${i?'':'on'}" onclick="[...this.parentNode.children].forEach(b=>b.classList.toggle('on',b===this))">${o}</button>`).join('')}</div>`;
+const segVal=id=>{const b=document.querySelector('#'+id+' .on');return b?b.textContent:''};
+function addMon(d,n){const [y,m,dd]=d.split('-').map(Number);const D=new Date(y,m-1+n,1);const last=new Date(D.getFullYear(),D.getMonth()+1,0).getDate();return ymd(new Date(D.getFullYear(),D.getMonth(),Math.min(dd,last)))}
+const repNext=(d,r)=>r==='w'?addDays(d,7):r==='m'?addMon(d,1):r==='q'?addMon(d,3):r==='y'?addMon(d,12):d;
+function nextRep(it){const nd=repNext(it.due||today(),it.rep);const c=JSON.parse(JSON.stringify(it));
+ ['notes','links','fus','stages'].forEach(k=>c[k]=[]);['resolved','resolvedOn','doneOn','followUp','outc','closeNote','rbNo','rbD','lnSkip','rel','cpid','vid'].forEach(k=>delete c[k]);
+ c.id=uid();c.createdAt=Date.now();c.due=nd;if(c.ms&&!c.ms.filter(x=>!x.pt).length)delete c.ms;if(c.ms)c.ms=c.ms.filter(x=>!x.pt).map(x=>{const y=Object.assign({},x,{id:uid()});if(y.pt0){y.n=y.pt0;delete y.pt0}delete y.dn;delete y.note;if(y.due)y.due=repNext(y.due,it.rep);return y});
+ if(c.asg)c.asg=c.asg.map(a=>({p:a.p,st:'Pending'}));S.items.push(c);log('Repeat created: '+c.title+' · '+fmtD(nd),c);return c}
+function tkClose(it,o){const t=today();it.resolved=true;it.resolvedOn=t;it.outc=o.outc||'Done';if(o.note)it.closeNote=o.note;if(o.rbNo)it.rbNo=o.rbNo;if(o.rbD)it.rbD=o.rbD;
+ log('Closed ('+it.outc+'): '+it.title,it);const nx=it.rep&&(o.mk||o.rep)?nextRep(it):null;if(it.cpid)try{cpSync(get(it.cpid))}catch(e){}return nx}
+A.tkCloseSheet=id=>{const it=get(id);const t=today();
+ sheet(`<div class="ct">Close follow-up</div><div class="meta">${esc(it.title)}${msNext(it)?` · <span class="rd">${msOf(it).filter(x=>!x.dn).length} step(s) not done</span>`:''}</div>${outcSeg()}
+ <label class="fld mt"><span>Closing note (optional)</span><textarea id="clN" rows="2" placeholder="${it.amt?'e.g. Rs '+num(it.amt)+' recovered, receipt No …':'e.g. Report received and checked'}"></textarea></label>
+ ${it.rb?`<div class="lb">Compliance reported to XEN</div><div class="grid2"><label class="fld"><span>Letter No</span><input id="clRn" value="${esc(it.rbNo||'')}"></label><label class="fld"><span>Date</span><input type="date" id="clRd" value="${esc(it.rbD||t)}"></label></div>`:''}
+ ${it.rep?`<label class="ck"><input type="checkbox" id="clRp" checked> Create the next one for ${fmtD(repNext(it.due||t,it.rep))} (repeats ${REPL[it.rep]})</label>`:''}
+ <button class="btn p wide mt" onclick="A.tkCloseSave('${id}')">Close follow-up</button>`)};
+A.tkCloseSave=id=>{const it=get(id);const o={outc:segVal('clO'),note:$('#clN').value.trim(),rbNo:$('#clRn')?$('#clRn').value.trim():'',rbD:$('#clRn')&&$('#clRn').value.trim()?$('#clRd').value:'',rep:$('#clRp')&&$('#clRp').checked};
+ snap();const nx=tkClose(it,o);buzz();save();closeSheet();render();toast('Closed'+(o.outc!=='Done'?' ('+o.outc.toLowerCase()+')':'')+(nx?' · next one due '+fmtD(nx.due):''),1)};
+{const o=A.resolve;A.resolve=id=>{const it=get(id);if(it&&it.type==='task'&&isOpen(it))return A.tkCloseSheet(id);o(id)}}
+{const o=A.reopen;if(o)A.reopen=id=>{const it=get(id);if(it&&it.type==='task'){delete it.outc;delete it.closeNote}o(id)}}
+
+/* ---------- follow-up rows on its own page ---------- */
+function pRow(pid,label,it){const p=person(pid);if(!p)return '';const ph=p.phone;const tk=it&&it.type==='task'&&isOpen(it);const n=tk?msNext(it):null;
+ const txt=it?'Reminder: '+it.title+(n?'\nStep: '+n.n+(n.due?' (by '+fmtD(n.due)+')':''):it.due?' (by '+fmtD(it.due)+')':'')+'\nPlease update the status.':'';
+ const lg=k=>tk?`A.chAuto('${it.id}','${k}');`:'';
+ return `<div class="irow ip tap" onclick="go('#person/${p.id}')"><div class="ilb">${esc(label)}</div><div class="ipv"><div class="av">${esc(inits(p.name))}</div><div class="ipn"><div>${esc(p.name)}</div><div class="meta">${esc([p.designation,p.section||p.posting].filter(Boolean).join(' · '))}</div></div>${ph?`<a class="ic" href="tel:${esc(ph)}" onclick="event.stopPropagation();${lg('Call')}" aria-label="Call ${esc(p.name)}">${ICO.call}</a><a class="ic" href="https://wa.me/${wa(ph)}${it?'?text='+encodeURIComponent(txt):''}" target="_blank" rel="noopener" onclick="event.stopPropagation();${lg('WhatsApp')}" aria-label="WhatsApp ${esc(p.name)}">${ICO.msg}</a>`:''}</div></div>`}
+function tkRows(it,rows,ps){const id=it.id;const op=isOpen(it);
+ if(op){const h=holder(it);const si=h.step?msOf(it).indexOf(h.step):-1;const st=si>=0?'step '+(si+1):'';
+  if(h.pids[0]&&!(ps.length===1&&ps[0]===h.pids[0])&&!(ps.length>1&&!h.step))rows.unshift(pRow(h.pids[0],'Now with'+(st?' · '+st:''),it));
+  else if(!h.pids.length&&(h.hk==='up'||h.hk==='dept'||(h.hk==='me'&&(h.step||it.hk==='me'))))rows.unshift(iRow('Now with',esc(h.hk==='me'?'Me':(h.name||HKL[h.hk]))+(st?` <span class="meta">(${st})</span>`:''),'',h.step?`A.msEd('${id}',${si})`:`go('#edit/task/${id}')`))}
+ if(it.amt){const r=recv(it);rows.push(iRow('Amount',`Rs ${num(r)} of ${num(it.amt)} received`+(r<it.amt?` <span class="meta">· balance ${num(it.amt-r)}</span>`:'')))}
+ const R=chL(it);if(R.length){const l=R[R.length-1];rows.push(iRow('Reminded',`${R.length}× · last ${esc(l.how.toLowerCase())} ${fmtD(l.d)}`,'',`A.chSheet('${id}')`))}
+ if(it.rb)rows.push(iRow('Report to XEN',it.rbNo?esc('No '+it.rbNo+(it.rbD?' · '+fmtD(it.rbD):'')):op?'<span class="meta">Asked for when you close it</span>':'<span class="rd">Not recorded</span>','',`A.tkRb('${id}')`));
+ if(it.rep)rows.push(iRow('Repeats',esc(REPL[it.rep])));
+ if(!op&&it.outc)rows.push(iRow('Result',esc(it.outc)+(it.closeNote?' · '+esc(it.closeNote):'')))}
+A.tkRb=id=>{const it=get(id);sheet(`<div class="ct">Compliance reported to XEN</div><div class="grid2 mt"><label class="fld"><span>Letter No</span><input id="clRn" value="${esc(it.rbNo||'')}"></label><label class="fld"><span>Date</span><input type="date" id="clRd" value="${esc(it.rbD||today())}"></label></div><button class="btn p wide" onclick="A.tkRbSave('${id}')">Save</button>`)};
+A.tkRbSave=id=>{const it=get(id);snap();it.rbNo=$('#clRn').value.trim();it.rbD=$('#clRd').value;if(!it.rbNo)delete it.rbNo;save();closeSheet();render();toast('Saved',1)};
+
+/* ---------- ⋯ menu: fewer, grouped entries ---------- */
+A.attachMenu=id=>sheet(`<div class="ct">Attach</div><div class="mt"><label class="mi"><span class="e">📎</span>File or photo<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="closeSheet();A.attachPick('${id}',this)"></label><div class="mi" onclick="closeSheet();A.lkSheet('${id}')"><span class="e">🔗</span>Google Drive link</div></div>`);
+A.letterMenu=id=>sheet(`<div class="ct">Letter</div><div class="mt"><div class="mi" onclick="closeSheet();A.relLetter('${id}')"><span class="e">✉</span>New letter</div><div class="mi" onclick="closeSheet();A.linkDown('${id}','letter')"><span class="e">⤷</span>Link an existing letter</div></div>`);
+function itMenuX(it,mi,add){const id=it.id;
+ if(it.type==='task'&&isOpen(it)){add.push(mi('☰',msOf(it).length?'Add a step':'Break into steps',`A.msEd('${id}',-1)`));add.push(mi('🔔','Reminders: log or draft a letter',`A.chSheet('${id}')`))}
+ if(it.type==='inquiry'){add.push(mi('⚖','Record hearing',`A.hrEdit('${id}','')`));if(inqAccused(it).length)add.push(mi('▤','Attendance sheet',`A.attSheet('${id}')`));const role=inqRole(it);
+  if(role==='Inquiry Officer')add.push(mi('✓',it.report&&it.report.date?'Edit report details':'Report submitted',`A.inqDone('${id}','report')`));
+  if(role==='Accused'){add.push(mi('✓',it.replyD?'Edit reply date':'Reply submitted',`A.inqDone('${id}','reply')`));add.push(mi('✎',it.outcome?'Edit decision':'Record decision',`A.inqDone('${id}','outcome')`))}}
+ if(it.type==='complaint')add.push(mi('⛓',it.grp?'Change linked complaints':'Link complaints about the same issue',`A.cpLink('${id}')`))}
+
+/* ---------- share from WhatsApp or any app ---------- */
+setTimeout(()=>{try{const q=new URLSearchParams(location.search);const tx=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' ').replace(/\s*\n+\s*/g,' · ').trim();if(!q.has('text')&&!q.has('title')&&!q.has('url'))return;history.replaceState(history.state,'',location.pathname+'#home');if(tx){A.ql(null,tx);toast('Shared text ready · check and save')}}catch(e){}},400);
 
 /* check before sharing, copying or marking uploaded */
 ['ntBoth','ntDocx','ntPdf'].forEach(k=>{const f=A[k];A[k]=()=>ntGuard(f)});{const f=A.ntCopy;A.ntCopy=k=>ntGuard(()=>f(k))}{const f=A.ntSt;A.ntSt=val=>val==='Submitted'?ntGuard(()=>f(val)):f(val)}
