@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0f5c63">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -218,7 +218,8 @@ textarea.need,input.need{border-color:var(--red)!important}
 .cps{padding:8px 0;border-bottom:1px solid var(--line)}.cps:last-of-type{border-bottom:0}.cpb{display:flex;gap:4px;flex-shrink:0}.cpa{margin-top:6px;padding:6px 8px;background:var(--bg);border-radius:8px;font-size:14px}.cpa .row{padding:3px 0}
 .cpn{display:grid;grid-template-columns:minmax(0,1fr) 110px 130px;gap:6px;margin-bottom:6px}@media(max-width:420px){.cpn{grid-template-columns:1fr 1fr}.cpn input:first-child{grid-column:1/-1}}
 .cpst{display:grid;grid-template-columns:minmax(0,1fr) 64px auto;gap:6px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line);align-items:center}.cpst>input:first-child{grid-column:1/-1}.cpst span{display:flex;gap:4px}
-.hnum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}.hnum a{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center;text-decoration:none;color:var(--ink)}.hnum b{display:block;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}.hnum span{font-size:12.5px;color:var(--mute)}.hnum .rdt{color:var(--red)}
+.hnum{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:10px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}.hnum a{background:none;border:0;border-left:1px solid var(--line);padding:12px 8px;text-align:center;text-decoration:none;color:var(--ink)}.hnum a:first-child{border-left:0}.hnum a:active{background:var(--accs)}
+.hnum b{display:block;font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}.hnum span{font-size:12.5px;color:var(--mute)}.hnum .rdt{color:var(--red)}
 .qacts{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}.qacts button{flex:1 1 auto;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:20px;padding:8px 12px;font:inherit;font-size:14px}
 .mchip{font-size:12.5px;color:var(--amb);margin-top:2px}
 .itop{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.itop .more,.more{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:20px;line-height:1;cursor:pointer}
@@ -277,6 +278,25 @@ details.xmore{margin:4px 0 12px;border-top:1px solid var(--line);padding-top:4px
 .selbar{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom));z-index:7;max-width:720px;margin:0 auto;display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -2px 8px rgba(0,0,0,.08)}.selbar span{flex:1;font-weight:600}.selbar button{height:42px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600}.selbar button.p{background:var(--acc);border-color:var(--acc);color:var(--card)}.selbar button:disabled{opacity:.45}
 #clO button{font-size:13px;padding:9px 2px}
 .msn{font-size:13.5px;color:var(--ink);opacity:.85;margin-top:3px;white-space:pre-wrap}
+.fbar{display:flex;gap:8px;margin-bottom:8px}.fsrch{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px;color:var(--mute)}.fsrch input{border:0;background:none;padding:11px 0;margin:0;outline:none;color:var(--ink)}
+.fbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:0 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}.fbtn.on{border-color:var(--acc);color:var(--acc);background:var(--accs)}
+.fsum{display:flex;justify-content:space-between;gap:10px;font-size:13.5px;color:var(--mute);margin:-2px 2px 10px}.fsum span{color:var(--ink)}.fsum a{font-weight:600;flex:none}
+.fgl{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:16px 2px 6px}.fopts{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.fopt{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;font-size:15px;padding:13px 14px;text-align:left;cursor:pointer}.fopt:last-child{border-bottom:0}.fopt em{font-style:normal;color:var(--mute);font-size:14px}.fopt em.rd{color:var(--red)}
+.fopt.on{color:var(--acc);font-weight:600}.fopt.on span:before{content:'✓ '}.fopt:active{background:var(--accs)}
+.fgo{position:sticky;bottom:-18px;background:var(--bg);padding:12px 0 4px;margin-top:6px}.flink{font-weight:600;font-size:15px}
+.osum{font-size:14px;color:var(--mute);line-height:1.6}.osum b{color:var(--ink);font-size:16px}
+.qlbar{position:fixed;left:0;right:0;bottom:var(--kb,0px);z-index:8;max-width:720px;margin:0 auto;background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+.qlfx{display:flex;gap:14px;overflow-x:auto;font-size:13.5px;padding:2px 6px 8px;white-space:nowrap;scrollbar-width:none}.qlfx span{color:var(--mute)}.qlfx a{font-weight:600}
+.qlin{display:flex;align-items:flex-end;gap:8px}.qlin textarea{flex:1;min-height:46px;max-height:35vh;resize:none;border-radius:23px;padding:12px 16px;line-height:1.35;margin:0}
+.qlgo{width:46px;height:46px;border-radius:50%;border:0;background:var(--acc);color:var(--card);flex:none;display:flex;align-items:center;justify-content:center;cursor:pointer}.qlgo:active{transform:scale(.94)}
+body:has(#qlBar) main{padding-bottom:180px}
+.qlhint{margin-top:18vh;text-align:center;color:var(--mute);font-size:14.5px;padding:0 18px}.qlex{display:inline-block;margin:8px 4px 0;padding:7px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-size:14px}.qlhint .meta{margin-top:12px}
+.qlfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.5px;color:var(--mute);margin:4px 2px 10px}.qlfoot a{font-weight:600}
+main .btn.s:not(.p):not(.d){background:none;border-color:transparent;color:var(--acc);font-weight:600;padding:6px 4px}
+main .stats{gap:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}main .stats>div,main .stats>a{border:0;border-radius:0;background:none;border-left:1px solid var(--line);padding:12px 4px}main .stats>:first-child{border-left:0}
+.tick.dn{background:var(--ok);border-color:var(--ok);box-shadow:inset 0 0 0 3px var(--card)}.rtr .tick+span{flex:1;margin-left:12px}
+.pstep{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.pstep b{width:24px;height:24px;border-radius:50%;background:var(--accs);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}.pstep span{flex:1}
 .prv{padding:8px 0;border-bottom:1px solid var(--line)}.prv:last-of-type{border-bottom:0}
 .pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:55vh;overflow:auto}.pkgi{border:2px solid var(--line);border-radius:10px;padding:4px;opacity:.55}.pkgi.on{border-color:var(--acc);opacity:1}.pkgi img{width:100%;height:150px;object-fit:contain;background:var(--bg);border-radius:6px;display:block;cursor:zoom-in}.pkgi .ck{font-size:12px;margin-top:4px}
 #phv{position:fixed;inset:0;background:#000;z-index:200;display:flex;align-items:center;justify-content:center}#phv img{max-width:100%;max-height:100%;object-fit:contain}#phv span{position:absolute;top:12px;right:16px;color:#fff;font-size:15px;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:16px}
@@ -631,7 +651,7 @@ function routinesBlock(){const t=today();const rs=S.routines.filter(r=>scopeSubs
  if(!rs.length)return hd+'<div class="card meta">No routine items. Tap Edit to add.</div>';
  if(dc===rs.length&&!RTX)return `<h2>Daily routine</h2><a class="arow list" href="#" onclick="RTX=true;render();return false"><span class="an">All ${rs.length} done today</span><span class="ac" style="color:var(--acc)">✓</span><span class="chev">›</span></a>`;
  const grp={};rs.forEach(r=>{const k=r.title.trim().toLowerCase();(grp[k]=grp[k]||[]).push(r)});
- return hd+`<div class="list">${Object.values(grp).map(l=>`<div class="rtr"><span class="${l.every(r=>dn[r.id])?'strike':''}">${esc(l[0].title)}</span>${l.map(r=>`<button class="pill ${dn[r.id]?'on':''}" onclick="A.rt('${r.id}')">${dn[r.id]?'✓ ':''}${SUB==='A'?esc(subName(r.sub)):'Done'}</button>`).join('')}</div>`).join('')}</div>`}
+ return hd+`<div class="list">${Object.values(grp).map(l=>`<div class="rtr">${SUB==='A'?'':`<button class="tick${dn[l[0].id]?' dn':''}" aria-label="Done today" onclick="A.rt('${l[0].id}')"></button>`}<span class="${l.every(r=>dn[r.id])?'strike':''}">${esc(l[0].title)}</span>${SUB==='A'?l.map(r=>`<button class="pill ${dn[r.id]?'on':''}" onclick="A.rt('${r.id}')">${dn[r.id]?'✓ ':''}${esc(subName(r.sub))}</button>`).join(''):''}</div>`).join('')}</div>`}
 
 /* ---------- search ---------- */
 let SQ={q:'',type:'all',time:'any'};
@@ -684,27 +704,8 @@ function vInbox(){const l=S.inbox.filter(inScope).sort((a,b)=>b.ts-a.ts);
 
 /* ---------- lists ---------- */
 let LF={ty:'',q:'',closed:false,dir:'all',time:'any',cat:'all'};
-function listItems(ty){const q=LF.q.toLowerCase().split(/\s+/).filter(Boolean);const t=today();
- let l=S.items.filter(it=>it.type===ty&&inScope(it)&&(!q.length||q.every(w=>itemText(it).includes(w))));
- if(REG[ty]){const df=REG[ty];const since={any:null,'1m':addDays(t,-35),'3m':addDays(t,-100),'6m':addDays(t,-190),'1y':addDays(t,-370)}[LF.time];
-  const aw=it=>ty==='letter'?isOpen(it):isOpen(it)||S.items.some(x=>x.rel===it.id&&x.type==='task'&&isOpen(x));
-  l=l.filter(it=>(LF.dir==='all'||(LF.dir==='await'?aw(it):it.dir===LF.dir))&&(!since||(it[df]||'')>=since)).sort((a,b)=>(b[df]||'').localeCompare(a[df]||'')||b.createdAt-a.createdAt);
-  return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing matches. Tap + to add.</p>'}
- if(LIB.includes(ty)){l=l.filter(it=>LF.cat==='all'||it.cat===LF.cat);const g={};l.forEach(it=>{(g[it.cat||'Other']=g[it.cat||'Other']||[]).push(it)});
-  return Object.entries(g).map(([c,a])=>`<h2>${esc(c)} (${a.length})</h2>`+a.sort((x,y)=>x.title.localeCompare(y.title)).map(it=>card(it,false)).join('')).join('')||`<p class="empty">Nothing yet. Tap + to add ${ty==='place'?'a rest house, office or police station':'a manual, canal detail or order'}.</p>`}
- l=l.filter(it=>LF.closed?!isOpen(it):isOpen(it));
- if(LF.closed)l.sort((a,b)=>(b.resolvedOn||b.due||'').localeCompare(a.resolvedOn||a.due||''));else l.sort((a,b)=>((keyDate(a)||'9')+a.createdAt).localeCompare((keyDate(b)||'9')+b.createdAt));
- return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing here.</p>'}
-function vList(ty){if(!T[ty])return vHome();if(ty==='task')return vTasks();if(LF.ty!==ty)LF={ty,q:'',closed:false,dir:'all',time:'any',cat:'all'};
- const ch=(k,arr)=>arr.length>5?`<select class="fsel" onchange="LF.${k}=this.value;render()">${arr.map(([v,l])=>`<option value="${esc(v)}" ${LF[k]===v?'selected':''}>${l}</option>`).join('')}</select>`:`<div class="fchips">${arr.map(([v,l])=>`<button class="${LF[k]===v?'on':''}" onclick="LF.${k}='${v}';render()">${l}</button>`).join('')}</div>`;
- let filt='';
- if(REG[ty])filt=ch('dir',[['all','All'],['Issued','Issued'],['Received','Received'],['await',ty==='letter'?'Pending':'Action pending']])+ch('time',[['any','Any time'],['1m','Last month'],['3m','3 months'],['6m','6 months'],['1y','1 year']]);
- else if(LIB.includes(ty))filt=ch('cat',[['all','All']].concat(T[ty].f[1].o.map(c=>[c,c])));
- else filt=`<div class="fchips"><button class="${LF.closed?'':'on'}" onclick="LF.closed=false;render()">Open</button><button class="${LF.closed?'on':''}" onclick="LF.closed=true;render()">Closed</button></div>`;
- let top='';if(STG[ty]&&ty!=='complaint'&&!LF.closed){const m={};S.items.filter(it=>it.type===ty&&inScope(it)&&isOpen(it)).forEach(it=>{const s=stageOf(it);m[s]=(m[s]||0)+1});const e=Object.entries(m);
-  if(e.length)top=`<div class="card"><div class="ct">Open by stage</div>${e.map(([s,c])=>`<div class="row between meta"><span>${esc(s)}</span><b>${c}</b></div>`).join('')}</div>`}
- return `<h1 class="pt">${T[ty].pl}</h1>${ty==='template'?'<div class="card"><label class="btn p">Upload files as templates<input type="file" hidden multiple accept=".docx,.doc,.pdf,.xlsx,.txt" onchange="A.tplBulk(this)"></label><p class="meta">Pick several Word / PDF letters at once. Each becomes a template you can rename and search inside. Or tap + to write a text template with blanks like {canal} {rd} {sen}.</p></div>':''}${ty==='place'?'<p class="meta" style="margin-top:-4px">Buildings and offices you visit or call: rest houses, offices, police stations, courts. Canal heads, outlets and river sites belong in <a href="#canals">Canal network</a>.</p>'+(S.items.filter(it=>it.type==='place'&&inScope(it)&&/^(Head|Canal site)/.test(it.cat||'')).length?`<div class="card warn">${(n=>n+(n===1?' place is a canal point':' places are canal points'))(S.items.filter(it=>it.type==='place'&&inScope(it)&&/^(Head|Canal site)/.test(it.cat||'')).length)} (head or outlet). Open each and use <b>Move to canal / section</b> so they sit on their canal.</div>`:'')+'<div class="acts" style="margin:0 0 8px"><label class="btn s">Import Google Earth file (.kml / .kmz)<input type="file" hidden accept=".kml,.kmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/octet-stream" onchange="A.kmlImp(this)"></label></div>'+(htWaiting()?`<div class="card warn"><b>${htWaiting()} canal head / tail pins are saved as places.</b><div class="acts"><button class="btn s p" onclick="A.htMove()">Move them to their canals</button></div></div>`:''):''}${ty==='pmiu'?'<p class="meta">Each PMIU canal wire with its points: offences with their documents, replies to observations, and disputed points with evidence.</p>':''}${ty==='wire'?'<p class="meta">Confirmation and repair wires of water-theft cases go in that case\'s stage note, not here.</p>':''}
- <input id="lq" type="search" placeholder="Search ${esc(T[ty].pl.toLowerCase())}" value="${esc(LF.q)}" oninput="LF.q=this.value;$('#lres').innerHTML=listItems('${ty}')" style="margin-bottom:8px">${filt}${top}<div id="lres">${listItems(ty)}</div>`}
+
+
 
 /* ---------- item detail ---------- */
 function stageBlock(it){if(it.type==='estimate')return estBlock(it);const f=STG[it.type];if(!f)return '';const all=f(it);const done=new Map((it.stages||[]).map(s=>[s.name,s]));const cur=stageOf(it);const ci=all.indexOf(cur);
@@ -794,7 +795,7 @@ const ago=d=>{if(!d)return 'never inspected';const n=Math.round((new Date(today(
 const rotRow=(x,s,sec)=>`<div class="prow lrow"><a class="an" href="#canal/${x.c.id}" style="text-decoration:none;color:var(--ink)"><b style="font-weight:600">${esc(x.c.name)}</b><div class="meta">${sec?esc(secShort(x.sec))+' · ':''}${ago(x.last)}${(()=>{const y=today().slice(0,4);const n=S.visits.filter(v=>v.canalId===x.c.id&&String(v.date).startsWith(y)).length;return n?' · '+n+'× in '+y:''})()}</div></a><button class="btn s" onclick="A.inspFor('${x.c.id}','${s}')">Record</button></div>`;
 const dots=(n,t)=>`<span class="dots ${n>=t?'ok':''}">${Array.from({length:t},(_,i)=>`<i class="${i<n?'on':''}"></i>`).join('')}</span>`;
 function vInsp(){const t=today(),ws=weekStart(t),sun=addDays(ws,6);
- const WX=inspWeek(ws);return `${backHome}<h1 class="pt">Inspections</h1><p class="meta">Week ${fmtD(ws)} – ${fmtD(sun)} · target Fri ${fmtD(addDays(ws,4))}, final Sat ${fmtD(addDays(ws,5))}</p><div class="card"><div class="iwk"><div><b>${WX.sub}/${WKT}</b>${dots(WX.sub,Math.max(WKT,WX.sub))}<span>notes submitted this week (both sub-divisions)</span></div><div><b>${WX.n}</b>${dots(WX.n,Math.max(WKT,WX.n))}<span>inspected</span></div></div><div class="meta mt">${esc(wkSplit(WX))}</div></div>${planCard()}`+scopeSubs().map(s=>{
+ const WX=inspWeek(ws);return `<h1 class="pt">Inspections</h1><p class="meta">Week ${fmtD(ws)} – ${fmtD(sun)} · target Fri ${fmtD(addDays(ws,4))}, final Sat ${fmtD(addDays(ws,5))}</p><div class="card"><div class="iwk"><div><b>${WX.sub}/${WKT}</b>${dots(WX.sub,Math.max(WKT,WX.sub))}<span>notes submitted this week (both sub-divisions)</span></div><div><b>${WX.n}</b>${dots(WX.n,Math.max(WKT,WX.n))}<span>inspected</span></div></div><div class="meta mt">${esc(wkSplit(WX))}</div></div>${planCard()}`+scopeSubs().map(s=>{
   const wkA=S.visits.filter(v=>v.sub===s&&v.date>=ws&&v.date<=sun).sort((a,b)=>a.date.localeCompare(b.date));const wk=wkA.filter(isRoutineV),wkO=wkA.filter(v=>!isRoutineV(v));const done=S.inspNotes[s+'|'+ws];
   const st=inspStat(s,ws),rot=inspRot(s),f=inspOrd(s);
   const past=S.visits.filter(v=>v.sub===s&&v.date<ws).sort((a,b)=>b.date.localeCompare(a.date));const pn=IPAST[s]?15:3;
@@ -846,7 +847,7 @@ function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');co
  $('#seg').style.display=SUBK().length<2?'none':'';$('#seg').innerHTML=SUBK().length>2?`<select class="segsel" onchange="setSub(this.value)">${[['A','All']].concat(SUBK().map(k=>[k,subName(k)])).map(([k,l])=>`<option value="${k}" ${SUB===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`:SUBK().concat('A').map(k=>[k,k==='A'?'All':subName(k)]).map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
  const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),note:()=>vNote(p[1]),verify:()=>vVerify(p[1],p[2]),curtail:vCurtail,offences:vOffences,qlog:vQlog,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
- const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);
+ const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!(v==='list'&&p[1]==='task')&&v!=='insp'&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);
  tabsSync(v,p,isHome);
  if(h!==LASTH){window.scrollTo(0,0);LASTH=h;if(v==='search'){const e=$('#sq');if(e)e.focus()}}}
 function setSub(k){SUB=k;try{localStorage.setItem('sdodesk.sub',k)}catch(e){}render()}
@@ -873,7 +874,7 @@ A.qlForm=k=>{const e=$('#qlT');const tx=e?e.value.trim():'';if(tx){const L=tx.sp
  if(k)return A.qaPick(k);sheet(`<div class="ct">Open a full form</div>${ADDG.map(([g,l])=>`<div class="meta" style="margin:10px 0 4px;font-weight:600">${g}</div><div class="grid2">${l.map(x=>addBtn(x[0])).join('')}</div>`).join('')}`)};
 A.qaPick=k=>{const u=S.settings.addUse=S.settings.addUse||{};u[k]=(u[k]||0)+1;save();A.addGo(k)};
 A.fab=()=>{const p=(location.hash.slice(1)||'home').split('/');const v=p[0];
- if(v==='list'&&T[p[1]])return p[1]==='task'?A.ql():go('edit/'+p[1]+'/new');
+ if(v==='list'&&T[p[1]])return p[1]==='task'?A.ql(null,'','','task'):go('edit/'+p[1]+'/new');
  if(v==='people')return go('editp/new');
  if(v==='person'&&person(p[1]))return A.ql({pid:p[1]});if(v==='canal'&&canal(p[1]))return A.ql({cid:p[1]});if(v==='sec'&&S.settings.subs[p[1]])return A.ql({s:p[1],g:decodeURIComponent(p.slice(2).join('/'))});if(v==='vehicle')return go('editv/new');
  if(v==='insp'){if(SUB!=='A')return go('editvisit/new/'+SUB);return sheet(`<div class="ct">Record inspection for</div><div class="grid2 mt">${SUBK().map(s=>`<button class="btn" onclick="closeSheet();go('editvisit/new/${s}')">${esc(subName(s))}</button>`).join('')}</div>`)}
@@ -1197,7 +1198,7 @@ function offList(sub){const a=offA(sub);if(!a)return '';const f=OFF_FILTERS.find
  if(f[0]==='repeat')return a.repeats.map(g=>{const x=g[0];const rb=g.filter(y=>y.robkar).length,fn=g.filter(y=>y.fine).length;return `<div class="card"><div class="ct">${esc(fmtRD(x.o.channel))} ${esc(fmtRD(x.o.rd))} <span class="chip r">${g.length} offences</span></div><div class="meta">Robkar ${rb} · Fine ${fn} · FIR ${g.filter(y=>y.fir).length} · Sr ${g.map(y=>y.o.sr).join(', ')}</div></div>`}).join('')||'<p class="empty">No outlet with 3 or more offences.</p>';
  let l=f[2](a);if(q.length)l=l.filter(x=>q.every(w=>(Object.values(x.o).join(' ')+' '+x.psL).toLowerCase().includes(w)));
  if(f[0]==='nofir')l=l.slice().sort((x,y)=>y.firAge-x.firAge);else if(f[0]==='noaction')l=l.slice().sort((x,y)=>y.age-x.age);
- const btn=l.length&&f[0]!=='all'?`<button class="btn s p" style="margin-bottom:8px" onclick="A.offTask('${sub}','${f[0]}')">Make one follow-up for these ${l.length}</button>`:'';
+ const btn=l.length&&f[0]!=='all'?`<button class="btn s" style="margin:-4px 0 6px" onclick="A.offTask('${sub}','${f[0]}')">Make one follow-up for these ${l.length}</button>`:'';
  return btn+(l.map(x=>offRow(sub,x)).join('')||'<p class="empty">Nothing in this list.</p>')}
 function vOffences(){const subs=scopeSubs();let h='<h1 class="pt">Offence register</h1><p class="meta">Read-only copy of your offence sheet. Staff keep the sheet; import the latest copy weekly and work the gaps here.</p>';
  if(subs.length>1)return h+subs.map(s=>{const a=offA(s);return `<div class="card" onclick="setSub('${s}');go('#offences')"><div class="ct">${esc(subName(s))}</div><div class="meta">${a?`${a.n} offences · <span class="rd">${a.noFir.length} FIR pending · ${a.noAction.length} no action</span> · imported ${fmtD(a.sh.importedAt)}`:'No sheet imported yet'}</div></div>`}).join('')+'<p class="meta">Pick a subdivision at the top to work its register.</p>';
@@ -1205,9 +1206,8 @@ function vOffences(){const subs=scopeSubs();let h='<h1 class="pt">Offence regist
  h+=`<div class="card"><div class="row between"><div><div class="ct">${sh?esc(sh.file):'No sheet imported'}</div><div class="meta">${sh?`Imported ${fmtD(sh.importedAt)}${diffDays(t,sh.importedAt)>=7?` <span class="rd">· ${diffDays(t,sh.importedAt)} days old, import the latest</span>`:''} · ${a.n} offences${(S.psMaps||{})[sub]&&(S.psMaps||{})[sub].length?' · police list '+S.psMaps[sub].length+' rows':''}`:'Download the sheet from Drive as .xlsx and import it.'}</div></div></div>
  <div class="acts"><label class="btn s p">Import latest sheet (.xlsx)<input type="file" hidden accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream" onchange="A.offImp('${sub}',this)"></label>${isUrl(link)?`<a class="btn s" href="${esc(link)}" target="_blank" rel="noopener">Open master sheet</a>`:''}<button class="btn s" onclick="A.sheetLink('${sub}')">${link?'Change':'Save'} sheet link</button></div></div>`;
  if(!a)return h;
- h+=`<div class="stats"><div><b>${a.n}</b><span>offences</span></div><div class="rd"><b>${a.noFir.length}</b><span>robkar, FIR pending</span></div><div class="rd"><b>${a.noAction.length}</b><span>no fine / robkar 15d+</span></div><div><b>${a.robkar} / ${a.fir}</b><span>robkars / FIRs</span></div><div><b>${a.fine}</b><span>fines (${a.fineNoAmt.length} no amount)</span></div><div><b>Rs ${num(a.tawanRs)}</b><span>tawan decided (${a.n-a.noTawan.length})</span></div></div>`;
- h+=`<div class="fchips">${OFF_FILTERS.map(([k,l,fn])=>`<button class="${OF.filter===k?'on':''}" onclick="OF.filter='${k}';render()">${l}${fn?' '+fn(a).length:' '+a.repeats.length}</button>`).join('')}</div>`;
- h+=`<input type="search" placeholder="Search channel, RD, robkar, SEN…" value="${esc(OF.q)}" oninput="OF.q=this.value;$('#ofl').innerHTML=offList('${sub}')" style="margin-bottom:8px"><div id="ofl">${offList(sub)}</div>`;
+ h+=`<div class="card osum"><b>${a.n}</b> offences · ${a.robkar} robkars · ${a.fir} FIRs · ${a.fine} fines (${a.fineNoAmt.length} no amount) · Rs ${num(a.tawanRs)} tawan decided (${a.n-a.noTawan.length})</div>`;
+ h+=fbar('off','Search channel, RD, robkar, SEN…',OF.q,`OF.q=this.value;$('#ofl').innerHTML=offList('${sub}')`)+`<div id="ofl">${offList(sub)}</div>`;
  return h}
 function vOff(sub,sr){const a=offA(sub);const x=a&&a.rows.find(r=>String(r.o.sr)===String(sr));if(!x)return '<a class="back" href="#offences">‹ Register</a><p class="empty">Not found. Import the sheet again.</p>';
  const kv=Object.keys(OFF_LBL).filter(k=>k!=='sr'&&x.o[k]!==''&&x.o[k]!=null).map(k=>{const v=x.o[k];const disp=k==='folder'||k==='pmiuFolder'?(isUrl(v)?`<a href="${esc(v)}" target="_blank" rel="noopener">Open</a>`:esc(v)):esc(DATE_F.includes(k)&&x.d[k]?fmtD(x.d[k]):(k==='amount'&&typeof v==='number'?'Rs '+num(v):v));return `<dt>${esc(OFF_LBL[k])}</dt><dd>${disp}</dd>`}).join('');
@@ -1859,7 +1859,7 @@ let BGST='checking';
 async function pushAlarmState(){if(!('caches' in window))return;try{const t=today(),ws=weekStart(t);const x0=inspWeek(ws);const subs={ALL:{name:'Inspections',n:x0.n,sub:x0.sub,all:1}};
  const dates=S.items.filter(it=>isOpen(it)&&it.type!=='event').map(keyDate).filter(Boolean);
  const ev=S.items.filter(it=>it.type==='event'&&!it.resolved&&it.due).map(it=>({d:it.due,tm:it.time||'',t:it.title})).concat(S.items.filter(it=>it.type==='court'&&!it.resolved&&it.hearing).map(it=>({d:it.hearing,tm:it.attendTime||'',t:'Court: '+it.title})));
- const st=Object.assign(eveState(),{ws,subs,dates,ev,ib:S.inbox.length,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()});
+ const st=Object.assign(eveState(),{added:S.items.filter(it=>it.createdAt&&ymd(new Date(it.createdAt))===t).length+S.items.reduce((n,it)=>n+(it.fus||[]).filter(x=>x.d===t).length,0),addedOn:t,ws,subs,dates,ev,ib:S.inbox.length,remHour:Number(S.settings.remHour||8),on:S.settings.bgRem!==false,ts:Date.now()});
  const c=await caches.open('sdo-alarm');await c.put('./__alarm.json',new Response(JSON.stringify(st),{headers:{'Content-Type':'application/json'}}))}catch(e){}}
 async function regBg(){try{if(!('serviceWorker' in navigator))return 'unsupported';const r=await navigator.serviceWorker.ready;if(!r.periodicSync)return 'unsupported';const p=await navigator.permissions.query({name:'periodic-background-sync'});if(p.state!=='granted')return 'not-installed';await r.periodicSync.register('sdo-check',{minInterval:3*3600*1000});return 'on'}catch(e){return 'unsupported'}}
 async function notifiedToday(){try{const c=await caches.open('sdo-alarm');const r=await c.match('./__last.txt');return r&&(await r.text())===today()}catch(e){return false}}
@@ -1870,7 +1870,7 @@ function remindersHTML(){const np=('Notification' in window)?Notification.permis
  <div class="ct mt">Background check</div><p class="meta" style="margin-top:2px">${bg}</p>
  <label class="chk" style="padding-left:0"><input type="checkbox" ${on?'checked':''} onchange="S.settings.bgRem=this.checked;save();render()"><span>Daily reminder on</span></label>
  <label class="fld"><span>Not before</span><select onchange="S.settings.remHour=+this.value;save();render()">${[6,7,8,9,10,11].map(x=>`<option value="${x}" ${x===h?'selected':''}>${x}:00 am</option>`).join('')}</select></label>
- <label class="fld"><span>Evening reminder</span><select onchange="S.settings.eveHour=+this.value;save();render()">${[[0,'Off'],[19,'7:00 pm'],[20,'8:00 pm'],[21,'9:00 pm']].map(([v,l])=>`<option value="${v}" ${v===(S.settings.eveHour===0?0:Number(S.settings.eveHour||20))?'selected':''}>${l}</option>`).join('')}</select></label><p class="meta">One evening alert if the app was not opened that day, inspection notes are waiting for eFOES, the vehicle log is missing for an inspection day, or a pump bill is pending.</p><div class="acts"><button class="btn s" onclick="A.notifTest()">Send a test notification</button></div>${S.settings.lastNotify?`<p class="meta">Last morning alert: ${fmtD(S.settings.lastNotify)}.</p>`:''}<p class="meta">While the app is open you also get an alert 2 hours before a timed meeting or hearing. Exact timing in the background is decided by Android, so the alert may come later in the morning than the hour set.</p></div>`}
+ <label class="fld"><span>Evening reminder</span><select onchange="S.settings.eveHour=+this.value;save();render()">${[[0,'Off'],[19,'7:00 pm'],[20,'8:00 pm'],[21,'9:00 pm']].map(([v,l])=>`<option value="${v}" ${v===(S.settings.eveHour===0?0:Number(S.settings.eveHour||20))?'selected':''}>${l}</option>`).join('')}</select></label><p class="meta">One evening alert if the app was not opened that day, inspection notes are waiting for eFOES, the vehicle log is missing for an inspection day, or a pump bill is pending.</p><div class="acts"><button class="btn s" onclick="A.notifTest()">Send a test notification</button></div>${S.settings.lastNotify?`<p class="meta">Last morning alert: ${fmtD(S.settings.lastNotify)}.</p>`:''}<p class="meta">While the app is open you also get an alert 2 hours before a timed meeting or hearing. Exact timing in the background is decided by Android, so the alert may come later in the morning than the hour set.</p></div>${pushCard()}`}
 
 /* ---------- Home tabs: Overdue / Due today / Next 2 days / Custom ---------- */
 let HOX=false,HT=null,HTU=null,HC={k:'7d',f:'',t:''};
@@ -1958,13 +1958,13 @@ function guessTy(lc){if(PERS_RE.test(lc))return 'pers';if(/\b(court|hearing|writ
 /* ---------- Quick log ---------- */
 const QTN={task:'Follow-up',pers:'Personal',prep:'To prepare',event:'Meeting',theft:'Water theft',court:'Court case',estimate:'Estimate',note:'Just a note'};
 let QL={text:'',ctx:null,ov:{},inboxId:''};
-A.ql=(ctx,text,inboxId)=>{QL={text:text||'',ctx:ctx||null,ov:{},inboxId:inboxId||''};closeSheet();go('#qlog')};
+A.ql=(ctx,text,inboxId,dty)=>{QL={text:text||'',ctx:ctx||null,ov:{},inboxId:inboxId||'',dty:dty||''};closeSheet();go('#qlog')};
 const qlLines=()=>QL.text.split('\n').map(x=>x.trim()).filter(Boolean);
 function qlCtx(){const x=Object.assign({},QL.ctx||{});if(x.pid&&person(x.pid)&&!x.g){const ps=pSec(person(x.pid));if(ps){x.s=ps.s;x.g=ps.g}}if(x.cid&&canal(x.cid)&&!x.g){const ls=linkSec(canal(x.cid),'');if(ls){x.s=ls.s;x.g=ls.g}}return x}
 const SKIPW=new Set(['with','from','that','this','have','work','works','report','reply','letter','regarding','about','canal','disty','minor','section','head','check','update','done','start','started','sent','send','today','tomorrow','hearing','court','case','date','next','need','needs']);
 const sigW=t=>[...new Set(nk(t).replace(/[^a-z0-9 ]/g,' ').split(' ').filter(w=>w.length>=4&&!SKIPW.has(w)))];
 function findSame(line,ty){const lw=new Set(sigW(line));let best=null,bs=0;S.items.filter(it=>isOpen(it)&&!LIB.includes(it.type)&&(ty==='court')===(it.type==='court')).forEach(it=>{const tw=sigW(it.title);if(tw.length<2)return;const hit=tw.filter(w=>lw.has(w)).length,sc=hit/tw.length;if(hit>=2&&sc>=0.6&&sc>bs){bs=sc;best=it}});return best}
-function qlResolve(line){const x=qlCtx(),o=QL.ov[line]||{},lc=nk(line);const R={title:line.replace(/[\s,;]+$/,''),ty:o.ty||guessTy(lc),rd:findRD(line),no:findNo(line),amt:findAmt(line),time:findTime(line)};
+function qlResolve(line){const x=qlCtx(),o=QL.ov[line]||{},lc=nk(line);const R={title:line.replace(/[\s,;]+$/,''),ty:o.ty||(QL.dty&&!/^(note|pers)$/.test(guessTy(lc))?QL.dty:guessTy(lc)),rd:findRD(line),no:findNo(line),amt:findAmt(line),time:findTime(line)};
  const L=findLink(line);
  if('cid' in o){R.cid=o.cid;R.sec=o.sec||null}else if(L&&L.c)R.cid=L.c.id;else if(L&&L.sec)R.sec=L.sec;else if(x.cid)R.cid=x.cid;else if(x.g)R.sec={s:x.s,g:x.g};
  if(R.cid&&canal(R.cid))R.sec=linkSec(canal(R.cid),R.rd)||R.sec||null;
@@ -1979,11 +1979,8 @@ const qchip=(i,k,l,on)=>`<button class="qchip ${on?'on':''}" onclick="A.qlEd(${i
 function qlPreview(){const ls=qlLines();if(!ls.length)return '';const rs=ls.map(qlResolve);const n=rs.filter(r=>r.ty!=='note').length;
  return rs.map((R,i)=>{const lk=R.cid&&canal(R.cid)?canal(R.cid).name+(R.rd?' · RD '+R.rd:''):R.sec?R.sec.g:'';const dl=R.due?({court:'Hearing ',event:'',estimate:'Target '}[R.ty]??'Due ')+fmtD(R.due)+(R.dueDef?' (default)':''):'';
   if(R.upd&&get(R.upd)){const u=get(R.upd);return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${qchip(i,'upd','Update to: '+u.title.slice(0,40),1)}${u.type==='court'?qchip(i,'due',R.due?'Next hearing '+fmtD(R.due):'+ next hearing',!!R.due):''}${R.time&&u.type==='court'?`<span class="chip">${esc(R.time)}</span>`:''}</div><div class="meta" style="margin-top:6px">Adds this line as an update on the existing ${esc(T[u.type].n.toLowerCase())}. Tap to make a new record instead.</div></div>`}
-  return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${R.cand?qchip(i,'upd','New record',0):''}${qchip(i,'ty',QTN[R.ty],1)}${R.ty==='note'?'':(R.ty==='pers'?'':qchip(i,'link',lk||'+ canal / section',!!lk)+(['task','theft','court','estimate'].includes(R.ty)?qchip(i,'p',R.pid?pShort(R.pid)+(R.pAuto?' (SEN)':''):'+ person',!!R.pid):''))+(R.ty==='estimate'&&!R.due?'':qchip(i,'due',dl||'+ date',!!R.due&&!R.dueDef))}${[R.no&&'No '+R.no,R.amt&&'Rs '+num(R.amt),R.time].filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>${R.sec&&R.ty!=='note'&&R.ty!=='pers'?`<div class="meta" style="margin-top:6px">${esc(secTxt(R.sec))}${SUBK().length>1?' · '+esc(subName(R.sub)):''}</div>`:''}</div>`}).join('')+`<div class="acts"><button class="btn p" style="flex:1" onclick="A.qlSave()">${n?'Save '+n+' record'+(n>1?'s':''):'Save'}</button><button class="btn" onclick="A.qlNote()">Save as note, sort later</button></div>`}
-let QLT=null;function qlRefresh(){clearTimeout(QLT);QLT=setTimeout(()=>{const e=$('#qlP');if(e)e.innerHTML=qlPreview()},250)}
-function vQlog(){const x=QL.ctx;const ct=x?[x.cid&&canal(x.cid)?canal(x.cid).name:'',x.g||'',x.pid&&person(x.pid)?person(x.pid).name:''].filter(Boolean).join(' · '):'';
- return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">Quick log</h1>${ct?`<div class="ctxb"><span>For <b>${esc(ct)}</b></span><button class="pill" onclick="QL.ctx=null;render()" aria-label="Remove">✕</button></div>`:''}<textarea id="qlT" rows="5" placeholder="One line per item, e.g.&#10;Sultana tail dry, Shehzad report by Thu&#10;Berm cutting RD 22 not started&#10;Grocery Friday" oninput="QL.text=this.value;qlRefresh()">${esc(QL.text)}</textarea><p class="meta" style="margin:4px 0 6px">Use the mic on your keyboard to speak. Each line becomes its own record. Tap a chip to correct it.</p><div class="meta">Or open a full form</div><div class="qlfull"><button class="pill" onclick="A.qlForm('complaint')">Complaint</button><button class="pill" onclick="A.qlForm('insp')">Inspection</button><button class="pill" onclick="A.qlForm('vehicle')">Vehicle</button><button class="pill" onclick="A.qlForm('')">Other…</button></div><div id="qlP">${qlPreview()}</div>`}
-A.qlSet=(i,k,v)=>{const line=qlLines()[i];if(line==null)return;const o=QL.ov[line]=QL.ov[line]||{};if(k==='link'){o.cid=v.cid;o.sec=v.sec}else o[k]=v;closeSheet();render()};
+  return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${R.cand?qchip(i,'upd','New record',0):''}${qchip(i,'ty',QTN[R.ty],1)}${R.ty==='note'?'':(R.ty==='pers'?'':qchip(i,'link',lk||'+ canal / section',!!lk)+(['task','theft','court','estimate'].includes(R.ty)?qchip(i,'p',R.pid?pShort(R.pid)+(R.pAuto?' (SEN)':''):'+ person',!!R.pid):''))+(R.ty==='estimate'&&!R.due?'':qchip(i,'due',dl||'+ date',!!R.due&&!R.dueDef))}${[R.no&&'No '+R.no,R.amt&&'Rs '+num(R.amt),R.time].filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>${R.sec&&R.ty!=='note'&&R.ty!=='pers'?`<div class="meta" style="margin-top:6px">${esc(secTxt(R.sec))}${SUBK().length>1?' · '+esc(subName(R.sub)):''}</div>`:''}</div>`}).join('')+`<div class="qlfoot"><span>${n?n+' record'+(n>1?'s':'')+' · tap ➤ to save':''}</span><a href="#" onclick="A.qlNote();return false">Save as note, sort later</a></div>`}
+let QLT=null;A.qlSet=(i,k,v)=>{const line=qlLines()[i];if(line==null)return;const o=QL.ov[line]=QL.ov[line]||{};if(k==='link'){o.cid=v.cid;o.sec=v.sec}else o[k]=v;closeSheet();render()};
 let PKL=null;
 function listSheet(title,items,cb){PKL={items,cb};sheet(`<div class="ct">${esc(title)}</div><input id="lsq" type="search" class="mt" placeholder="Search" oninput="$('#lsr').innerHTML=lsRows()"><div id="lsr" class="mt" style="max-height:62vh;overflow:auto">${lsRows()}</div>`)}
 function lsRows(){const e=$('#lsq');const q=(e?e.value:'').toLowerCase().trim();return PKL.items.map((x,i)=>[x,i]).filter(([x])=>x.h?!q:!q||(x.l+' '+(x.sub||'')).toLowerCase().includes(q)).slice(0,80).map(([x,i])=>x.h?`<div class="lb">${esc(x.l)}</div>`:`<div class="lrow" style="cursor:pointer" onclick="A.lsPick(${i})"><b style="font-weight:600">${esc(x.l)}</b>${x.sub?`<div class="meta">${esc(x.sub)}</div>`:''}</div>`).join('')||'<p class="empty">No match.</p>'}
@@ -3072,22 +3069,6 @@ function tGroups(l){const t=today(),w=addDays(t,7);const G=[['Overdue',[]],['Tod
  l.forEach(it=>{const N=tNext(it);const k=N&&N.d;G[!k?4:k<t?0:k===t?1:k<=w?2:3][1].push(it)});const used=G.filter(g=>g[1].length);
  if(used.length<2)return `<div class="list">${tSort(l).map(trow).join('')}</div>`;
  return used.map(([n,L])=>`<div class="grp">${n} · ${L.length}</div><div class="list">${tSort(L).map(trow).join('')}</div>`).join('')}
-function tRows(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
- if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(tLate)}
- if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
- if(TF.w&&TF.f!=='closed')l=l.filter(it=>holder(it).hk===TF.w);
- const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));
- if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
- return l.length?(q.length?`<div class="list">${tSort(l).map(trow).join('')}</div>`:tGroups(l)):`<p class="empty">${TF.f==='pers'?'No personal items.':'Nothing here.'}</p>`}
-function vTasks(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));const op=base.filter(it=>isOpen(it)&&!it.personal);
- const n={open:op.length,over:op.filter(tLate).length,pers:base.filter(it=>it.personal&&isOpen(it)).length};const hc={};op.forEach(it=>{const k=holder(it).hk;hc[k]=(hc[k]||0)+1});
- const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
- const fb=(k,l,c)=>`<button class="${TF.f===k?'on':''}" onclick="TF.f='${k}';TSEL=null;render()">${l}${c!=null?' '+c:''}</button>`;
- return `<div class="row between"><h1 class="pt">Follow-ups</h1>${TF.f==='closed'||!op.length?'':`<button class="pill" onclick="TSEL=TSEL?null:new Set();render()">${TSEL?'Cancel':'Select'}</button>`}</div>
- <div class="frow"><input type="search" placeholder="Search" value="${esc(TF.q)}" oninput="TF.q=this.value;$('#tres').innerHTML=tRows()"></div>
- <div class="frow"><select onchange="TF.sec=this.value;render()" aria-label="Section" style="flex:1"><option value="">All sections</option>${secs.map(([v,l])=>`<option value="${esc(v)}" ${TF.sec===v?'selected':''}>${esc(l)}</option>`).join('')}<option value="-" ${TF.sec==='-'?'selected':''}>Not linked</option></select><select onchange="TF.w=this.value;render()" aria-label="Who holds it" style="flex:1"><option value="">Anyone</option>${['staff','me','up','dept'].map(k=>`<option value="${k}" ${TF.w===k?'selected':''}>${k==='staff'?'With my staff':k==='me'?'With me':k==='up'?'With higher office':'With other dept'} (${hc[k]||0})</option>`).join('')}</select></div>
- <div class="fchips">${fb('open','Open',n.open)}${fb('over','Overdue',n.over)}${n.pers||TF.f==='pers'?fb('pers','Personal',n.pers):''}${fb('closed','Closed')}</div>${TF.f!=='pers'&&TF.f!=='closed'&&!TSEL?secSummary():''}<div id="tres">${tRows()}</div>
- ${TSEL?`<div class="selbar"><span>${TSEL.size} selected</span><button onclick="A.tsMove()" ${TSEL.size?'':'disabled'}>Move</button><button class="p" onclick="A.tsClose()" ${TSEL.size?'':'disabled'}>Close</button></div>`:''}`}
 A.tsT=id=>{if(!TSEL)return;TSEL.has(id)?TSEL.delete(id):TSEL.add(id);render()};
 A.tsMove=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;listSheet('Move '+ids.length+' to',S.people.filter(pScope).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>({v:p.id,l:p.name,sub:[p.designation,p.section].filter(Boolean).join(' · ')})),pid=>{if(!pid)return;snap();ids.forEach(id=>{const it=get(id);if(!it)return;it.assignees=pid;it.asg=[{p:pid,st:'Pending'}];it.owner=pid;log('Moved to '+pShort(pid)+': '+it.title,it)});TSEL=null;save();render();toast('Moved '+ids.length+' to '+pShort(pid),1)})};
 A.tsClose=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;sheet(`<div class="ct">Close ${ids.length} follow-up${ids.length>1?'s':''}</div>${outcSeg()}<label class="fld mt"><span>Closing note (optional)</span><textarea id="clN" rows="2"></textarea></label><button class="btn p wide mt" onclick="A.tsCloseSave()">Close ${ids.length}</button>`)};
@@ -3187,6 +3168,112 @@ function itMenuX(it,mi,add){const id=it.id;
 
 /* ---------- share from WhatsApp or any app ---------- */
 setTimeout(()=>{try{const q=new URLSearchParams(location.search);const tx=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' ').replace(/\s*\n+\s*/g,' · ').trim();if(!q.has('text')&&!q.has('title')&&!q.has('url'))return;history.replaceState(history.state,'',location.pathname+'#home');if(tx){A.ql(null,tx);toast('Shared text ready · check and save')}}catch(e){}},400);
+
+/* ================= v66: one filter pattern, composer at the bottom, daily push ================= */
+const ICF='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>';
+const ICS='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+const ICSEND='<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg>';
+/* ---------- filters: search + one Filter button; choices live in a bottom sheet ---------- */
+const FREG={};let FSN='';
+function fbar(name,ph,q,onq){const F=FREG[name];const act=F.active();
+ return `<div class="fbar"><label class="fsrch">${ICS}<input type="search" placeholder="${esc(ph)}" value="${esc(q)}" oninput="${onq}"></label><button class="fbtn${act.length?' on':''}" onclick="A.fOpen('${name}')">${ICF}<span>Filter${act.length?' · '+act.length:''}</span></button></div>${act.length?`<div class="fsum"><span>${act.map(esc).join(' · ')}</span><a href="#" onclick="A.fReset('${name}');return false">Clear</a></div>`:''}`}
+function fSheetHTML(name){const F=FREG[name];const G=F.groups();
+ return `<div class="row between"><div class="ct">Filter</div>${F.active().length?`<a href="#" class="flink" onclick="A.fReset('${name}',1);return false">Reset</a>`:''}</div>${G.map((g,gi)=>`<div class="fgl">${esc(g.l)}</div><div class="fopts">${g.o.map(([v,l,c,red],oi)=>`<button class="fopt${g.cur===v?' on':''}" onclick="A.fSet('${name}',${gi},${oi})"><span>${esc(l)}</span>${c!=null&&c!==''?`<em${red&&c?' class="rd"':''}>${esc(String(c))}</em>`:''}</button>`).join('')}</div>`).join('')}<div class="fgo"><button class="btn p wide" onclick="closeSheet()">Show ${F.n()}</button></div>`}
+A.fOpen=name=>{FSN=name;sheet(fSheetHTML(name))};
+A.fSet=(name,gi,oi)=>{const F=FREG[name];const g=F.groups()[gi];F.set(g.k,g.o[oi][0]);render();const b=$('#sheet .sheetbox');if(b){const sc=b.scrollTop;b.innerHTML=fSheetHTML(name);b.scrollTop=sc}};
+A.fReset=(name,keep)=>{FREG[name].reset();render();const b=$('#sheet .sheetbox');if(keep&&b)b.innerHTML=fSheetHTML(name)};
+const fCount=(st,k,v,fn)=>{const o=st[k];st[k]=v;const n=fn();st[k]=o;return n};
+
+/* follow-ups */
+const WHO={staff:'With my staff',me:'With me',up:'With higher office',dept:'With other department'};
+function tList(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
+ if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(tLate)}
+ if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
+ if(TF.w&&TF.f!=='closed')l=l.filter(it=>holder(it).hk===TF.w);
+ const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));return l}
+function tRows(){const l=tList();const q=TF.q.trim();
+ if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
+ return l.length?(q?`<div class="list">${tSort(l).map(trow).join('')}</div>`:tGroups(l)):`<p class="empty">${TF.f==='pers'?'No personal items.':TF.f==='over'?'Nothing overdue.':'Nothing here.'}</p>`}
+FREG.task={
+ active:()=>[TF.f!=='open'?{over:'Overdue',pers:'Personal',closed:'Closed'}[TF.f]:'',TF.w?WHO[TF.w]:'',TF.sec?(TF.sec==='-'?'No section':secShort(TF.sec.split('|')[1])):''].filter(Boolean),
+ groups:()=>{const c=(k,v)=>fCount(TF,k,v,()=>tList().length);const pers=S.items.filter(it=>it.type==='task'&&inScope(it)&&it.personal&&isOpen(it)).length;
+  const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
+  return [{l:'Show',k:'f',cur:TF.f,o:[['open','Open',c('f','open')],['over','Overdue',c('f','over'),1]].concat(pers||TF.f==='pers'?[['pers','Personal',pers]]:[]).concat([['closed','Closed','']])},
+   {l:'Who holds it now',k:'w',cur:TF.w||'',o:[['','Anyone',c('w','')]].concat(Object.keys(WHO).map(k=>[k,WHO[k],c('w',k)]))},
+   {l:'Section',k:'sec',cur:TF.sec||'',o:[['','All sections',c('sec','')]].concat(secs.map(([v,l])=>[v,l,c('sec',v)])).concat([['-','No section',c('sec','-')]])}]},
+ set:(k,v)=>{TF[k]=v;TSEL=null},reset:()=>{TF.f='open';TF.w='';TF.sec=''},n:()=>tList().length};
+function vTasks(){const n=tList().length;
+ return `<div class="row between"><h1 class="pt">Follow-ups</h1>${TSEL?`<a href="#" class="flink" onclick="TSEL=null;render();return false">Cancel</a>`:TF.f!=='closed'&&n?`<button class="more" aria-label="More" onclick="A.tkMenu()">⋯</button>`:''}</div>
+ ${fbar('task','Search follow-ups',TF.q,"TF.q=this.value;$('#tres').innerHTML=tRows()")}<div id="tres">${tRows()}</div>
+ ${TSEL?`<div class="selbar"><span>${TSEL.size} selected</span><button onclick="A.tsMove()" ${TSEL.size?'':'disabled'}>Move</button><button class="p" onclick="A.tsClose()" ${TSEL.size?'':'disabled'}>Close</button></div>`:''}`}
+A.tkMenu=()=>{const mi=(e,l,on)=>`<div class="mi" onclick="closeSheet();${on}"><span class="e">${e}</span>${esc(l)}</div>`;sheet(`<div class="ct">Follow-ups</div><div class="mt">${mi('☑','Select several to move or close',"TSEL=new Set();render()")}${mi('✎','New follow-up with full form',"A.qaPick('task')")}${mi('🗂','Closed follow-ups',"TF.f='closed';render()")}</div>`)};
+
+/* generic lists (wires, letters, complaints, courts …) */
+const DIRL={all:'All',Issued:'Issued',Received:'Received',await:'Action pending'};const TIMEL={any:'Any time','1m':'Last month','3m':'Last 3 months','6m':'Last 6 months','1y':'Last year'};
+function listArr(ty){const q=LF.q.toLowerCase().split(/\s+/).filter(Boolean);const t=today();
+ let l=S.items.filter(it=>it.type===ty&&inScope(it)&&(!q.length||q.every(w=>itemText(it).includes(w))));
+ if(REG[ty]){const df=REG[ty];const since={any:null,'1m':addDays(t,-35),'3m':addDays(t,-100),'6m':addDays(t,-190),'1y':addDays(t,-370)}[LF.time];
+  const aw=it=>ty==='letter'?isOpen(it):isOpen(it)||S.items.some(x=>x.rel===it.id&&x.type==='task'&&isOpen(x));
+  return l.filter(it=>(LF.dir==='all'||(LF.dir==='await'?aw(it):it.dir===LF.dir))&&(!since||(it[df]||'')>=since)).sort((a,b)=>(b[df]||'').localeCompare(a[df]||'')||b.createdAt-a.createdAt)}
+ if(LIB.includes(ty))return l.filter(it=>LF.cat==='all'||it.cat===LF.cat);
+ l=l.filter(it=>LF.closed?!isOpen(it):isOpen(it));if(LF.stage)l=l.filter(it=>stageOf(it)===LF.stage);
+ if(LF.closed)l.sort((a,b)=>(b.resolvedOn||b.due||'').localeCompare(a.resolvedOn||a.due||''));else l.sort((a,b)=>((keyDate(a)||'9')+a.createdAt).localeCompare((keyDate(b)||'9')+b.createdAt));return l}
+function listItems(ty){const l=listArr(ty);
+ if(REG[ty])return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing matches. Tap + to add.</p>';
+ if(LIB.includes(ty)){const g={};l.forEach(it=>{(g[it.cat||'Other']=g[it.cat||'Other']||[]).push(it)});
+  return Object.entries(g).map(([c,a])=>`<h2>${esc(c)} · ${a.length}</h2>`+a.sort((x,y)=>x.title.localeCompare(y.title)).map(it=>card(it,false)).join('')).join('')||`<p class="empty">Nothing yet. Tap + to add ${ty==='place'?'a rest house, office or police station':'a manual, canal detail or order'}.</p>`}
+ return l.map(it=>card(it,false)).join('')||'<p class="empty">Nothing here.</p>'}
+FREG.list={
+ active:()=>{const ty=LF.ty,a=[];if(REG[ty]){if(LF.dir!=='all')a.push(DIRL[LF.dir]);if(LF.time!=='any')a.push(TIMEL[LF.time])}else if(LIB.includes(ty)){if(LF.cat!=='all')a.push(LF.cat)}else{if(LF.closed)a.push('Closed');if(LF.stage)a.push(LF.stage)}return a},
+ groups:()=>{const ty=LF.ty;const c=(k,v)=>fCount(LF,k,v,()=>listArr(ty).length);
+  if(REG[ty])return [{l:'Show',k:'dir',cur:LF.dir,o:Object.keys(DIRL).map(k=>[k,k==='await'&&ty==='letter'?'Pending':DIRL[k],c('dir',k),k==='await'])},{l:'Period',k:'time',cur:LF.time,o:Object.keys(TIMEL).map(k=>[k,TIMEL[k],c('time',k)])}];
+  if(LIB.includes(ty))return [{l:'Category',k:'cat',cur:LF.cat,o:[['all','All',c('cat','all')]].concat(T[ty].f[1].o.map(x=>[x,x,c('cat',x)]))}];
+  const G=[{l:'Show',k:'closed',cur:LF.closed?'1':'',o:[['','Open',c('closed',false)],['1','Closed','']]}];
+  if(STG[ty]&&!LF.closed){const m={};S.items.filter(it=>it.type===ty&&inScope(it)&&isOpen(it)).forEach(it=>{const s=stageOf(it);if(s)m[s]=(m[s]||0)+1});const e=Object.entries(m);if(e.length)G.push({l:'Stage',k:'stage',cur:LF.stage||'',o:[['','All stages','']].concat(e.map(([s,n])=>[s,s,n]))})}
+  return G},
+ set:(k,v)=>{LF[k]=k==='closed'?v==='1':v;if(k==='closed')LF.stage=''},reset:()=>{Object.assign(LF,{closed:false,dir:'all',time:'any',cat:'all',stage:''})},n:()=>listArr(LF.ty).length};
+function vList(ty){if(!T[ty])return vHome();if(ty==='task')return vTasks();if(LF.ty!==ty)LF={ty,q:'',closed:false,dir:'all',time:'any',cat:'all',stage:''};
+ const intro={pmiu:'Each PMIU canal wire with its points: offences with their documents, replies to observations, and disputed points with evidence.',wire:'Confirmation and repair wires of water-theft cases go in that case\'s stage note, not here.'}[ty];
+ let extra='';
+ if(ty==='template')extra='<div class="card"><label class="btn p">Upload files as templates<input type="file" hidden multiple accept=".docx,.doc,.pdf,.xlsx,.txt" onchange="A.tplBulk(this)"></label><p class="meta">Pick several Word / PDF letters at once. Each becomes a template you can rename and search inside. Or tap + to write a text template with blanks like {canal} {rd} {sen}.</p></div>';
+ if(ty==='place'){const cp=S.items.filter(it=>it.type==='place'&&inScope(it)&&/^(Head|Canal site)/.test(it.cat||'')).length;
+  extra='<p class="meta" style="margin-top:-4px">Buildings and offices you visit or call: rest houses, offices, police stations, courts. Canal heads, outlets and river sites belong in <a href="#canals">Canal network</a>.</p>'+(cp?`<div class="card warn">${cp+(cp===1?' place is a canal point':' places are canal points')} (head or outlet). Open each and use <b>Move to canal / section</b> so they sit on their canal.</div>`:'')+'<div class="acts" style="margin:0 0 8px"><label class="btn s">Import Google Earth file (.kml / .kmz)<input type="file" hidden accept=".kml,.kmz,application/vnd.google-earth.kml+xml,application/vnd.google-earth.kmz,application/octet-stream" onchange="A.kmlImp(this)"></label></div>'+(htWaiting()?`<div class="card warn"><b>${htWaiting()} canal head / tail pins are saved as places.</b><div class="acts"><button class="btn s p" onclick="A.htMove()">Move them to their canals</button></div></div>`:'')}
+ return `<h1 class="pt">${T[ty].pl}</h1>${intro?`<p class="meta" style="margin-top:-4px">${intro}</p>`:''}${extra}${fbar('list','Search '+T[ty].pl.toLowerCase(),LF.q,`LF.q=this.value;$('#lres').innerHTML=listItems('${ty}')`)}<div id="lres">${listItems(ty)}</div>`}
+
+/* offence register */
+FREG.off={
+ active:()=>{const f=OFF_FILTERS.find(x=>x[0]===OF.filter);return f&&f[0]!=='all'?[f[1]]:[]},
+ groups:()=>{const a=offA(scopeSubs()[0]);if(!a)return [];return [{l:'Show',k:'filter',cur:OF.filter,o:OFF_FILTERS.map(([k,l,fn])=>[k,l,fn?fn(a).length:a.repeats.length,k!=='all'])}]},
+ set:(k,v)=>{OF[k]=v},reset:()=>{OF.filter='all'},n:()=>{const a=offA(scopeSubs()[0]);if(!a)return 0;const f=OFF_FILTERS.find(x=>x[0]===OF.filter)||OFF_FILTERS[0];return f[2]?f[2](a).length:a.repeats.length}};
+
+/* ---------- Quick log as a composer at the bottom, like a chat box ---------- */
+function qlGrow(e){e.style.height='auto';e.style.height=Math.min(e.scrollHeight,window.innerHeight*0.35)+'px'}
+function qlHint(dt){return `<div class="qlhint"><div>${dt?'Write the follow-up in one line. The app picks out the person, place and date.':'Write or speak one line per item. The app picks out the person, place and date.'}</div><div class="qlex">${dt?'Shehzad report on Sultana tail by Thursday':'Sultana tail dry, Shehzad report by Thu'}</div>${dt?'':'<div class="qlex">Berm cutting RD 22 not started</div>'}<div class="meta">Tap the mic on your keyboard to speak.</div></div>`}
+function vQlog(){const x=QL.ctx;const dt=QL.dty==='task';const ct=x?[x.cid&&canal(x.cid)?canal(x.cid).name:'',x.g||'',x.pid&&person(x.pid)?person(x.pid).name:''].filter(Boolean).join(' · '):'';
+ setTimeout(()=>{const e=$('#qlT');if(!e)return;qlGrow(e);if(document.activeElement!==e){e.focus();try{e.selectionStart=e.selectionEnd=e.value.length}catch(z){}}},60);
+ return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">${dt?'New follow-up':'Quick log'}</h1>${ct?`<div class="ctxb"><span>For <b>${esc(ct)}</b></span><button class="pill" onclick="QL.ctx=null;render()" aria-label="Remove">✕</button></div>`:''}<div id="qlP">${qlPreview()||qlHint(dt)}</div>
+ <div class="qlbar" id="qlBar"><div class="qlfx"><span>Full form:</span>${[['task','Follow-up'],['complaint','Complaint'],['insp','Inspection'],['vehicle','Vehicle'],['','More…']].map(([k,l])=>`<a href="#" onclick="A.qlForm('${k}');return false">${l}</a>`).join('')}</div>
+ <div class="qlin"><textarea id="qlT" rows="1" enterkeyhint="enter" placeholder="${dt?'What, who, by when…':'Type or speak · one line per item'}" oninput="QL.text=this.value;qlGrow(this);qlRefresh()">${esc(QL.text)}</textarea><button class="qlgo" onclick="A.qlSave()" aria-label="Save">${ICSEND}</button></div></div>`}
+function qlRefresh(){clearTimeout(QLT);QLT=setTimeout(()=>{const e=$('#qlP');if(e){e.innerHTML=qlPreview()||qlHint(QL.dty==='task');window.scrollTo(0,document.body.scrollHeight)}},250)}
+/* keep bottom bars above the on-screen keyboard */
+if(window.visualViewport){const kbf=()=>{const kb=Math.max(0,Math.round(window.innerHeight-visualViewport.height-visualViewport.offsetTop));document.documentElement.style.setProperty('--kb',kb+'px')};visualViewport.addEventListener('resize',kbf);visualViewport.addEventListener('scroll',kbf)}
+
+/* ---------- daily reminder pushed from GitHub, so it arrives even when the app is closed ---------- */
+const PUSH_REPO='https://github.com/abdulwahab36/sdo-desk';
+const b64u=a=>btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+A.pushSetup=async()=>{try{if(!('serviceWorker' in navigator)||!('PushManager' in window))return toast('This browser cannot receive push messages');
+ const p=await Notification.requestPermission();if(p!=='granted')return toast('Allow notifications for SDO Desk first');
+ const reg=await navigator.serviceWorker.ready;const old=await reg.pushManager.getSubscription();if(old)await old.unsubscribe();
+ const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);const raw=new Uint8Array(await crypto.subtle.exportKey('raw',kp.publicKey));const jwk=await crypto.subtle.exportKey('jwk',kp.privateKey);
+ const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:raw});
+ const code=btoa(JSON.stringify({s:sub.toJSON(),p:b64u(raw),k:jwk.d}));S.settings.pushSet=today();save();
+ sheet(`<div class="ct">Daily reminder: one-time setup</div><p class="meta">This code lets GitHub send a reminder to this phone at about 8:30 AM and 7:45 PM. Keep it private.</p>
+ <textarea id="pushC" rows="4" readonly class="mt" style="font-size:12px">${code}</textarea>
+ <div class="pstep"><b>1</b><span>Copy the code</span><button class="btn s p" onclick="navigator.clipboard.writeText($('#pushC').value).then(()=>toast('Code copied'))">Copy</button></div>
+ <div class="pstep"><b>2</b><span>On GitHub, name it <b>SDO_PUSH</b>, paste the code as the secret, tap Add secret</span><a class="btn s" target="_blank" rel="noopener" href="${PUSH_REPO}/settings/secrets/actions/new">Open GitHub</a></div>
+ <div class="pstep"><b>3</b><span>Send a test: tap Run workflow</span><a class="btn s" target="_blank" rel="noopener" href="${PUSH_REPO}/actions/workflows/remind.yml">Open</a></div>
+ <p class="meta">If you reinstall the app or clear its data, repeat this setup.</p>`)}catch(e){toast('Could not set up push: '+(e&&e.message||e))}};
+function pushCard(){return `<div class="card"><div class="ct">Daily reminder even when the app is closed</div><p class="meta">Morning: what is due today. Evening: what you logged today, what is overdue, and a nudge if you logged nothing.${S.settings.pushSet?' Set up on '+fmtD(S.settings.pushSet)+'.':''}</p><button class="btn p wide" onclick="A.pushSetup()">${S.settings.pushSet?'Set up again':'Set up daily reminder'}</button></div>`}
 
 /* check before sharing, copying or marking uploaded */
 ['ntBoth','ntDocx','ntPdf'].forEach(k=>{const f=A[k];A[k]=()=>ntGuard(f)});{const f=A.ntCopy;A.ntCopy=k=>ntGuard(()=>f(k))}{const f=A.ntSt;A.ntSt=val=>val==='Submitted'?ntGuard(()=>f(val)):f(val)}
