@@ -1,0 +1,26 @@
+name: Daily reminder
+# Sends a push to the phone at about 8:20 AM and 7:45 PM Pakistan time.
+# The phone builds the message from its own data; nothing personal is stored here.
+on:
+  schedule:
+    - cron: '20 3 * * *'
+    - cron: '45 14 * * *'
+  workflow_dispatch:
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send push
+        env:
+          SDO_PUSH: ${{ secrets.SDO_PUSH }}
+          SLOT: ${{ github.event.schedule == '20 3 * * *' && 'am' || 'eve' }}
+        run: |
+          if [ -z "$SDO_PUSH" ]; then echo "SDO_PUSH secret is not set yet"; exit 0; fi
+          npm i --no-save --silent web-push@3.6.7
+          node -e '
+          const wp=require("web-push");
+          const c=JSON.parse(Buffer.from(process.env.SDO_PUSH.trim(),"base64").toString());
+          wp.setVapidDetails("https://abdulwahab36.github.io/sdo-desk/",c.p,c.k);
+          wp.sendNotification(c.s,JSON.stringify({slot:process.env.SLOT}),{TTL:36000})
+            .then(r=>console.log("sent",r.statusCode))
+            .catch(e=>{console.error("failed",e.statusCode,e.body);process.exit(1)});'
