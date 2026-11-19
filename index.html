@@ -297,6 +297,18 @@ main .btn.s:not(.p):not(.d){background:none;border-color:transparent;color:var(-
 main .stats{gap:0;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}main .stats>div,main .stats>a{border:0;border-radius:0;background:none;border-left:1px solid var(--line);padding:12px 4px}main .stats>:first-child{border-left:0}
 .tick.dn{background:var(--ok);border-color:var(--ok);box-shadow:inset 0 0 0 3px var(--card)}.rtr .tick+span{flex:1;margin-left:12px}
 .pstep{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.pstep b{width:24px;height:24px;border-radius:50%;background:var(--accs);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}.pstep span{flex:1}
+body:has(#qlBar) #toast{bottom:calc(140px + var(--kb,0px))}body:has(#sheet) #toast{top:calc(12px + env(safe-area-inset-top));bottom:auto}
+.lhd{display:flex;align-items:center;gap:2px}.lhd h1{flex:1;margin-bottom:0}.ib2{position:relative;width:42px;height:42px;border:0;background:none;color:var(--mute);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer}.ib2 svg{width:22px;height:22px}.ib2.on{color:var(--acc)}.ib2 i{position:absolute;top:3px;right:3px;background:var(--acc);color:var(--card);font-style:normal;font-size:10px;font-weight:700;border-radius:8px;min-width:16px;height:16px;line-height:16px;text-align:center}.ib2:active{background:var(--accs)}
+.lsum{color:var(--mute);font-size:14px;margin:2px 2px 10px}.lsum b{color:var(--red);font-weight:600}
+.trow .lu{font-size:13px;opacity:.85;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trow .lu i{color:var(--mute);font-style:normal}.pin{margin-right:4px}
+.tst{color:var(--mute);font-size:14px;margin:-4px 2px 12px}
+.nxc{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px}.nl{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
+.nr{display:flex;align-items:center;gap:12px;margin-top:8px;cursor:pointer}.nr .tick{border-color:var(--acc)}.nr .bd{flex:1;min-width:0}.nr .t{font-size:16px;font-weight:600}.nr .m{font-size:13.5px;color:var(--mute);margin-top:2px}
+.nxc .who{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line);cursor:pointer}.nxc .who .bd{flex:1;min-width:0;font-size:14.5px}.nxc .who .m{font-size:12.5px;color:var(--mute)}
+.nthen{margin-top:10px;font-size:13px;color:var(--mute);cursor:pointer}.dlink{display:block;padding:14px 2px;font-weight:600}
+.uch{display:flex;gap:8px;overflow-x:auto;padding:0 2px 8px;scrollbar-width:none}.uch button{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:7px 12px;font:inherit;font-size:13.5px;cursor:pointer;white-space:nowrap}.uch button:first-child{border-color:var(--acc);color:var(--acc)}.uch button:active{background:var(--accs)}
+.dq{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.dq input{flex:1;min-width:140px;margin:0}
+.sp{margin-top:10px;font-size:13.5px}.sp>div{display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line)}.sp em{font-style:normal;color:var(--mute);width:16px}.sp small{color:var(--mute);margin-left:auto}
 .prv{padding:8px 0;border-bottom:1px solid var(--line)}.prv:last-of-type{border-bottom:0}
 .pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:55vh;overflow:auto}.pkgi{border:2px solid var(--line);border-radius:10px;padding:4px;opacity:.55}.pkgi.on{border-color:var(--acc);opacity:1}.pkgi img{width:100%;height:150px;object-fit:contain;background:var(--bg);border-radius:6px;display:block;cursor:zoom-in}.pkgi .ck{font-size:12px;margin-top:4px}
 #phv{position:fixed;inset:0;background:#000;z-index:200;display:flex;align-items:center;justify-content:center}#phv img{max-width:100%;max-height:100%;object-fit:contain}#phv span{position:absolute;top:12px;right:16px;color:#fff;font-size:15px;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:16px}
@@ -439,7 +451,7 @@ const PRI=['Normal','High','Low'];
 const LACTS=['Record only','Reply to write','Directions to act on','Awaiting their reply'];
 const actOf=it=>it.act||(it.replyDue?(it.dir==='Received'?'Reply to write':'Awaiting their reply'):'Record only');const priRank=it=>it.priority==='High'?0:it.priority==='Low'?2:1;
 const T={
- task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('priority','Priority','sel',PRI),F('assignees','Assigned to (one or more)','people'),F('due','Deadline (optional)','date'),F('details','Details','textarea')]},
+ task:{n:'Follow-up',pl:'Follow-ups',daily:1,f:[F('title','Task / direction'),F('source','Source','sel',['XEN direction','Meeting','SE / Chief direction','Canal wire','Self','Other']),F('priority','Priority','sel',PRI),F('assignees','Assigned to (one or more)','people'),F('due','Official deadline (optional)','date'),F('details','Details','textarea')]},
  complaint:{n:'Complaint',pl:'Complaints',daily:1,f:[F('source','Source','sel',['WRIMS (PMIU)','Ombudsman Punjab','Other']),F('refNo','Complaint No'),F('title','Subject (optional: made from type and name)'),F('received','Received on','date'),F('due','Reply due (blank: WRIMS 3 days, others 7)','date'),F('side','Side','sel',['Technical','Revenue']),F('owner','Report from','person'),F('details','Details','textarea')]},
  estimate:{n:'Estimate',pl:'Estimates',daily:0,f:[F('scheme','M&R or ADP','sel',['M&R Work','ADP Scheme']),F('closure','Closure work or other than closure','sel',['Closure work','Other than closure']),F('wtype','Nature of work','sel',['Desilting','Other than desilting','Building work']),F('title','Name of work (as submitted)'),F('wpName','Name in work plan (if different, e.g. full canal)'),F('canal','Canal / channel','list','canals'),F('reaches','Reaches (e.g. 0+000-12+000, 23+000-34+000)'),F('xsInt','Cross-section every','sel',['1000 ft','500 ft']),F('amount','Amount submitted (Rs)','num'),F('authority','Sanctioning authority','sel',['Auto','XEN','SE','Chief Engineer']),F('owner','Sub Engineer','person'),F('estNo','Estimate No'),F('estDate','Received from SEN on','date'),F('items','Items included','textarea'),F('due','Target date','date'),F('details','Details','textarea')]},
  theft:{n:'Water theft',pl:'Water theft',daily:1,f:[F('title','Location (canal / RD / outlet)'),F('canal','Canal / channel','list','canals'),F('reportedOn','Reported on','date'),F('owner','Reported by (SEN)','person'),F('zildar','Zilladar','person'),F('culprits','Culprits (Fard-e-Qasran)','textarea'),F('hearing','Hearing date','date'),F('decision','Decision','sel',['Pending','Fine','Robkar / FIR']),F('fineAmount','Fine (Rs)','num'),F('receiptNo','Receipt No'),F('robkarNo','Robkar No / date'),F('policeStation','Police station'),F('firNo','FIR No'),F('tawanStatus','Tawan case','sel',['Not started','Case submitted by Zilladar','Notice issued (SDR)','Decided']),F('tawanHearing','Tawan hearing date','date'),F('tawanAmount','Tawan (Rs)','num'),F('details','Details','textarea')]},
@@ -491,7 +503,7 @@ function datesOf(it){const r=[];const p=(d,l)=>{if(d)r.push({d,l})};
   case 'resource':case 'place':case 'template':break;
   case 'pmiu':if(!it.subOn)p(it.replyDue,'Reply due'+(it.replyTime?' '+it.replyTime:''));if(!it.seDec)p(it.meetingDate,'SE meeting');break;
   case 'event':p(it.due,'Event'+(it.time?' '+it.time:''));break;
-  default:p(it.due,it.type==='estimate'?'Target':'Deadline');if(it.type==='task'){const n=msNext(it);if(n&&n.due)p(n.due,'Step: '+n.n)}}
+  default:if(it.type==='task')p(tkOn(it),'Check');else p(it.due,it.type==='estimate'?'Target':'Deadline')}
  return r}
 const keyDate=it=>datesOf(it).map(x=>x.d).sort()[0]||null;
 const stageOf=it=>it.type==='estimate'?estStatus(it):STG[it.type]?(it.stages&&it.stages.length?it.stages[it.stages.length-1].name:'Not started'):'';
@@ -906,8 +918,12 @@ A.saveItem=(ty,id)=>{const it0=id?get(id):null;const vals={};T[ty].f.forEach(f=>
  snap();const it=it0||{id:uid(),type:ty,createdAt:Date.now(),stages:[],notes:[],links:[]};Object.assign(it,vals);it.sub=$('#f_sub').value;
  if(ty==='task'||ty==='wire'){const ids=idsOf(ty==='task'?it.assignees:it.recips);if(ids.length||it.asg)it.asg=ids.map(p=>prevA.find(a=>a.p===p)||{p,st:'Pending'});if(ty==='task')it.owner=ids[0]||''}
  if(ty==='task'&&$('#f_pers')){if($('#f_pers').checked){it.personal=true;const ph=phRead('pc');const ct=Object.assign({name:$('#f_pc').value.trim()},ph);if(ct.name||ct.phone)it.contact=ct;else delete it.contact;it.source='Other';it.asg=[];it.owner='';it.assignees=''}else{delete it.personal;delete it.contact}}
- if(ty==='task'&&$('#f_hk')){const hk=$('#f_hk').value;if(hk)it.hk=hk;else delete it.hk;const wt=$('#f_wt').value.trim();if(/up|dept/.test(hk)&&wt)it.wt=wt;else delete it.wt;const rp=$('#f_rep').value;if(rp)it.rep=rp;else delete it.rep;const am=Number(String($('#f_amt').value).replace(/[^0-9.]/g,''));if(am>0)it.amt=am;else delete it.amt;if($('#f_rb').checked)it.rb=1;else delete it.rb}
- if(ty==='task'&&!it.due&&!(it.followUp&&it.followUp>today()))it.followUp=addDays(today(),7);
+ if(ty==='task'&&$('#f_who')){const y={};whoSet(y,$('#f_who').value,'',$('#f_whoP')?$('#f_whoP').value:'',it.sub);it.nx=it.nx||{};it.nx.who=y.who||'';it.nx.whoT=y.whoT||'';it.nx.n=$('#f_nx').value.trim();it.nx.on=$('#f_on').value||it.due||addDays(today(),3);
+  if(!it.personal){if(y.who){it.owner=y.who;it.assignees=y.who;it.asg=[prevA.find(a=>a.p===y.who)||{p:y.who,st:'Pending'}]}else{it.owner='';it.assignees='';it.asg=[]}}
+  const pv=it.plan||[];const PL=$('#f_plan').value.split('\n').map(z=>z.trim()).filter(Boolean);if(PL.length)it.plan=PL.map(z=>pv.find(q=>q.n===z)||{n:z});else delete it.plan;
+  if($('#f_xen').checked){if(!/direction/i.test(it.source||''))it.source='XEN direction';it.rb=1}else{if(/direction/i.test(it.source||'')||!it.source)it.source=it.personal?'Other':'Self';delete it.rb}
+  it.priority=$('#f_pin').checked?'High':'Normal';const rp=$('#f_rep').value;if(rp)it.rep=rp;else delete it.rep;const am=Number(String($('#f_amt').value).replace(/[^0-9.]/g,''));if(am>0)it.amt=am;else delete it.amt;delete it.followUp}
+ 
  if(ty==='task'&&$('#f_ms')){const L=$('#f_ms').value.split('\n').map(x=>x.trim()).filter(Boolean);if(L.length)it.ms=(it.ms||[]).concat(L.map(n=>({id:uid(),n})))}
  if(ty==='complaint'&&!it.due&&it.received&&/^WRIMS/.test(it.source))it.due=addDays(it.received,3);
  if(ty==='complaint'){cpFormSave(it);if(!it0&&!it.due)it.due=addDays(it.received||today(),7);cpMigrate(it);if(it0){const r=(it.steps||[])[0];if(r&&r.st==='rcv'&&it.received)r.date=it.received}cpSync(it)}
@@ -1972,14 +1988,14 @@ function qlResolve(line){const x=qlCtx(),o=QL.ov[line]||{},lc=nk(line);const R={
  if('pid' in o)R.pid=o.pid;else{const fp=findPerson(ptxt,R.sec,R.ty!=='task');R.pid=fp?fp.id:(x.pid||'');if(!R.pid&&R.sec&&['task','theft','estimate'].includes(R.ty)){const h=secHead(R.sec.s,R.sec.g);if(h){R.pid=h.id;R.pAuto=1}}}
  if('due' in o)R.due=o.due;else{R.due=findDate(line);if(!R.due&&['task','prep','pers'].includes(R.ty)){R.due=addDays(today(),3);R.dueDef=1}if(!R.due&&R.ty==='event'){R.due=today();R.dueDef=1}}
  if(R.ty==='pers'){R.cid='';R.sec=null;R.pid=''}
- if(R.ty!=='note'&&R.ty!=='pers'){const m=findSame(line,R.ty);if(m){R.cand=m.id;R.upd='upd' in o?o.upd:m.id}}
+ if(R.ty!=='note'&&R.ty!=='pers'){const m=findSame(line,R.ty);if(m){R.cand=m.id;R.upd='upd' in o?o.upd:''}}
  const pp=R.pid&&person(R.pid);R.sub=R.sec?R.sec.s:R.cid&&canal(R.cid)?canalSubs(canal(R.cid))[0]:pp&&pp.sub!=='B'&&S.settings.subs[pp.sub]?pp.sub:x.s&&S.settings.subs[x.s]?x.s:defSub();
- return R}
+ qlStgParse(R,line);return R}
 const qchip=(i,k,l,on)=>`<button class="qchip ${on?'on':''}" onclick="A.qlEd(${i},'${k}')">${esc(l)}</button>`;
 function qlPreview(){const ls=qlLines();if(!ls.length)return '';const rs=ls.map(qlResolve);const n=rs.filter(r=>r.ty!=='note').length;
- return rs.map((R,i)=>{const lk=R.cid&&canal(R.cid)?canal(R.cid).name+(R.rd?' · RD '+R.rd:''):R.sec?R.sec.g:'';const dl=R.due?({court:'Hearing ',event:'',estimate:'Target '}[R.ty]??'Due ')+fmtD(R.due)+(R.dueDef?' (default)':''):'';
+ return rs.map((R,i)=>{const lk=R.cid&&canal(R.cid)?canal(R.cid).name+(R.rd?' · RD '+R.rd:''):R.sec?R.sec.g:'';const dl=R.due?({court:'Hearing ',event:'',estimate:'Target ',task:'Check ',pers:'Check '}[R.ty]??'Due ')+fmtD(R.due)+(R.dueDef?' (default)':''):'';
   if(R.upd&&get(R.upd)){const u=get(R.upd);return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${qchip(i,'upd','Update to: '+u.title.slice(0,40),1)}${u.type==='court'?qchip(i,'due',R.due?'Next hearing '+fmtD(R.due):'+ next hearing',!!R.due):''}${R.time&&u.type==='court'?`<span class="chip">${esc(R.time)}</span>`:''}</div><div class="meta" style="margin-top:6px">Adds this line as an update on the existing ${esc(T[u.type].n.toLowerCase())}. Tap to make a new record instead.</div></div>`}
-  return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${R.cand?qchip(i,'upd','New record',0):''}${qchip(i,'ty',QTN[R.ty],1)}${R.ty==='note'?'':(R.ty==='pers'?'':qchip(i,'link',lk||'+ canal / section',!!lk)+(['task','theft','court','estimate'].includes(R.ty)?qchip(i,'p',R.pid?pShort(R.pid)+(R.pAuto?' (SEN)':''):'+ person',!!R.pid):''))+(R.ty==='estimate'&&!R.due?'':qchip(i,'due',dl||'+ date',!!R.due&&!R.dueDef))}${[R.no&&'No '+R.no,R.amt&&'Rs '+num(R.amt),R.time].filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>${R.sec&&R.ty!=='note'&&R.ty!=='pers'?`<div class="meta" style="margin-top:6px">${esc(secTxt(R.sec))}${SUBK().length>1?' · '+esc(subName(R.sub)):''}</div>`:''}</div>`}).join('')+`<div class="qlfoot"><span>${n?n+' record'+(n>1?'s':'')+' · tap ➤ to save':''}</span><a href="#" onclick="A.qlNote();return false">Save as note, sort later</a></div>`}
+  return `<div class="card qlc"><div class="qlt">${esc(R.title)}</div><div class="qch">${R.cand&&get(R.cand)?qchip(i,'upd','Add to: '+get(R.cand).title.slice(0,26)+'?',0):''}${qchip(i,'ty',QTN[R.ty],1)}${R.ty==='note'?'':(R.ty==='pers'?'':qchip(i,'link',lk||'+ canal / section',!!lk)+(['task','theft','court','estimate'].includes(R.ty)?qchip(i,'p',R.pid?pShort(R.pid)+(R.pAuto?' (SEN)':''):'+ person',!!R.pid):''))+(R.ty==='estimate'&&!R.due?'':qchip(i,'due',dl||'+ date',!!R.due&&!R.dueDef))}${[R.no&&'No '+R.no,R.amt&&'Rs '+num(R.amt),R.time].filter(Boolean).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>${R.sec&&R.ty!=='note'&&R.ty!=='pers'?`<div class="meta" style="margin-top:6px">${esc(secTxt(R.sec))}${SUBK().length>1?' · '+esc(subName(R.sub)):''}</div>`:''}${qlStg(R)}</div>`}).join('')+`<div class="qlfoot"><span>${n?n+' record'+(n>1?'s':'')+' · tap ➤ to save':''}</span><a href="#" onclick="A.qlNote();return false">Save as note, sort later</a></div>`}
 let QLT=null;A.qlSet=(i,k,v)=>{const line=qlLines()[i];if(line==null)return;const o=QL.ov[line]=QL.ov[line]||{};if(k==='link'){o.cid=v.cid;o.sec=v.sec}else o[k]=v;closeSheet();render()};
 let PKL=null;
 function listSheet(title,items,cb){PKL={items,cb};sheet(`<div class="ct">${esc(title)}</div><input id="lsq" type="search" class="mt" placeholder="Search" oninput="$('#lsr').innerHTML=lsRows()"><div id="lsr" class="mt" style="max-height:62vh;overflow:auto">${lsRows()}</div>`)}
@@ -1999,13 +2015,13 @@ function qlMake(R){const c=R.cid&&canal(R.cid);const base={id:uid(),createdAt:Da
  if(c&&R.ty!=='pers'){base.canalId=c.id;base.canal=c.name}if(R.rd&&R.ty!=='pers')base.rd=R.rd;if(!c&&R.sec&&R.ty!=='pers')base.secG=R.sec.g;
  const xen=/\bxen\b/i.test(R.title);let it;
  switch(R.ty){
-  case 'pers':it=Object.assign(base,{type:'task',personal:true,source:'Other',priority:'Normal',due:R.due,details:''});break;
+  case 'pers':it=Object.assign(base,{type:'task',personal:true,source:'Other',priority:'Normal',due:R.due,details:''});tkInit(it,R);break;
   case 'event':it=Object.assign(base,{type:'event',due:R.due||today(),time:R.time||'',place:c?c.name:''});break;
   case 'prep':it=Object.assign(base,{type:'prep',kind:'Other',dirBy:xen?'XEN':'Self',priority:'Normal',due:R.due});it.stages.push({name:'To draft',date:today(),note:''});break;
   case 'theft':it=Object.assign(base,{type:'theft',reportedOn:today(),owner:R.pid||'',decision:'Pending'});it.stages.push({name:'Reported by SEN',date:today(),note:''});break;
   case 'court':it=Object.assign(base,{type:'court',court:'Civil Court',hearing:R.due||'',attendTime:R.time||'',owner:R.pid||'',refNo:R.no||''});break;
   case 'estimate':it=Object.assign(base,{type:'estimate',scheme:'M&R Work',closure:'Other than closure',wtype:'Other than desilting',amount:R.amt||'',estNo:R.no||'',estDate:today(),owner:R.pid||'',due:R.dueDef?'':R.due||''});it.ch={rcv:{date:today(),no:R.no||''}};it.stages.push({name:'Received from SEN',date:today(),note:R.no?'No '+R.no:''});break;
-  default:it=Object.assign(base,{type:'task',source:xen?'XEN direction':'Self',priority:'Normal',due:R.due,details:''});if(R.pid){it.assignees=R.pid;it.owner=R.pid;it.asg=[{p:R.pid,st:'Pending'}]}}
+  default:it=Object.assign(base,{type:'task',source:xen?'XEN direction':'Self',priority:'Normal',due:R.due,details:''});if(R.pid){it.assignees=R.pid;it.owner=R.pid;it.asg=[{p:R.pid,st:'Pending'}]}tkInit(it,R)}
  S.items.push(it);log('Added '+(it.personal?'personal item':T[it.type].n.toLowerCase())+': '+it.title,it);return it}
 A.qlSave=()=>{const e=$('#qlT');if(e)QL.text=e.value;const ls=qlLines();if(!ls.length)return toast('Type at least one line');const rs=ls.map(qlResolve);const mk=rs.filter(r=>r.ty!=='note'),nt=rs.filter(r=>r.ty==='note');
  snap();const up=mk.filter(r=>r.upd&&get(r.upd));up.forEach(qlUpdate);const made=mk.filter(r=>!(r.upd&&get(r.upd))).map(qlMake);if(nt.length)S.inbox.push({id:uid(),ts:Date.now(),text:nt.map(r=>r.title).join('\n'),sub:(QL.ctx&&QL.ctx.s)||defSub()});if(QL.inboxId)S.inbox=S.inbox.filter(x=>x.id!==QL.inboxId);
@@ -2037,11 +2053,11 @@ A.mvSave=()=>{mvKeep();const it=get(MV.id);if(MV.rd&&rdV(MV.rd)==null)return toa
  if(MV.pers){delete it.canalId;delete it.secG;delete it.rd}else{const c=MV.cid&&canal(MV.cid);
   if(c){it.canalId=c.id;if(hasF(it,'canal'))it.canal=c.name;delete it.secG;const x=linkSec(c,MV.rd);if(x&&it.sub!=='B')it.sub=x.s}else{delete it.canalId;if(hasF(it,'canal')&&canalByName(it.canal))it.canal='';if(MV.sec){const a=MV.sec.split('|');it.secG=a.slice(1).join('|');if(it.sub!=='B')it.sub=a[0]}else delete it.secG}
   if(MV.rd)it.rd=MV.rd;else if(it.type!=='letter')delete it.rd;
-  const pf=pField(it);if(pf==='assignees'){const prev=asgOf(it);if(MV.pid){it.assignees=MV.pid;it.owner=MV.pid;it.asg=[prev.find(a=>a.p===MV.pid)||{p:MV.pid,st:'Pending'}]}else{it.assignees='';it.owner='';it.asg=[]}}else if(pf==='owner')it.owner=MV.pid}
+  const pf=pField(it);if(pf==='assignees'){const prev=asgOf(it);if(MV.pid){it.assignees=MV.pid;it.owner=MV.pid;it.asg=[prev.find(a=>a.p===MV.pid)||{p:MV.pid,st:'Pending'}];if(it.nx){it.nx.who=MV.pid;it.nx.whoT=''}}else{it.assignees='';it.owner='';it.asg=[];if(it.nx)it.nx.who=''}}else if(pf==='owner')it.owner=MV.pid}
  const after=linkTxt(it);if(after!==before){(it.notes=it.notes||[]).push({ts:Date.now(),text:'Moved: '+before+' → '+after});log('Moved: '+it.title+' → '+after,it)}it.lnSkip=undefined;delete it.lnSkip;save();closeSheet();render();toast(after!==before?'Moved to '+after:'No change',1)};
 A.mvAll=pid=>{const l=pWork(pid);if(!l.length)return toast('No open work with this person');const p=person(pid);sheet(`<div class="ct">Move all open work</div><div class="meta">${l.length} open item${l.length>1?'s':''} with ${esc(p.name)}. Use this when someone is transferred or on leave.</div><label class="fld mt"><span>Give to</span><select id="mva"><option value="">Choose</option>${peopleItems({g:p.section}).slice(1).filter(x=>x.v!==pid).map(x=>`<option value="${x.v}">${esc(x.l)} · ${esc(x.sub)}</option>`).join('')}</select></label><button class="btn p wide" onclick="A.mvAllDo('${pid}')">Move ${l.length}</button>`)};
-A.mvAllDo=pid=>{const to=$('#mva').value;if(!to||to===pid)return toast('Choose another person');snap();const l=pWork(pid);const sw=s=>idsOf(s).map(x=>x===pid?to:x).filter((x,i,a)=>a.indexOf(x)===i).join(',');
- l.forEach(it=>{if(it.owner===pid)it.owner=to;if(it.zildar===pid)it.zildar=to;if(it.assignees)it.assignees=sw(it.assignees);if(it.recips)it.recips=sw(it.recips);if(it.asg)it.asg=it.asg.map(a=>a.p===pid?Object.assign({},a,{p:to}):a).filter((a,i,arr)=>arr.findIndex(b=>b.p===a.p)===i);(it.notes=it.notes||[]).push({ts:Date.now(),text:'Moved from '+pShort(pid)+' to '+pShort(to)})});
+A.mvAllDo=pid=>{const to=$('#mva').value;if(!to||to===pid)return toast('Choose another person');snap();const l=[...new Set(pWork(pid).concat(pNow(pid)))];const sw=s=>idsOf(s).map(x=>x===pid?to:x).filter((x,i,a)=>a.indexOf(x)===i).join(',');
+ l.forEach(it=>{if(it.nx&&it.nx.who===pid)it.nx.who=to;(it.plan||[]).forEach(y=>{if(y.who===pid)y.who=to});if(it.owner===pid)it.owner=to;if(it.zildar===pid)it.zildar=to;if(it.assignees)it.assignees=sw(it.assignees);if(it.recips)it.recips=sw(it.recips);if(it.asg)it.asg=it.asg.map(a=>a.p===pid?Object.assign({},a,{p:to}):a).filter((a,i,arr)=>arr.findIndex(b=>b.p===a.p)===i);(it.notes=it.notes||[]).push({ts:Date.now(),text:'Moved from '+pShort(pid)+' to '+pShort(to)})});
  log('Moved '+l.length+' open item(s) from '+pShort(pid)+' to '+pShort(to),{});save();closeSheet();render();toast('Moved '+l.length+' to '+pShort(to),1)};
 
 /* ---------- follow-ups: one list ---------- */
@@ -2748,7 +2764,7 @@ A.remEd=(id,i)=>{const it=get(id);const x=it.rems[i];sheet(`<div class="ct">Remi
 A.remSave=(id,i)=>{const it=get(id);const x=it.rems[i];snap();x.no=$('#reN').value.trim();x.date=$('#reD').value||x.date;x.due=$('#reU').value||x.due;save();closeSheet();render();toast('Saved',1)};
 A.remDel=(id,i)=>{if(!confirm('Delete this reminder wire record?'))return;const it=get(id);snap();it.rems.splice(i,1);save();closeSheet();render();toast('Deleted',1)};
 
-function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Item not found.</p>';const ty=T[it.type];const t=today();
+function vItem(id){const it=get(id);if(!it)return backHome+'<p class="empty">Item not found.</p>';if(it.type==='task')return vTask(id);const ty=T[it.type];const t=today();
  let h=`<div class="itop"><a class="back" href="javascript:goBack()">‹ Back</a><button class="more" onclick="A.itMenu('${id}')" aria-label="More actions">⋯</button></div><div class="tags"><span class="chip g">${ty.n}</span><span class="chip">${esc(subName(it.sub))}</span>${it.personal?'<span class="chip a">Personal</span>':''}${dueChip(it)}${it.resolved?`<span class="chip">Closed ${fmtD(it.resolvedOn)}</span>`:''}${it.followUp&&isOpen(it)&&it.followUp>t?`<span class="chip">Look again ${fmtD(it.followUp)}</span>`:''}${it.doneOn===t&&isOpen(it)?'<span class="chip g">Followed up today</span>':''}${it.type==='pmiu'&&it.subOn?`<span class="chip g">Submission made ${fmtD(it.subOn)}</span>`:''}</div><h1 class="pt">${esc(it.title)}</h1>`;
  const relIt=it.rel&&get(it.rel);const lib=LIB.includes(it.type);
  const ps=(asgOf(it).length?asgOf(it).map(a=>a.p):(it.owner?[it.owner]:[])).filter(person);
@@ -2949,7 +2965,7 @@ function ibarP(it){const id=it.id;
   if(role==='Accused'){if(!it.replyD)return {l:'Reply submitted',on:`A.inqDone('${id}','reply')`};return it.outcome&&it.outcome.date?null:{l:'Record decision',on:`A.inqDone('${id}','outcome')`}}
   return {l:'+ Hearing',on:`A.hrEdit('${id}','')`}}
  return null}
-function itemBar(it){const id=it.id;let b;
+function itemBar(it){if(it.type==='task')return tkBar(it);const id=it.id;let b;
  if(it.type==='template'){if(!it.body)return '';b=[`<button class="p" onclick="TPLCTX=null;A.tplUse('${id}')">Copy / share text</button>`]}
  else if(LIB.includes(it.type))return '';
  else if(it.type==='pmiu')b=[isOpen(it)?`<button onclick="A.pmPt('${id}',-1)">+ Add point</button>`:`<button onclick="A.reopen('${id}')">Reopen</button>`,`<button class="p" onclick="A.pmSubmit('${id}')">Make submission</button>`];
@@ -2978,12 +2994,6 @@ const HKO=[['','Auto'],['staff','My staff'],['me','Me'],['up','Higher office (XE
 const pByName=s=>{const k=String(s||'').trim().toLowerCase();return k?S.people.find(p=>p.name.toLowerCase()===k):null};
 const pHk=pid=>{const p=person(pid);return p&&/\b(xen|s\.?e|executive engineer|superintending|chief engineer)\b/i.test(p.designation||'')?'up':'staff'};
 const guessHk=t=>/\b(xen|s\.?e|circle|chief|secretar|director|commissioner|division office|head ?office)\b/i.test(t||'')?'up':'dept';
-function holder(it){const n=it.type==='task'?msNext(it):null;
- if(n&&(n.who||n.whoT||n.hk)){const hk=n.hk||(n.who?pHk(n.who):guessHk(n.whoT));return {hk,pids:n.who&&person(n.who)?[n.who]:[],name:n.who&&person(n.who)?pShort(n.who):(n.whoT||''),step:n}}
- if(it.personal)return {hk:'me',pids:[],name:''};
- const hk=it.hk||'';if(hk==='up'||hk==='dept')return {hk,pids:[],name:it.wt||''};if(hk==='me')return {hk,pids:[],name:''};
- const a=asgOf(it);const pend=a.length?(asgPend(it).length?asgPend(it):a):[];const pids=(pend.length?pend.map(x=>x.p):(it.owner?[it.owner]:[])).filter(person);
- return {hk:pids.length?'staff':'me',pids,name:pids.map(pShort).join(', ')}}
 function holderLine(it){if(it.type!=='task')return '';const h=holder(it);if(h.hk==='staff')return h.name;if(h.hk==='me')return it.personal?'':'With me';return 'With '+(h.name||(h.hk==='up'?'higher office':'other department'))}
 const pNow=pid=>S.items.filter(it=>isOpen(it)&&!LIB.includes(it.type)&&(it.type==='task'?holder(it).pids.includes(pid):(it.owner===pid||it.zildar===pid||asgOf(it).some(a=>a.p===pid))));
 const recv=it=>(it.fus||[]).reduce((s,x)=>s+(+x.rs||0),0);
@@ -3036,17 +3046,6 @@ A.msNextSave=(id,i)=>{const it=get(id);const x=it.ms[i];whoSet(x,$('#nqW').value
 
 /* ---------- the follow-up form ---------- */
 const REPL={w:'every week',m:'every month',q:'every 3 months',y:'every year'};
-function tkForm(src,it){const fv=k=>src[k]==null?'':src[k];const F_=k=>{const f=T.task.f.find(x=>x.k===k);return f&&fieldVisible('task',src,k)?fieldHTML(f,fv(k)):''};
- const main=['title','assignees','due'],more=['source','priority','details'];
- const extra=T.task.f.filter(f=>!main.includes(f.k)&&!more.includes(f.k)).map(f=>F_(f.k)).join('');
- const hk=src.hk||'';const rb=src.rb!=null?!!src.rb:(!it&&/direction/i.test(src.source||'XEN direction'));
- setTimeout(()=>{const so=$('#f_source'),cb=$('#f_rb');if(so&&cb)so.addEventListener('change',()=>{if(!cb.dataset.man)cb.checked=/direction/i.test(so.value)})},0);
- return main.map(F_).join('')+extra+`<details class="xmore" id="tkMore" ${it?'open':''}><summary>More: source, holder, repeat, amount${it?'':', steps'}</summary>${more.map(F_).join('')}
- <div class="grid2"><label class="fld"><span>Who holds it</span><select id="f_hk" onchange="$('#f_wtw').style.display=/up|dept/.test(this.value)?'':'none'">${HKO.map(([k,l])=>`<option value="${k}" ${hk===k?'selected':''}>${esc(l)}</option>`).join('')}</select></label><label class="fld" id="f_wtw" style="display:${/up|dept/.test(hk)?'':'none'}"><span>Which office</span><input id="f_wt" value="${esc(src.wt||'')}" placeholder="e.g. XEN office"></label></div>
- <div class="grid2"><label class="fld"><span>Repeats</span><select id="f_rep"><option value="">Never</option>${Object.entries(REPL).map(([k,l])=>`<option value="${k}" ${src.rep===k?'selected':''}>${l[0].toUpperCase()+l.slice(1)}</option>`).join('')}</select></label><label class="fld"><span>Amount, Rs (optional)</span><input id="f_amt" inputmode="numeric" value="${esc(src.amt||'')}" placeholder="e.g. 100000"></label></div>
- <label class="ck"><input type="checkbox" id="f_rb" ${rb?'checked':''} onchange="this.dataset.man=1"> Report compliance to XEN when closing</label>
- ${it?'':`<label class="fld mt"><span>Steps (optional, one per line)</span><textarea id="f_ms" rows="3" placeholder="Report called from SEN&#10;Site verification&#10;Reply to XEN"></textarea></label>`}${persBlock(src)}</details>`}
-
 /* ---------- list ---------- */
 let TSEL=null;
 const quiet=it=>diffDays(today(),lastAct(it));
@@ -3055,7 +3054,7 @@ function tNext(it){const t=today();const kd=keyDate(it);const f=it.followUp&&isO
  if(kd)return {d:kd,k:'due'};if(f)return {d:f,k:'look'};return null}
 const tLate=it=>{const N=tNext(it);return !!N&&N.k==='due'&&N.d<today()};
 const tSort=L=>L.slice().sort((a,b)=>(b.priority==='High')-(a.priority==='High')||((tNext(a)||{}).d||'9').localeCompare((tNext(b)||{}).d||'9'));
-function trow(it){const t=today();const N=tNext(it);let cls='',due='',dc='';
+function trow(it){if(it.type==='task')return tkRow(it);const t=today();const N=tNext(it);let cls='',due='',dc='';
  if(N){const n=diffDays(N.d,t);
   if(N.k==='look'){due=n<0?'Look again · '+(-n)+'d ago':n===0?'Look again today':'Look again '+fmtD(N.d);dc=n<=0||N.late?'a':''}
   else if(n<0){const q=quiet(it);if(q>=7){cls='over';due=(-n)+'d overdue'+(q<-n?' · no update '+q+'d':'');dc='r'}else{due=(-n)+'d overdue';dc='a'}}
@@ -3065,12 +3064,8 @@ function trow(it){const t=today();const N=tNext(it);let cls='',due='',dc='';
  const parts=[one&&!it.personal?'':(it.personal?'Personal':T[it.type].n),it.priority==='High'?'High':'',SUB==='A'?subName(it.sub):'',it.type==='task'?holderLine(it):(it.type==='wire'&&asgOf(it).length?asgLine(it):pShort(it.owner)),stageOf(it),msLine(it)||(it.type==='task'?'':fuLine(it)),it.amt?'Rs '+num(recv(it))+' of '+num(it.amt):''].filter(Boolean);
  const meta=parts.map((x,i)=>i===0&&!(one&&!it.personal)?`<span class="ty">${esc(x)}</span>`:x==='High'?'<span class="rd">High</span>':esc(x)).join(' · ');
  return `<div class="trow ${cls}${sel&&TSEL.has(it.id)?' sel':''}"><button class="tick${sel&&TSEL.has(it.id)?' on':''}" aria-label="${sel?'Select':'Followed up today'}" onclick="${sel?`A.tsT('${it.id}')`:`A.tick('${it.id}')`}"></button><div class="bd" onclick="${sel?`A.tsT('${it.id}')`:`go('#item/${it.id}')`}"><div class="tt">${esc(it.title)}</div>${meta?`<div class="mt2">${meta}</div>`:''}</div><div class="due ${dc}">${esc(due)}</div></div>`}
-function tGroups(l){const t=today(),w=addDays(t,7);const G=[['Overdue',[]],['Today',[]],['Next 7 days',[]],['Later',[]],['No date',[]]];
- l.forEach(it=>{const N=tNext(it);const k=N&&N.d;G[!k?4:k<t?0:k===t?1:k<=w?2:3][1].push(it)});const used=G.filter(g=>g[1].length);
- if(used.length<2)return `<div class="list">${tSort(l).map(trow).join('')}</div>`;
- return used.map(([n,L])=>`<div class="grp">${n} · ${L.length}</div><div class="list">${tSort(L).map(trow).join('')}</div>`).join('')}
 A.tsT=id=>{if(!TSEL)return;TSEL.has(id)?TSEL.delete(id):TSEL.add(id);render()};
-A.tsMove=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;listSheet('Move '+ids.length+' to',S.people.filter(pScope).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>({v:p.id,l:p.name,sub:[p.designation,p.section].filter(Boolean).join(' · ')})),pid=>{if(!pid)return;snap();ids.forEach(id=>{const it=get(id);if(!it)return;it.assignees=pid;it.asg=[{p:pid,st:'Pending'}];it.owner=pid;log('Moved to '+pShort(pid)+': '+it.title,it)});TSEL=null;save();render();toast('Moved '+ids.length+' to '+pShort(pid),1)})};
+A.tsMove=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;listSheet('Move '+ids.length+' to',S.people.filter(pScope).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>({v:p.id,l:p.name,sub:[p.designation,p.section].filter(Boolean).join(' · ')})),pid=>{if(!pid)return;snap();ids.forEach(id=>{const it=get(id);if(!it)return;it.assignees=pid;it.asg=[{p:pid,st:'Pending'}];it.owner=pid;if(it.nx){it.nx.who=pid;it.nx.whoT=''}log('Moved to '+pShort(pid)+': '+it.title,it)});TSEL=null;save();render();toast('Moved '+ids.length+' to '+pShort(pid),1)})};
 A.tsClose=()=>{const ids=[...(TSEL||[])];if(!ids.length)return;sheet(`<div class="ct">Close ${ids.length} follow-up${ids.length>1?'s':''}</div>${outcSeg()}<label class="fld mt"><span>Closing note (optional)</span><textarea id="clN" rows="2"></textarea></label><button class="btn p wide mt" onclick="A.tsCloseSave()">Close ${ids.length}</button>`)};
 A.tsCloseSave=()=>{const ids=[...(TSEL||[])];const o={outc:segVal('clO'),note:$('#clN').value.trim()};snap();let r=0;ids.forEach(id=>{const it=get(id);if(it&&isOpen(it)&&tkClose(it,Object.assign({mk:1},o)))r++});TSEL=null;buzz();save();closeSheet();render();toast('Closed '+ids.length+(r?' · '+r+' repeat'+(r>1?'s':'')+' created':''),1)};
 
@@ -3159,12 +3154,7 @@ A.tkRbSave=id=>{const it=get(id);snap();it.rbNo=$('#clRn').value.trim();it.rbD=$
 /* ---------- ⋯ menu: fewer, grouped entries ---------- */
 A.attachMenu=id=>sheet(`<div class="ct">Attach</div><div class="mt"><label class="mi"><span class="e">📎</span>File or photo<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="closeSheet();A.attachPick('${id}',this)"></label><div class="mi" onclick="closeSheet();A.lkSheet('${id}')"><span class="e">🔗</span>Google Drive link</div></div>`);
 A.letterMenu=id=>sheet(`<div class="ct">Letter</div><div class="mt"><div class="mi" onclick="closeSheet();A.relLetter('${id}')"><span class="e">✉</span>New letter</div><div class="mi" onclick="closeSheet();A.linkDown('${id}','letter')"><span class="e">⤷</span>Link an existing letter</div></div>`);
-function itMenuX(it,mi,add){const id=it.id;
- if(it.type==='task'&&isOpen(it)){add.push(mi('☰',msOf(it).length?'Add a step':'Break into steps',`A.msEd('${id}',-1)`));add.push(mi('🔔','Reminders: log or draft a letter',`A.chSheet('${id}')`))}
- if(it.type==='inquiry'){add.push(mi('⚖','Record hearing',`A.hrEdit('${id}','')`));if(inqAccused(it).length)add.push(mi('▤','Attendance sheet',`A.attSheet('${id}')`));const role=inqRole(it);
-  if(role==='Inquiry Officer')add.push(mi('✓',it.report&&it.report.date?'Edit report details':'Report submitted',`A.inqDone('${id}','report')`));
-  if(role==='Accused'){add.push(mi('✓',it.replyD?'Edit reply date':'Reply submitted',`A.inqDone('${id}','reply')`));add.push(mi('✎',it.outcome?'Edit decision':'Record decision',`A.inqDone('${id}','outcome')`))}}
- if(it.type==='complaint')add.push(mi('⛓',it.grp?'Change linked complaints':'Link complaints about the same issue',`A.cpLink('${id}')`))}
+
 
 /* ---------- share from WhatsApp or any app ---------- */
 setTimeout(()=>{try{const q=new URLSearchParams(location.search);const tx=[q.get('title'),q.get('text'),q.get('url')].filter(Boolean).join(' ').replace(/\s*\n+\s*/g,' · ').trim();if(!q.has('text')&&!q.has('title')&&!q.has('url'))return;history.replaceState(history.state,'',location.pathname+'#home');if(tx){A.ql(null,tx);toast('Shared text ready · check and save')}}catch(e){}},400);
@@ -3186,27 +3176,6 @@ const fCount=(st,k,v,fn)=>{const o=st[k];st[k]=v;const n=fn();st[k]=o;return n};
 
 /* follow-ups */
 const WHO={staff:'With my staff',me:'With me',up:'With higher office',dept:'With other department'};
-function tList(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
- if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(tLate)}
- if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
- if(TF.w&&TF.f!=='closed')l=l.filter(it=>holder(it).hk===TF.w);
- const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));return l}
-function tRows(){const l=tList();const q=TF.q.trim();
- if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
- return l.length?(q?`<div class="list">${tSort(l).map(trow).join('')}</div>`:tGroups(l)):`<p class="empty">${TF.f==='pers'?'No personal items.':TF.f==='over'?'Nothing overdue.':'Nothing here.'}</p>`}
-FREG.task={
- active:()=>[TF.f!=='open'?{over:'Overdue',pers:'Personal',closed:'Closed'}[TF.f]:'',TF.w?WHO[TF.w]:'',TF.sec?(TF.sec==='-'?'No section':secShort(TF.sec.split('|')[1])):''].filter(Boolean),
- groups:()=>{const c=(k,v)=>fCount(TF,k,v,()=>tList().length);const pers=S.items.filter(it=>it.type==='task'&&inScope(it)&&it.personal&&isOpen(it)).length;
-  const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
-  return [{l:'Show',k:'f',cur:TF.f,o:[['open','Open',c('f','open')],['over','Overdue',c('f','over'),1]].concat(pers||TF.f==='pers'?[['pers','Personal',pers]]:[]).concat([['closed','Closed','']])},
-   {l:'Who holds it now',k:'w',cur:TF.w||'',o:[['','Anyone',c('w','')]].concat(Object.keys(WHO).map(k=>[k,WHO[k],c('w',k)]))},
-   {l:'Section',k:'sec',cur:TF.sec||'',o:[['','All sections',c('sec','')]].concat(secs.map(([v,l])=>[v,l,c('sec',v)])).concat([['-','No section',c('sec','-')]])}]},
- set:(k,v)=>{TF[k]=v;TSEL=null},reset:()=>{TF.f='open';TF.w='';TF.sec=''},n:()=>tList().length};
-function vTasks(){const n=tList().length;
- return `<div class="row between"><h1 class="pt">Follow-ups</h1>${TSEL?`<a href="#" class="flink" onclick="TSEL=null;render();return false">Cancel</a>`:TF.f!=='closed'&&n?`<button class="more" aria-label="More" onclick="A.tkMenu()">⋯</button>`:''}</div>
- ${fbar('task','Search follow-ups',TF.q,"TF.q=this.value;$('#tres').innerHTML=tRows()")}<div id="tres">${tRows()}</div>
- ${TSEL?`<div class="selbar"><span>${TSEL.size} selected</span><button onclick="A.tsMove()" ${TSEL.size?'':'disabled'}>Move</button><button class="p" onclick="A.tsClose()" ${TSEL.size?'':'disabled'}>Close</button></div>`:''}`}
-A.tkMenu=()=>{const mi=(e,l,on)=>`<div class="mi" onclick="closeSheet();${on}"><span class="e">${e}</span>${esc(l)}</div>`;sheet(`<div class="ct">Follow-ups</div><div class="mt">${mi('☑','Select several to move or close',"TSEL=new Set();render()")}${mi('✎','New follow-up with full form',"A.qaPick('task')")}${mi('🗂','Closed follow-ups',"TF.f='closed';render()")}</div>`)};
 
 /* generic lists (wires, letters, complaints, courts …) */
 const DIRL={all:'All',Issued:'Issued',Received:'Received',await:'Action pending'};const TIMEL={any:'Any time','1m':'Last month','3m':'Last 3 months','6m':'Last 6 months','1y':'Last year'};
@@ -3248,11 +3217,11 @@ FREG.off={
 
 /* ---------- Quick log as a composer at the bottom, like a chat box ---------- */
 function qlGrow(e){e.style.height='auto';e.style.height=Math.min(e.scrollHeight,window.innerHeight*0.35)+'px'}
-function qlHint(dt){return `<div class="qlhint"><div>${dt?'Write the follow-up in one line. The app picks out the person, place and date.':'Write or speak one line per item. The app picks out the person, place and date.'}</div><div class="qlex">${dt?'Shehzad report on Sultana tail by Thursday':'Sultana tail dry, Shehzad report by Thu'}</div>${dt?'':'<div class="qlex">Berm cutting RD 22 not started</div>'}<div class="meta">Tap the mic on your keyboard to speak.</div></div>`}
+function qlHint(dt){return `<div class="qlhint"><div>${dt?'Write the follow-up in one line. The app picks out the person, place and date.':'Write or speak one line per item. The app picks out the person, place and date.'}</div><div class="qlex">${dt?'Shehzad report on Sultana tail by Thursday':'Sultana tail dry, Shehzad report by Thu'}</div><div class="qlex">Estimate Rodi Minor &gt; SEN prepares 22 Nov &gt; XEN check</div><div class="meta" style="margin-top:8px">Stages: put &gt; between them</div>${dt?'':'<div class="qlex">Berm cutting RD 22 not started</div>'}<div class="meta">Tap the mic on your keyboard to speak.</div></div>`}
 function vQlog(){const x=QL.ctx;const dt=QL.dty==='task';const ct=x?[x.cid&&canal(x.cid)?canal(x.cid).name:'',x.g||'',x.pid&&person(x.pid)?person(x.pid).name:''].filter(Boolean).join(' · '):'';
  setTimeout(()=>{const e=$('#qlT');if(!e)return;qlGrow(e);if(document.activeElement!==e){e.focus();try{e.selectionStart=e.selectionEnd=e.value.length}catch(z){}}},60);
  return `<a class="back" href="javascript:goBack()">‹ Back</a><h1 class="pt">${dt?'New follow-up':'Quick log'}</h1>${ct?`<div class="ctxb"><span>For <b>${esc(ct)}</b></span><button class="pill" onclick="QL.ctx=null;render()" aria-label="Remove">✕</button></div>`:''}<div id="qlP">${qlPreview()||qlHint(dt)}</div>
- <div class="qlbar" id="qlBar"><div class="qlfx"><span>Full form:</span>${[['task','Follow-up'],['complaint','Complaint'],['insp','Inspection'],['vehicle','Vehicle'],['','More…']].map(([k,l])=>`<a href="#" onclick="A.qlForm('${k}');return false">${l}</a>`).join('')}</div>
+ <div class="qlbar" id="qlBar"><div class="qlfx"><span>Full form:</span>${[['task','Follow-up'],['complaint','Complaint'],['insp','Inspection'],['vehicle','Vehicle'],['','More…']].map(([k,l])=>`<a href="#" onclick="A.qlForm('${k}');return false">${l}</a>`).join('')}${(S.settings.plans||[]).length?'<a href="#" onclick="A.qlStages();return false">Saved stages…</a>':''}</div>
  <div class="qlin"><textarea id="qlT" rows="1" enterkeyhint="enter" placeholder="${dt?'What, who, by when…':'Type or speak · one line per item'}" oninput="QL.text=this.value;qlGrow(this);qlRefresh()">${esc(QL.text)}</textarea><button class="qlgo" onclick="A.qlSave()" aria-label="Save">${ICSEND}</button></div></div>`}
 function qlRefresh(){clearTimeout(QLT);QLT=setTimeout(()=>{const e=$('#qlP');if(e){e.innerHTML=qlPreview()||qlHint(QL.dty==='task');window.scrollTo(0,document.body.scrollHeight)}},250)}
 /* keep bottom bars above the on-screen keyboard */
@@ -3274,6 +3243,161 @@ A.pushSetup=async()=>{try{if(!('serviceWorker' in navigator)||!('PushManager' in
  <div class="pstep"><b>3</b><span>Send a test: tap Run workflow</span><a class="btn s" target="_blank" rel="noopener" href="${PUSH_REPO}/actions/workflows/remind.yml">Open</a></div>
  <p class="meta">If you reinstall the app or clear its data, repeat this setup.</p>`)}catch(e){toast('Could not set up push: '+(e&&e.message||e))}};
 function pushCard(){return `<div class="card"><div class="ct">Daily reminder even when the app is closed</div><p class="meta">Morning: what is due today. Evening: what you logged today, what is overdue, and a nudge if you logged nothing.${S.settings.pushSet?' Set up on '+fmtD(S.settings.pushSet)+'.':''}</p><button class="btn p wide" onclick="A.pushSetup()">${S.settings.pushSet?'Set up again':'Set up daily reminder'}</button></div>`}
+
+/* ================= v67: follow-up = what next, who has it, when to check ================= */
+/* it.nx={n:what next, who:person id, whoT:office or name, on:check date}; it.plan=[{n,who}] later stages; history in it.fus */
+const tkOn=it=>(it.nx&&it.nx.on)||it.due||'';
+const tkDueNow=it=>{const o=tkOn(it);return !!o&&o<=today()};
+const wkd=d=>{try{return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{weekday:'short'})}catch(e){return fmtD(d)}};
+const agoD=d=>{const n=diffDays(today(),d);return n<=0?'today':n===1?'yesterday':n+'d ago'};
+function lastUpd(it){let b=null;(it.fus||[]).forEach(x=>{if(x.text&&!x.how&&!/^Check moved/.test(x.text)&&(!b||x.d>=b.d))b={d:x.d,t:x.text}});(it.notes||[]).forEach(n=>{const d=ymd(new Date(n.ts));if(!/^Moved/.test(n.text)&&(!b||d>b.d))b={d,t:n.text}});return b}
+/* who has it now */
+function holder(it){if(it.personal)return {hk:'me',pids:[],name:''};const x=it.nx||{};
+ if(x.who&&person(x.who))return {hk:pHk(x.who),pids:[x.who],name:pShort(x.who)};
+ if(x.whoT)return /^(me|self|sdo|myself)$/i.test(x.whoT.trim())?{hk:'me',pids:[],name:''}:{hk:guessHk(x.whoT),pids:[],name:x.whoT};
+ if(it.hk==='up'||it.hk==='dept')return {hk:it.hk,pids:[],name:it.wt||''};
+ const a=asgOf(it);const pend=a.length?(asgPend(it).length?asgPend(it):a):[];const pids=(pend.length?pend.map(y=>y.p):(it.owner?[it.owner]:[])).filter(person);
+ return {hk:pids.length?'staff':'me',pids,name:pids.map(pShort).join(', ')}}
+/* move old follow-ups (steps, look-again dates, holders) into the new shape once; nothing is deleted */
+function tkMigrate(){let ch=0;S.items.forEach(it=>{if(it.type!=='task'||it.nx)return;ch=1;const pend=(it.ms||[]).filter(x=>!x.dn);const f=pend[0];
+ it.nx={n:f?f.n:'',who:f&&f.who?f.who:'',whoT:f&&f.whoT?f.whoT:'',on:f&&f.due?f.due:''};
+ if(pend.length>1)it.plan=pend.slice(1).map(x=>({n:x.n,who:x.who||'',whoT:x.whoT||''}));
+ (it.ms||[]).filter(x=>x.dn).forEach(x=>{if(!(it.fus||[]).some(y=>y.text&&y.text.includes(x.n)))(it.fus=it.fus||[]).push({d:x.dn,text:'✓ '+x.n+(x.note?' · '+x.note:'')})});
+ if(it.ms){it.msOld=it.ms;delete it.ms}
+ if(!it.nx.who&&!it.nx.whoT){const a=asgOf(it);const p=(a.find(y=>y.st!=='Submitted')||a[0]||{}).p||it.owner||'';if(p)it.nx.who=p;else if(it.hk==='up'||it.hk==='dept')it.nx.whoT=it.wt||(it.hk==='up'?'Higher office':'Other department')}
+ if(!it.nx.on)it.nx.on=it.followUp&&(!it.due||it.followUp>it.due)?it.followUp:(it.due||it.followUp||'');
+ delete it.followUp});if(ch)save();return ch}
+setTimeout(()=>{try{if(tkMigrate())render()}catch(e){console.error(e)}},0);
+
+/* ---------- list ---------- */
+const tkSort=L=>L.slice().sort((a,b)=>(b.priority==='High')-(a.priority==='High')||(tkOn(a)||'9').localeCompare(tkOn(b)||'9'));
+function tkRow(it){const t=today();const on=tkOn(it);const n=on?diffDays(on,t):null;const op=isOpen(it);
+ const due=!op?'Closed':n==null?'':n<0?(-n)+'d late':n===0?'Today':n===1?'Tomorrow':n<7?wkd(on):fmtD(on);
+ const x=it.nx||{};const lu=op?lastUpd(it):null;const sel=TSEL&&/^#list\/task/.test(location.hash);const one=/^#list\//.test(location.hash);
+ const meta=[one?'':'<span class="ty">'+(it.personal?'Personal':'Follow-up')+'</span>',one&&it.personal?'Personal':'',SUB==='A'?esc(subName(it.sub)):'',esc(holderLine(it)),x.n?esc(x.n):'',it.amt?'Rs '+num(recv(it))+' of '+num(it.amt):''].filter(Boolean).join(' · ');
+ return `<div class="trow tk${sel&&TSEL.has(it.id)?' sel':''}"><button class="tick${sel&&TSEL.has(it.id)?' on':''}" aria-label="${sel?'Select':'Done'}" onclick="${sel?`A.tsT('${it.id}')`:`A.tkDone('${it.id}')`}"></button><div class="bd" onclick="${sel?`A.tsT('${it.id}')`:`go('#item/${it.id}')`}"><div class="tt">${it.priority==='High'?'<span class="pin">📌</span>':''}${esc(it.title)}</div>${meta?`<div class="mt2">${meta}</div>`:''}${lu?`<div class="lu">“${esc(lu.t)}” <i>· ${agoD(lu.d)}</i></div>`:''}</div><div class="due ${op&&n!=null&&n<0?'r':n===0?'a':''}">${esc(due)}</div></div>`}
+function tGroups(l){const t=today(),w=addDays(t,7);const G=[['To check',[]],['Waiting on other offices',[]],['This week',[]],['Later',[]],['No date',[]]];
+ l.forEach(it=>{const on=tkOn(it);const hk=holder(it).hk;G[hk==='up'||hk==='dept'?1:!on?4:on<=t?0:on<=w?2:3][1].push(it)});const used=G.filter(g=>g[1].length);
+ if(used.length<2)return `<div class="list">${tkSort(l).map(trow).join('')}</div>`;
+ return used.map(([n,L])=>`<div class="grp">${n} · ${L.length}</div><div class="list">${tkSort(L).map(trow).join('')}</div>`).join('')}
+function tList(){const base=S.items.filter(it=>it.type==='task'&&inScope(it));let l;
+ if(TF.f==='closed')l=base.filter(it=>!isOpen(it));else if(TF.f==='pers')l=base.filter(it=>it.personal&&isOpen(it));else{l=base.filter(it=>isOpen(it)&&!it.personal);if(TF.f==='over')l=l.filter(tkDueNow)}
+ if(TF.sec&&TF.f!=='pers')l=l.filter(it=>{const x=iSec(it);return TF.sec==='-'?!x:x&&(x.s+'|'+x.g)===TF.sec});
+ if(TF.w&&TF.f!=='closed')l=l.filter(it=>holder(it).hk===TF.w);
+ const q=TF.q.toLowerCase().split(/\s+/).filter(Boolean);if(q.length)l=l.filter(it=>q.every(w=>itemText(it).includes(w)));return l}
+function tRows(){const l=tList();
+ if(TF.f==='closed')return l.sort((a,b)=>(b.resolvedOn||'').localeCompare(a.resolvedOn||'')).slice(0,60).map(it=>card(it,false)).join('')||'<p class="empty">Nothing closed yet.</p>';
+ return l.length?(TF.q.trim()?`<div class="list">${tkSort(l).map(trow).join('')}</div>`:tGroups(l)):`<p class="empty">${TF.f==='over'?'Nothing to check today.':TF.f==='pers'?'No personal items.':'Nothing here. Tap + to add a follow-up.'}</p>`}
+FREG.task={
+ active:()=>[TF.f!=='open'?{over:'To check',pers:'Personal',closed:'Closed'}[TF.f]:'',TF.w?WHO[TF.w]:'',TF.sec?(TF.sec==='-'?'No section':secShort(TF.sec.split('|')[1])):''].filter(Boolean),
+ groups:()=>{const c=(k,v)=>fCount(TF,k,v,()=>tList().length);const pers=S.items.filter(it=>it.type==='task'&&inScope(it)&&it.personal&&isOpen(it)).length;
+  const secs=scopeSubs().flatMap(s=>secNames(s).filter(g=>!isZil(g)).map(g=>[s+'|'+g,(SUBK().length>1&&SUB==='A'?subName(s)+' · ':'')+secShort(g)]));
+  return [{l:'Show',k:'f',cur:TF.f,o:[['open','Open',c('f','open')],['over','To check now',c('f','over'),1]].concat(pers||TF.f==='pers'?[['pers','Personal',pers]]:[]).concat([['closed','Closed','']])},
+   {l:'With',k:'w',cur:TF.w||'',o:[['','Anyone',c('w','')]].concat(Object.keys(HKL).map(k=>[k,HKL[k],c('w',k)]))},
+   {l:'Section',k:'sec',cur:TF.sec||'',o:[['','All sections',c('sec','')]].concat(secs.map(([v,l])=>[v,l,c('sec',v)])).concat([['-','No section',c('sec','-')]])}]},
+ set:(k,v)=>{TF[k]=v;TSEL=null},reset:()=>{TF.f='open';TF.w='';TF.sec=''},n:()=>tList().length};
+function vTasks(){const op=S.items.filter(it=>it.type==='task'&&inScope(it)&&isOpen(it)&&!it.personal);const chk=op.filter(tkDueNow).length;const wt=op.filter(it=>/up|dept/.test(holder(it).hk)).length;const act=FREG.task.active();
+ return `<div class="lhd"><h1 class="pt">Follow-ups</h1>${TSEL?`<a href="#" class="flink" onclick="TSEL=null;render();return false">Cancel</a>`:`<button class="ib2" aria-label="Search" onclick="TF.so=!TF.so;render();setTimeout(()=>{const e=$('#tq');if(e)e.focus()},60)">${ICS}</button><button class="ib2${act.length?' on':''}" aria-label="Filter" onclick="A.fOpen('task')">${ICF}${act.length?`<i>${act.length}</i>`:''}</button><button class="ib2" aria-label="More" onclick="A.tkMenu()">⋯</button>`}</div>
+ <div class="lsum">${op.length} open${chk?` · <b>${chk} to check</b>`:''}${wt?` · ${wt} waiting on offices`:''}</div>
+ ${TF.so||TF.q?`<div class="fbar"><label class="fsrch">${ICS}<input id="tq" type="search" placeholder="Search follow-ups" value="${esc(TF.q)}" oninput="TF.q=this.value;$('#tres').innerHTML=tRows()"></label></div>`:''}
+ ${act.length?`<div class="fsum"><span>${act.map(esc).join(' · ')}</span><a href="#" onclick="A.fReset('task');return false">Clear</a></div>`:''}<div id="tres">${tRows()}</div>
+ ${TSEL?`<div class="selbar"><span>${TSEL.size} selected</span><button onclick="A.tsMove()" ${TSEL.size?'':'disabled'}>Move</button><button class="p" onclick="A.tsClose()" ${TSEL.size?'':'disabled'}>Close</button></div>`:''}`}
+A.tkMenu=()=>{const mi=(e,l,on)=>`<div class="mi" onclick="closeSheet();${on}"><span class="e">${e}</span>${esc(l)}</div>`;sheet(`<div class="ct">Follow-ups</div><div class="mt">${mi('✎','New follow-up with full form',"A.qaPick('task')")}${mi('☑','Select several to move or close',"TSEL=new Set();render()")}${mi('☰','Saved stage lists',"A.stgList()")}${mi('🗂','Closed follow-ups',"TF.f='closed';render()")}</div>`)};
+/* list circle = done: finishes the next stage, or closes when nothing is left */
+A.tkDone=id=>{const it=get(id);if(!it||!isOpen(it))return;if(it.nx&&it.nx.n&&(it.plan||[]).length)return A.nxDone(id,1);if(it.rb||it.rep)return A.tkCloseSheet(id);snap();if(it.nx&&it.nx.n)(it.fus=it.fus||[]).push({d:today(),text:'✓ '+it.nx.n});tkClose(it,{outc:'Done'});buzz();save();render();toast('Closed · '+it.title.slice(0,40),1)};
+A.tkQuickClose=id=>{const it=get(id);if(!it||!isOpen(it))return;if(it.rb||it.rep)return A.tkCloseSheet(id);snap();tkClose(it,{outc:'Done'});buzz();save();render();toast('Closed · '+it.title.slice(0,40),1)};
+{const o=A.resolve;A.resolve=id=>{const it=get(id);if(it&&it.type==='task'&&isOpen(it))return A.tkQuickClose(id);o(id)}}
+{const o=A.upd;A.upd=id=>{const it=get(id);if(it&&it.type==='task'&&isOpen(it)){if(!/^#item\//.test(location.hash))go('#item/'+id);setTimeout(()=>{const e=$('#uT');if(e)e.focus()},200);return}o(id)}}
+
+/* ---------- one follow-up ---------- */
+const TKD=new Set();A.tkDet=id=>{TKD.has(id)?TKD.delete(id):TKD.add(id);render()};
+function nxCard(it){const id=it.id,x=it.nx||{},t=today(),on=tkOn(it),n=on?diffDays(on,t):null;const h=holder(it);const p=h.pids[0]&&person(h.pids[0]);const R=chL(it).length;
+ const ph=p&&p.phone;const txt='Reminder: '+it.title+(x.n?'\nNext: '+x.n:'')+(on?' (by '+fmtD(on)+')':'')+'\nPlease update the status.';
+ const who=h.hk==='me'&&!h.name?`<div class="who"><div class="av">Me</div><div class="bd">With me</div></div>`:`<div class="who"${p?` onclick="go('#person/${p.id}')"`:''}><div class="av">${esc(inits(p?p.name:(h.name||'?')))}</div><div class="bd">${h.name?'With '+esc(p?p.name:h.name):'<span class="meta">Nobody set · tap Next to choose</span>'}<div class="m">${esc([p?p.designation:h.name?HKL[h.hk]:'',R?'reminded '+R+'×':''].filter(Boolean).join(' · '))}</div></div>${ph?`<a class="ic" href="tel:${esc(ph)}" onclick="event.stopPropagation();A.chAuto('${id}','Call')" aria-label="Call">${ICO.call}</a><a class="ic" target="_blank" rel="noopener" href="https://wa.me/${wa(ph)}?text=${encodeURIComponent(txt)}" onclick="event.stopPropagation();A.chAuto('${id}','WhatsApp')" aria-label="WhatsApp">${ICO.msg}</a>`:''}</div>`;
+ const pl=it.plan||[];
+ return `<div class="nxc"><div class="nl">Next</div><div class="nr"><button class="tick" aria-label="Done" onclick="A.nxDone('${id}')"></button><div class="bd" onclick="A.nxEd('${id}')"><div class="t">${x.n?esc(x.n):'<span class="meta">Nothing set · tap to add the next stage</span>'}</div><div class="m">${on?(n<0?`<span class="rd">Check was ${fmtD(on)} · ${-n}d late</span>`:n===0?'Check today':'Check '+(n<7?wkd(on)+' ':'')+fmtD(on)):'No check date'}</div></div><span class="chev">›</span></div>${who}${pl.length?`<div class="nthen" onclick="A.nxEd('${id}')">Then: ${pl.map(y=>esc(y.n)).join(' → ')}</div>`:''}</div>`}
+function tkDetails(it,kids){const id=it.id,rows=[];const c=iCanal(it),x=iSec(it),relIt=it.rel&&get(it.rel);
+ if(c)rows.push(iRow('Canal',esc(c.name)+(it.rd?' · RD '+esc(it.rd):''),'#canal/'+c.id));if(x)rows.push(iRow('Section',esc(x.g),'#sec/'+x.s+'/'+encodeURIComponent(x.g)));
+ if(!c&&!x&&!it.personal)rows.push(iRow('Link','<span class="meta">Not linked to a canal or section</span>','',`A.mv('${id}')`));
+ if(relIt)rows.push(iRow('Linked to',esc(T[relIt.type].n+' · '+relIt.title),'#item/'+relIt.id));
+ rows.push(iRow('Source',esc(it.source||'Self')));if(it.amt){const r=recv(it);rows.push(iRow('Amount',`Rs ${num(r)} of ${num(it.amt)} received`))}
+ if(it.rb)rows.push(iRow('Report to XEN',it.rbNo?esc('No '+it.rbNo+(it.rbD?' · '+fmtD(it.rbD):'')):isOpen(it)?'<span class="meta">Asked when you close it</span>':'<span class="rd">Not recorded</span>','',`A.tkRb('${id}')`));
+ if(it.rep)rows.push(iRow('Repeats',esc(REPL[it.rep])));const R=chL(it);if(R.length)rows.push(iRow('Reminded',`${R.length}× · last ${esc(R[R.length-1].how.toLowerCase())} ${fmtD(R[R.length-1].d)}`,'',`A.chSheet('${id}')`));
+ if(it.createdAt)rows.push(iRow('Added',fmtD(ymd(new Date(it.createdAt)))));
+ let h=`<div class="icard">${rows.join('')}</div>`;if(it.details)h+=`<div class="idet">${esc(it.details).replace(/\n/g,'<br>')}</div>`;
+ if(it.personal&&it.contact)h+=`<div class="card"><b>${esc(it.contact.name||'')}</b>${phShow(it.contact)}</div>`;
+ if(asgOf(it).length>1)h+=asgBlock(it);return h+filesBlock(it,kids)}
+function vTask(id){const it=get(id),t=today(),op=isOpen(it);
+ const st=[op?'':'Closed '+fmtD(it.resolvedOn)+(it.outc&&it.outc!=='Done'?' · '+esc(it.outc):''),it.due?'Due '+fmtD(it.due)+(op&&it.due<t?' · '+diffDays(t,it.due)+'d past due':''):'',/direction/i.test(it.source||'')?esc(it.source):'',it.personal?'Personal':'',SUBK().length>1?esc(subName(it.sub)):''].filter(Boolean).join(' · ');
+ let h=`<div class="itop"><a class="back" href="javascript:goBack()">‹ Back</a><button class="more" onclick="A.itMenu('${id}')" aria-label="More actions">⋯</button></div><h1 class="pt">${it.priority==='High'?'📌 ':''}${esc(it.title)}</h1>${st?`<div class="tst">${st}</div>`:''}`;
+ if(op)h+=nxCard(it);else if(it.closeNote)h+=`<div class="idet">${esc(it.closeNote)}</div>`;
+ h+=histBlock(it).replace(/<h2>History · \d+<\/h2>/,'<h2>Updates</h2>');
+ const kids=S.items.filter(y=>y.rel===id).sort((a,b)=>itemDate(b).localeCompare(itemDate(a)));const det=TKD.has(id);
+ h+=`<a href="#" class="dlink" onclick="A.tkDet('${id}');return false">${det?'Hide details ▴':'Details, files and letters'+(kids.length?' ('+kids.length+')':'')+' ›'}</a>`;if(det)h+=tkDetails(it,kids);
+ return h+tkBar(it)}
+function tkBar(it){const id=it.id,x=it.nx||{};if(!isOpen(it))return `<div class="ibar"><button onclick="A.done('${id}')">Add note</button><button class="p" onclick="A.reopen('${id}')">Reopen</button></div>`;
+ return `<div class="qlbar" id="qlBar"><div class="uch">${x.n?`<button onclick="A.nxDone('${id}')">✓ Done</button>`:''}<button onclick="A.nxEd('${id}')">Next…</button><button onclick="A.tkLater('${id}')">Later…</button><button onclick="A.tkQuickClose('${id}')">${x.n?'Close':'✓ Close'}</button></div><div class="qlin"><textarea id="uT" rows="1" placeholder="What happened?" oninput="qlGrow(this)"></textarea><button class="qlgo" onclick="A.uSend('${id}')" aria-label="Add update">${ICSEND}</button></div></div>`}
+/* write an update: a note is enough; a date in it moves the check date */
+A.uSend=id=>{const it=get(id);const e=$('#uT');const tx=e?e.value.trim():'';if(!tx){if(e)e.focus();return toast('Write what happened')}
+ snap();const t=today();const en={d:t,text:tx};const d=findDate(tx);let mv='';if(d&&d>t){it.nx=it.nx||{};it.nx.on=d;mv=' · check moved to '+fmtD(d)}
+ if(it.amt){const a=findAmt(tx);if(a&&+a>0)en.rs=+a}(it.fus=it.fus||[]).push(en);it.doneOn=t;log('Update: '+it.title+' · '+tx,it);save();render();toast('Update added'+mv,1)};
+A.nxDone=(id,fromList)=>{const it=get(id);if(!it||!isOpen(it))return;const x=it.nx||{};if(!x.n)return A.tkQuickClose(id);
+ snap();const t=today();(it.fus=it.fus||[]).push({d:t,text:'✓ '+x.n});it.doneOn=t;const pl=it.plan||[];const nx=pl.shift();if(!pl.length)delete it.plan;
+ if(nx){const ow=nx.who||nx.whoT?'':offWho(nx.n);it.nx={n:nx.n,who:nx.who||(nx.whoT||ow?'':x.who||''),whoT:nx.who?'':(nx.whoT||ow||(x.who?'':x.whoT||'')),on:nx.on||addDays(t,3)};log('Stage done: '+x.n+' · '+it.title,it);buzz();save();render();return toast('Done · next: '+nx.n,1)}
+ it.nx={n:'',who:x.who||'',whoT:x.whoT||'',on:x.on&&x.on>t?x.on:addDays(t,3)};log('Stage done: '+x.n+' · '+it.title,it);buzz();save();render();A.nxEd(id,1)};
+A.nxEd=(id,after)=>{const it=get(id);if(!it)return;const x=it.nx||{},t=today(),pl=it.plan||[];const wv=x.who&&person(x.who)?person(x.who).name:(x.whoT||'');
+ const names=[...new Set(S.items.flatMap(y=>[(y.nx||{}).n].concat((y.plan||[]).map(z=>z.n))).concat((S.settings.plans||[]).flatMap(p=>p.st)).filter(Boolean))].sort();
+ sheet(`<div class="ct">${after?'✓ Done · what is next?':'Next'}</div><div class="meta">${esc(it.title)}</div>
+ <label class="fld mt"><span>What should happen next</span><input id="nxN" list="nxNl" value="${esc(x.n||'')}" placeholder="e.g. SE sanction, reply from SEN"></label><datalist id="nxNl">${names.map(n=>`<option value="${esc(n)}">`).join('')}</datalist>
+ <label class="fld"><span>With</span><input id="nxW" list="nxWl" value="${esc(wv)}" placeholder="Name or office, e.g. XEN office" oninput="A.whoChk(this,'nxPw')"></label>${pplList('nxWl')}<label class="fld" id="nxPw" style="display:none"><span>Phone (optional, saves this name to People)</span><input id="nxP" inputmode="tel" placeholder="03xx-xxxxxxx"></label>
+ <div class="lb">Check on</div><div class="dq">${[[1,'Tomorrow'],[3,'3 days'],[7,'1 week']].map(([d,l])=>`<button class="pill" onclick="$('#nxD').value='${addDays(t,d)}'">${l}</button>`).join('')}<input type="date" id="nxD" value="${esc(x.on&&x.on>=t?x.on:addDays(t,3))}"></div>
+ <label class="fld mt"><span>Then (later stages, one per line, optional)</span><textarea id="nxL" rows="2" placeholder="XEN check&#10;SE sanction">${esc(pl.map(y=>y.n).join('\n'))}</textarea></label>${(S.settings.plans||[]).length?`<a href="#" class="flink" onclick="A.stgPick('${id}');return false">Use a saved stage list</a>`:''}
+ <button class="btn p wide mt" onclick="A.nxSave('${id}')">Save</button>${after?`<button class="btn wide mt" onclick="closeSheet();A.tkQuickClose('${id}')">Nothing more · close it</button>`:''}`);setTimeout(()=>{const e=$('#nxN');if(e&&!x.n)e.focus()},80)};
+A.nxSave=id=>{const it=get(id);const t=today();const n=$('#nxN').value.trim();const y={};whoSet(y,$('#nxW').value,'',$('#nxP')?$('#nxP').value:'',it.sub);const old=it.nx||{};
+ snap();it.nx={n,who:y.who||'',whoT:y.whoT||'',on:$('#nxD').value||addDays(t,3)};
+ const prev=it.plan||[];const L=$('#nxL').value.split('\n').map(s=>s.trim()).filter(Boolean);if(L.length)it.plan=L.map(s=>prev.find(z=>z.n===s)||{n:s});else delete it.plan;
+ if((old.who||old.whoT||'')!==(it.nx.who||it.nx.whoT||'')&&(it.nx.who||it.nx.whoT)){(it.fus=it.fus||[]).push({d:t,text:'Now with '+(it.nx.who?pShort(it.nx.who):it.nx.whoT)});if(it.nx.who&&!it.personal){it.owner=it.nx.who;it.assignees=it.nx.who;it.asg=[(it.asg||[]).find(a=>a.p===it.nx.who)||{p:it.nx.who,st:'Pending'}]}}
+ save();closeSheet();render();toast('Saved',1)};
+A.tkLater=id=>{const it=get(id),t=today(),x=it.nx||{};sheet(`<div class="ct">Check again on</div><div class="meta">${esc(it.title)}</div><div class="grid2 mt">${[[1,'Tomorrow'],[3,'In 3 days'],[7,'In a week'],[14,'In 2 weeks']].map(([d,l])=>`<button class="btn" onclick="A.tkLaterSave('${id}','${addDays(t,d)}')">${l}<br><span class="meta">${wkd(addDays(t,d))} ${fmtD(addDays(t,d))}</span></button>`).join('')}</div><label class="fld mt"><span>Or pick a date</span><input type="date" id="ltD" min="${addDays(t,1)}" value="${esc(x.on&&x.on>t?x.on:'')}"></label><button class="btn p wide" onclick="A.tkLaterSave('${id}',$('#ltD').value)">Save</button>`)};
+A.tkLaterSave=(id,d)=>{if(!d||d<=today())return toast('Pick a date after today');const it=get(id);snap();it.nx=it.nx||{};it.nx.on=d;(it.fus=it.fus||[]).push({d:today(),text:'Check moved to '+fmtD(d)});save();closeSheet();render();toast('Check '+wkd(d)+' '+fmtD(d),1)};
+
+/* ---------- saved stage lists ---------- */
+A.stgList=()=>{const P=S.settings.plans||[];sheet(`<div class="ct">Saved stage lists</div>${P.length?`<div class="list mt">${P.map((p,i)=>`<div class="arow"><span class="an"><b style="font-weight:600">${esc(p.n)}</b><div class="meta">${p.st.map(esc).join(' → ')}</div></span><button class="ib sm" onclick="A.stgDel(${i})" aria-label="Delete">✕</button></div>`).join('')}</div>`:'<p class="meta mt">None yet. Open a follow-up with stages and use ⋯ → Save these stages as a list.</p>'}`)};
+A.stgDel=i=>{if(!confirm('Delete this stage list?'))return;snap();S.settings.plans.splice(i,1);save();A.stgList()};
+A.stgSave=id=>{const it=get(id);const st=[(it.nx||{}).n].concat((it.plan||[]).map(y=>y.n)).filter(Boolean);if(st.length<2)return toast('Add at least two stages first (Next… → Then)');sheet(`<div class="ct">Save stage list</div><div class="meta">${st.map(esc).join(' → ')}</div><label class="fld mt"><span>Name</span><input id="plN" value="${esc(it.title.slice(0,40))}"></label><button class="btn p wide" onclick="A.stgSaveDo('${id}')">Save</button>`)};
+A.stgSaveDo=id=>{const it=get(id);const n=$('#plN').value.trim();if(!n)return toast('Give it a name');const st=[(it.nx||{}).n].concat((it.plan||[]).map(y=>y.n)).filter(Boolean);snap();(S.settings.plans=S.settings.plans||[]).push({n,st});save();closeSheet();toast('Saved · use it when adding with “Saved stages”',1)};
+A.stgPick=id=>{const P=S.settings.plans||[];listSheet('Use a saved stage list',P.map((p,i)=>({v:String(i),l:p.n,sub:p.st.join(' → ')})),v=>{const p=P[+v];if(!p)return;const it=get(id);snap();it.nx=it.nx||{};it.nx.n=p.st[0];it.nx.on=it.nx.on||addDays(today(),3);it.plan=p.st.slice(1).map(n=>({n}));if(!it.plan.length)delete it.plan;save();render();toast('Stages set: '+p.st.join(' → '),1)})};
+A.qlStages=()=>{const P=S.settings.plans||[];if(!P.length)return toast('No saved stage lists yet');listSheet('Add saved stages',P.map((p,i)=>({v:String(i),l:p.n,sub:p.st.join(' → ')})),v=>{const p=P[+v];const e=$('#qlT');if(!p||!e)return;const L=e.value.split('\n');const k=Math.max(0,L.length-1);L[k]=(L[k].replace(/\s*>.*$/,'')||p.n)+' > '+p.st.join(' > ');e.value=L.join('\n');QL.text=e.value;qlGrow(e);qlRefresh()})};
+/* copy a follow-up for another person */
+A.tkCopy=id=>listSheet('Copy for',S.people.filter(pScope).sort((a,b)=>a.name.localeCompare(b.name)).map(p=>({v:p.id,l:p.name,sub:[p.designation,p.section].filter(Boolean).join(' · ')})),pid=>{if(!pid)return;const it=get(id);snap();const c=JSON.parse(JSON.stringify(it));
+ ['notes','links','fus','stages'].forEach(k=>c[k]=[]);['resolved','resolvedOn','doneOn','outc','closeNote','rbNo','rbD','msOld'].forEach(k=>delete c[k]);c.id=uid();c.createdAt=Date.now();c.owner=pid;c.assignees=pid;c.asg=[{p:pid,st:'Pending'}];c.nx=Object.assign({},c.nx||{},{who:pid,whoT:''});S.items.push(c);log('Copied for '+pShort(pid)+': '+c.title,c);save();go('#item/'+c.id);toast('Copied for '+pShort(pid),1)});
+function itMenuX(it,mi,add){const id=it.id;
+ if(it.type==='task'&&isOpen(it)){add.push(mi('🔔','Reminders: log or draft a letter',`A.chSheet('${id}')`));if((it.plan||[]).length)add.push(mi('☰','Save these stages as a list',`A.stgSave('${id}')`));else add.push(mi('☰','Use a saved stage list',`A.stgPick('${id}')`));add.push(mi('⧉','Copy for another person',`A.tkCopy('${id}')`))}
+ if(it.type==='inquiry'){add.push(mi('⚖','Record hearing',`A.hrEdit('${id}','')`));if(inqAccused(it).length)add.push(mi('▤','Attendance sheet',`A.attSheet('${id}')`));const role=inqRole(it);
+  if(role==='Inquiry Officer')add.push(mi('✓',it.report&&it.report.date?'Edit report details':'Report submitted',`A.inqDone('${id}','report')`));
+  if(role==='Accused'){add.push(mi('✓',it.replyD?'Edit reply date':'Reply submitted',`A.inqDone('${id}','reply')`));add.push(mi('✎',it.outcome?'Edit decision':'Record decision',`A.inqDone('${id}','outcome')`))}}
+ if(it.type==='complaint')add.push(mi('⛓',it.grp?'Change linked complaints':'Link complaints about the same issue',`A.cpLink('${id}')`))}
+
+/* ---------- adding: stages with “>”, the full form ---------- */
+const offWho=n=>/\bxen\b/i.test(n)?'XEN office':/\b(s\.?e\.?|superintending)\b/i.test(n)?'SE office':/\bchief\b/i.test(n)?'Chief Engineer office':'';
+function qlStgParse(R,line){if(!line.includes('>')||R.ty==='note'||R.ty==='pers')return;const parts=line.split(/\s*>\s*/);if(parts.length<2)return;R.ty='task';R.title=parts[0].trim();
+ R.stg=parts.slice(1).map(s=>s.trim()).filter(Boolean).map(s=>{const fp=findPerson(s,R.sec,false);return {n:s,who:fp?fp.id:'',whoT:fp?'':offWho(s),on:findDate(s)||''}});
+ const fp=findPerson(parts[0],R.sec,false);if(fp)R.pid=fp.id;else if(!R.pid&&R.stg[0]&&R.stg[0].who)R.pid=R.stg[0].who;
+ const d=findDate(parts[0]);if(d){R.due=d;R.dueDef=0}else{R.due=addDays(today(),3);R.dueDef=1}}
+const qlStg=R=>R.stg&&R.stg.length?`<div class="sp">${R.stg.map((x,i)=>`<div><em>${i+1}</em><span>${esc(x.n)}</span><small>${esc([x.who?pShort(x.who):x.whoT||'',x.on?fmtD(x.on):''].filter(Boolean).join(' · '))}</small></div>`).join('')}</div>`:'';
+function tkInit(it,R){const t=today();const st=R.stg||[];const f=st[0];if(R.dueDef||!R.due)delete it.due;
+ it.nx={n:f?f.n:'',who:f&&f.who?f.who:(f&&f.whoT?'':(R.pid||'')),whoT:f&&!f.who?f.whoT||'':'',on:(f&&f.on)||(!R.dueDef&&R.due)||addDays(t,3)};if(st.length>1)it.plan=st.slice(1).map(x=>({n:x.n,who:x.who||'',whoT:x.whoT||''}));
+ if(/\b(xen|s\.?e\.?|direction)\b/i.test(R.title)){it.source='XEN direction';it.rb=1}else if(!it.personal)it.source='Self'}
+function tkForm(src,it){const fv=k=>src[k]==null?'':src[k];const F_=k=>{const f=T.task.f.find(x=>x.k===k);return f?fieldHTML(f,fv(k)):''};const t=today();
+ const x=src.nx||{};const wv=x.who&&person(x.who)?person(x.who).name:(x.whoT||(src.owner&&person(src.owner)?person(src.owner).name:''));const xen=it?(!!src.rb||/direction/i.test(src.source||'')):false;
+ return F_('title')+`<label class="fld"><span>With</span><input id="f_who" list="fwl" value="${esc(wv)}" placeholder="Name or office" oninput="A.whoChk(this,'f_whoPw')"></label>${pplList('fwl')}<label class="fld" id="f_whoPw" style="display:none"><span>Phone (optional, saves this name to People)</span><input id="f_whoP" inputmode="tel"></label>
+ <label class="fld"><span>Next stage (optional)</span><input id="f_nx" value="${esc(x.n||'')}" placeholder="e.g. Report from SEN"></label>
+ <div class="grid2"><label class="fld"><span>Check on</span><input type="date" id="f_on" value="${esc(x.on||(src.due&&src.due>=t?src.due:addDays(t,3)))}"></label>${F_('due')}</div>
+ <label class="ck"><input type="checkbox" id="f_xen" ${xen?'checked':''}> From XEN / SE (asks for the compliance letter when closing)</label>
+ <details class="xmore" id="tkMore" ${it&&(src.details||src.plan||src.amt||src.rep||src.personal)?'open':''}><summary>More: notes, later stages, pin, amount, repeat</summary>${F_('details')}
+ <label class="fld"><span>Later stages (one per line)</span><textarea id="f_plan" rows="2" placeholder="XEN check&#10;SE sanction">${esc((src.plan||[]).map(y=>y.n).join('\n'))}</textarea></label>
+ <label class="ck"><input type="checkbox" id="f_pin" ${src.priority==='High'?'checked':''}> Pin to top</label>
+ <div class="grid2"><label class="fld"><span>Repeats</span><select id="f_rep"><option value="">Never</option>${Object.entries(REPL).map(([k,l])=>`<option value="${k}" ${src.rep===k?'selected':''}>${l[0].toUpperCase()+l.slice(1)}</option>`).join('')}</select></label><label class="fld"><span>Amount, Rs (optional)</span><input id="f_amt" inputmode="numeric" value="${esc(src.amt||'')}" placeholder="e.g. 100000"></label></div>${persBlock(src)}</details>`}
 
 /* check before sharing, copying or marking uploaded */
 ['ntBoth','ntDocx','ntPdf'].forEach(k=>{const f=A[k];A[k]=()=>ntGuard(f)});{const f=A.ntCopy;A.ntCopy=k=>ntGuard(()=>f(k))}{const f=A.ntSt;A.ntSt=val=>val==='Submitted'?ntGuard(()=>f(val)):f(val)}
