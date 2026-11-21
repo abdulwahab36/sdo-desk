@@ -1,8 +1,11 @@
-const C='sdo-desk-v67';
+const C='sdo-desk-v68';
+const PDFB='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 const FILES=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./fflate.js','./drive.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(FILES)));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=='sdo-alarm').map(k=>caches.delete(k)))));self.clients.claim()});
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||!e.request.url.startsWith(self.location.origin))return;
+self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&!['sdo-alarm','sdo-share','sdo-lib'].includes(k)).map(k=>caches.delete(k)))));self.clients.claim()});
+self.addEventListener('fetch',e=>{if(e.request.method==='POST'&&/\/share-in\/?$/.test(new URL(e.request.url).pathname)){e.respondWith(shareIn(e.request));return}
+ if(e.request.method==='GET'&&e.request.url.startsWith(PDFB)){e.respondWith(caches.open('sdo-lib').then(c=>c.match(e.request.url).then(r=>r||fetch(e.request).then(n=>{if(n.ok)c.put(e.request.url,n.clone());return n}))));return}
+ if(e.request.method!=='GET'||!e.request.url.startsWith(self.location.origin))return;
  e.respondWith(fetch(e.request.url,{cache:'no-cache',credentials:'same-origin'}).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp));return r}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
 self.addEventListener('notificationclick',e=>{e.notification.close();const u=(e.notification.data&&e.notification.data.url)||'./';e.waitUntil(clients.matchAll({type:'window'}).then(ws=>{if(ws.length){const c=ws[0];return (c.navigate?c.navigate(u).catch(()=>c):Promise.resolve(c)).then(x=>(x||c).focus())}return clients.openWindow(u)}))});
 self.addEventListener('push',e=>{let d={};try{d=e.data?e.data.json():{}}catch(x){}e.waitUntil(pushNote(d))});
@@ -33,3 +36,8 @@ async function pushNote(d){let st=null;try{const c=await caches.open('sdo-alarm'
  if(st&&st.on!==false){lines=eve?eveLines(st,now):alarmLines(st,now);if(eve){const n=st.addedOn===t?(st.added||0):0;lines.unshift(n?'Logged today: '+n+' new or updated item'+(n>1?'s':'')+'.':'Nothing logged today. Add today\'s directions and follow-ups now.')}}
  if(!lines.length)lines=[eve?'Anything new today? Log it before you forget.':'Open SDO Desk to plan today.'];
  return self.registration.showNotification(eve?'SDO Desk · evening check':'SDO Desk · today',{body:lines.join('\n'),icon:'icon-192.png',badge:'icon-192.png',tag:eve?'sdo-eve':'sdo-daily',renotify:true,data:{url:eve?'./#qlog':'./#home'}})}
+/* files shared from WhatsApp or any app: hold them until the page picks them up */
+async function shareIn(req){try{const fd=await req.formData();const c=await caches.open('sdo-share');const ts=Date.now();const m={ts,title:fd.get('title')||'',text:fd.get('text')||'',url:fd.get('url')||'',files:[]};let n=0;
+ for(const f of fd.getAll('files')){if(!f||typeof f==='string'||!f.size)continue;const k='./__share/'+ts+'-'+(n++);await c.put(k,new Response(f,{headers:{'content-type':f.type||'application/octet-stream'}}));m.files.push({k,name:f.name||'file',type:f.type||'',size:f.size})}
+ await c.put('./__share/'+ts+'.json',new Response(JSON.stringify(m),{headers:{'content-type':'application/json'}}))}catch(e){}
+ return Response.redirect(new URL('./#share',self.registration.scope).href,303)}
