@@ -309,6 +309,31 @@ body:has(#qlBar) #toast{bottom:calc(140px + var(--kb,0px))}body:has(#sheet) #toa
 .uch{display:flex;gap:8px;overflow-x:auto;padding:0 2px 8px;scrollbar-width:none}.uch button{flex:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:7px 12px;font:inherit;font-size:13.5px;cursor:pointer;white-space:nowrap}.uch button:first-child{border-color:var(--acc);color:var(--acc)}.uch button:active{background:var(--accs)}
 .dq{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}.dq input{flex:1;min-width:140px;margin:0}
 .sp{margin-top:10px;font-size:13.5px}.sp>div{display:flex;gap:10px;padding:6px 0;border-top:1px solid var(--line)}.sp em{font-style:normal;color:var(--mute);width:16px}.sp small{color:var(--mute);margin-left:auto}
+#fv{position:fixed;inset:0;z-index:300;background:#111;display:flex;flex-direction:column;color:#fff}
+.fvtop{display:flex;align-items:center;gap:8px;padding:calc(6px + env(safe-area-inset-top)) 4px 6px 16px;background:#000}.fvtop span{flex:1;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fvtop button{width:48px;height:48px;border:0;background:none;color:#fff;font-size:20px;cursor:pointer}
+.fvb{flex:1;position:relative;overflow:hidden;touch-action:none}.fvb.pdf{overflow:auto;touch-action:pan-x pan-y}
+.fvimg{width:100%;height:100%;object-fit:contain;transform-origin:0 0;user-select:none;-webkit-user-drag:none;display:block}
+.fvpages{width:100%;padding:8px 0}.fvpg{background:#fff;width:calc(100% - 16px);margin:0 auto 8px}.fvpg img{width:100%;height:100%;display:block}
+.fvmsg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:6px;font-size:15px;color:#ddd}.fvmsg .meta{color:#aaa}
+.fvext{width:72px;height:88px;border-radius:10px;background:#2a2a2a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin-bottom:8px}
+.fvbar{display:flex;background:#000;padding-bottom:env(safe-area-inset-bottom)}.fvbar button{flex:1;min-height:62px;border:0;background:none;color:#fff;font:inherit;font-size:12.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer}.fvbar button b{font-size:18px;line-height:20px;font-weight:400}.fvbar button:active{background:#222}
+.th{display:inline-flex;align-items:center;justify-content:center;width:56px;height:72px;border-radius:8px;overflow:hidden;background:var(--accs);color:var(--acc);flex:none;font-size:11px;font-weight:700;letter-spacing:.03em}.th i{font-style:normal}.th img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.th.xs{width:36px;height:46px;border-radius:6px;font-size:9px}
+.th.lg{display:flex;width:100%;height:28vh;min-height:170px;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:24px}.th.lg.ok{background:#fff}.th.lg img{object-fit:cover;object-position:top}.shname{margin-top:14px}
+.shprev{position:relative;display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}.shzoom{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;padding:5px 10px;border-radius:12px}
+.shorig{margin:6px 2px 14px;word-break:break-word}
+.shstrip{display:flex;gap:8px;overflow-x:auto;margin-bottom:10px;padding:2px}.shstrip button{padding:0;border:2px solid transparent;border-radius:10px;background:none;cursor:pointer;line-height:0}.shstrip button.on{border-color:var(--acc)}
+.shq{margin-bottom:8px;min-height:46px}
+.shrow{display:flex;width:100%;align-items:center;gap:12px;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);font:inherit;text-align:left;cursor:pointer}.shrow:last-child{border-bottom:0}.shrow.on{background:var(--accs)}
+.shrb{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}.shrow.on .shrb{border-color:var(--acc);background:var(--acc);box-shadow:inset 0 0 0 3px var(--card)}
+.shrt{display:flex;flex-direction:column;gap:2px;min-width:0}.shrt b{font-weight:600;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shrt span{font-size:13px;color:var(--mute)}
+.shnone{padding:12px 14px;margin:0}
+.shnew{display:grid;grid-template-columns:1fr 1fr;gap:8px}.shnew .btn{padding:12px;margin:0}
+.shbar{display:flex;gap:8px}.shbar .btn{margin:0;min-height:48px}.shbar .btn.p{flex:1}.shbar .btn:disabled{opacity:.45}
+.shpend{display:flex;align-items:center;gap:10px;background:var(--accs);border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:0 0 12px;font-size:14px}.shpend>span:not(.th){flex:1}
+.shcard{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);border-color:var(--acc)}.shcard>span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:2px}.shgo{font-size:24px;color:var(--acc)}
+.shmi{flex:1}.shmini{display:flex;gap:4px}.shhint{margin:10px 4px 0}
+.shgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.shgrid button{display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:6px;color:var(--ink);font:inherit;cursor:pointer;text-align:left;min-width:0}.shgrid .th{width:100%;height:110px}.shgrid span{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.shgrid em{font-style:normal;font-size:11.5px;color:var(--mute)}
 .prv{padding:8px 0;border-bottom:1px solid var(--line)}.prv:last-of-type{border-bottom:0}
 .pkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:55vh;overflow:auto}.pkgi{border:2px solid var(--line);border-radius:10px;padding:4px;opacity:.55}.pkgi.on{border-color:var(--acc);opacity:1}.pkgi img{width:100%;height:150px;object-fit:contain;background:var(--bg);border-radius:6px;display:block;cursor:zoom-in}.pkgi .ck{font-size:12px;margin-top:4px}
 #phv{position:fixed;inset:0;background:#000;z-index:200;display:flex;align-items:center;justify-content:center}#phv img{max-width:100%;max-height:100%;object-fit:contain}#phv span{position:absolute;top:12px;right:16px;color:#fff;font-size:15px;background:rgba(0,0,0,.5);padding:6px 12px;border-radius:16px}
@@ -441,7 +466,7 @@ const fGet=id=>fTx('readonly',st=>st.get(id));
 const fAll=()=>fTx('readonly',st=>st.getAll());
 const fDel=id=>fTx('readwrite',st=>st.delete(id));
 const blobToB64=b=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=()=>rej(fr.error);fr.readAsDataURL(b)});
-async function fileGC(){try{const used=new Set();S.items.forEach(it=>(it.links||[]).forEach(l=>{if(l.fileId)used.add(l.fileId)}));(S.visits||[]).forEach(v=>((v.nt||{}).photos||[]).forEach(x=>used.add(x.fid)));(S.vehicle||[]).forEach(v=>{if(v.slip)used.add(v.slip)});S.items.forEach(it=>{const ad=st=>Object.values(st||{}).forEach(x=>(x.f||[]).forEach(f=>used.add(f)));ad(it.pmDocs);(it.pmOff||[]).forEach(p=>{ad(p.docs);(p.ev||[]).forEach(e=>used.add(e.f))})});(S.canals||[]).forEach(c=>{[c.hPhoto,c.tPhoto].forEach(x=>{if(x)used.add(x)});(c.outlets||[]).forEach(o=>{if(o.photo)used.add(o.photo)})});const all=await fAll();for(const r of all)if(!used.has(r.id))await fDel(r.id)}catch(e){}}
+async function fileGC(){try{const used=new Set();(S.shared||[]).forEach(x=>used.add(x.fid));S.items.forEach(it=>(it.links||[]).forEach(l=>{if(l.fileId)used.add(l.fileId)}));(S.visits||[]).forEach(v=>((v.nt||{}).photos||[]).forEach(x=>used.add(x.fid)));(S.vehicle||[]).forEach(v=>{if(v.slip)used.add(v.slip)});S.items.forEach(it=>{const ad=st=>Object.values(st||{}).forEach(x=>(x.f||[]).forEach(f=>used.add(f)));ad(it.pmDocs);(it.pmOff||[]).forEach(p=>{ad(p.docs);(p.ev||[]).forEach(e=>used.add(e.f))})});(S.canals||[]).forEach(c=>{[c.hPhoto,c.tPhoto].forEach(x=>{if(x)used.add(x)});(c.outlets||[]).forEach(o=>{if(o.photo)used.add(o.photo)})});const all=await fAll();for(const r of all)if(!used.has(r.id))await fDel(r.id)}catch(e){}}
 
 /* ---------- model ---------- */
 const DESIGS=['XEN','SE','Chief Engineer','SDO','Sub Engineer (SEN)','Sub Divisional Clerk (SDC)','Sub Divisional Reader (SDR)','SDR / Zilladar','Zilladar','Canal Patwari','Signaller','Mate','Mistry','Earthwork Mistry','Gauge Reader','Regular Beldar','Beldar','Artificer','Telephone Attendant','Naib Qasid','Dak Runner','Chowkidar','Chowkidar cum Cook','Cook','Sweeper','Drawing Branch','NESPAK','AAG / Law Officer','Police (SHO)','Other'];
@@ -581,7 +606,7 @@ const backHome='<a class="back" href="javascript:goBack()">‹ Back</a>';
 /* ---- navigation: Back never strands you; phone Back closes menus first ---- */
 function goBack(){if(history.state&&history.state.root)location.replace('#home');else history.back()}
 function ovPush(){if(!(history.state&&history.state.ov))history.pushState({ov:1,root:!!(history.state&&history.state.root)},'',location.href)}
-window.addEventListener('popstate',()=>{const o=$('#sheet')||$('#drawer');if(o){closeSheet();closeDrawer();return}
+window.addEventListener('popstate',()=>{if($('#fv')){A.fvClose(1);return}const o=$('#sheet')||$('#drawer');if(o){closeSheet();closeDrawer();return}
  const h=location.hash.slice(1)||'home';if(h===LASTH&&!(history.state&&history.state.root))history.back()});
 
 /* ================= drawer ================= */
@@ -857,7 +882,7 @@ const curView=()=>(location.hash.slice(1)||'home').split('/')[0];
 function render(){const h=location.hash.slice(1)||'home';const p=h.split('/');const v=p[0];if(v!=='edit')PREFILL=null;if(v!=='editvisit')VPRE=null;if(v!=='editcanal'){ECR=null;if(v!=='canals')ECP=null}if(v!=='editp')PPRE=null;if(v!=='editv')VEP=null;if(h!==LASTH)WKX=0;closeDrawer();
  if(SUB!=='A'&&!S.settings.subs[SUB])SUB='A';
  $('#seg').style.display=SUBK().length<2?'none':'';$('#seg').innerHTML=SUBK().length>2?`<select class="segsel" onchange="setSub(this.value)">${[['A','All']].concat(SUBK().map(k=>[k,subName(k)])).map(([k,l])=>`<option value="${k}" ${SUB===k?'selected':''}>${esc(l)}</option>`).join('')}</select>`:SUBK().concat('A').map(k=>[k,k==='A'?'All':subName(k)]).map(([k,l])=>`<button class="${SUB===k?'on':''}" onclick="setSub('${k}')">${esc(l)}</button>`).join('');
- const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),note:()=>vNote(p[1]),verify:()=>vVerify(p[1],p[2]),curtail:vCurtail,offences:vOffences,qlog:vQlog,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
+ const V={home:vHome,lagging:vLagging,today:vToday,search:vSearch,cal:vCal,inbox:vInbox,log:vLog,list:()=>vList(p[1]),item:()=>vItem(p[1]),edit:()=>vEdit(p[1],p[2]),people:vPeople,person:()=>vPerson(p[1]),editp:()=>vEditP(p[1]),vehicle:vVehicle,editv:()=>vEditV(p[1]),insp:vInsp,editvisit:()=>vEditVisit(p[1],p[2]),settings:vSettings,canals:vCanals,sec:()=>vSec(p[1],decodeURIComponent(p.slice(2).join('/'))),zil:()=>vZil(decodeURIComponent(p.slice(1).join('/'))),areas:vAreas,editcanal:()=>vEditCanal(p[1],p[2]),canal:()=>vCanal(p[1]),note:()=>vNote(p[1]),verify:()=>vVerify(p[1],p[2]),curtail:vCurtail,offences:vOffences,qlog:vQlog,share:vShare,missing:vMissing,linkfix:vLinkfix,off:()=>vOff(p[1],p[2])};
  $('#main').innerHTML=(V[v]||vHome)();
  const isHome=!V[v]||v==='home'||v==='today';if(!isHome&&!(v==='list'&&p[1]==='task')&&v!=='insp'&&!$('#main .back'))$('#main').insertAdjacentHTML('afterbegin',backHome);
  tabsSync(v,p,isHome);
@@ -967,11 +992,8 @@ A.rmLink=(id,i)=>{snap();get(id).links.splice(i,1);save();render();toast('Remove
 A.upload=async(id,inp)=>{const files=[...inp.files];inp.value='';const it=get(id);let n=0;
  for(const f of files){if(f.size>25e6){toast(f.name+' is over 25 MB. Keep it in Drive and paste the link.');continue}const fid=uid();
   const text=await extractText(f);try{await fPut({id:fid,name:f.name,type:f.type,size:f.size,blob:f,ts:Date.now(),text})}catch(e){toast('Could not store '+f.name);continue}if(text)TEXTS[fid]=text;
-  if(!n)snap();(it.links=it.links||[]).push({fileId:fid,label:f.name.replace(/\.[^.]+$/,''),name:f.name,size:f.size});n++}
+  if(!n)snap();(it.links=it.links||[]).push({fileId:fid,label:smartLabel(it,f.name),name:f.name,size:f.size});n++}
  if(n){log('Stage: '+it.title+': '+n+' file(s) attached',it);save();render();toast(n+' file(s) attached')}};
-A.openDoc=async(id,i)=>{const it=get(id);const l=it&&it.links&&it.links[i];if(!l)return;if(l.url){window.open(l.url,'_blank','noopener');return}
- let r;try{r=await fGet(l.fileId)}catch(e){}if(!r)return toast('File not on this device. Restore a backup that includes it.');
- const u=URL.createObjectURL(r.blob);const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';if(/Android/i.test(navigator.userAgent)||!/pdf|image/.test(r.type||''))a.download=r.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),120000)};
 A.rt=rid=>{snap();const t=today();const r=S.routines.find(x=>x.id===rid);const d=S.routineDone[t]=S.routineDone[t]||{};d[rid]=!d[rid];log('Routine '+(d[rid]?'done':'unchecked')+': '+r.title,{sub:r.sub});save();render()};
 A.calSel=ds=>{CAL.sel=ds;render()};
 A.calM=n=>{CAL.m+=n;if(CAL.m<0){CAL.m=11;CAL.y--}if(CAL.m>11){CAL.m=0;CAL.y++}render()};
@@ -2831,7 +2853,7 @@ function crMove(e){if(!CR||!CR.drag)return;const p=crPt(e),s=CR.src,r=CR.r,mn=40
  CR.r={x:x1,y:y1,w:x2-x1,h:y2-y1};crDraw()}
 A.ntPkCrop=async i=>{const x=NTPK[i];const b=await cropEdit(x.f);if(!b)return;URL.revokeObjectURL(x.url);x.f=new File([b],'photo.jpg',{type:'image/jpeg',lastModified:x.f.lastModified});x.url=URL.createObjectURL(x.f);ntPkSheet()};
 async function storeFile(f){const id=uid();if(isImg(f)){const b=await compressImg(f,2000,0.85);await fPut({id,name:String(f.name||'photo').replace(/\.[^.]+$/,'')+'.jpg',type:'image/jpeg',size:b.size,blob:b,ts:Date.now(),text:''})}else{if(f.size>25e6)throw new Error('big');await fPut({id,name:f.name||'file',type:f.type||'application/octet-stream',size:f.size,blob:f,ts:Date.now(),text:''})}return id}
-A.fView=async fid=>{let r;try{r=await fGet(fid)}catch(e){}if(!r)return toast('File not on this phone. Restore a backup.');const u=URL.createObjectURL(r.blob);if(/^image\//.test(r.type))A.ntView(u);else window.open(u,'_blank','noopener')};
+
 
 /* ---------- PMIU: points with three outcomes, documents, submission, SE decision ---------- */
 const PMD_DEF=[{id:'pw',n:'Copy of the relevant PMIU canal wire',w:1},{id:'ep',n:'Evaluation proforma duly signed by SDO',w:1},{id:'sw',n:'Copy of canal wire submitted by Sub Engineer'},{id:'cw',n:'Copy of canal wire confirmed by SDO'},{id:'rw',n:'Copy of repair canal wire'},{id:'sm',n:'Copy of SMS sent to PMIU'},{id:'rs',n:'Copy of repair SMS sent to PMIU'},{id:'rb',n:'Verified robkar from the concerned police station'},{id:'fi',n:'Copy of FIR (if registered)'},{id:'tw',n:'Complete tawan proceedings'}];
@@ -2984,7 +3006,7 @@ A.pMenu=id=>{const n=pWork(id).length;const mi=(e,l,on,cls)=>`<div class="mi${cl
 function phNorm(v){const s=String(v||'').trim();const d=s.replace(/[\s\-().]/g,'');let m=d.match(/^(?:\+92|0092|92)(3\d{9})$/)||d.match(/^0?(3\d{9})$/);if(m)return '0'+m[1].slice(0,3)+'-'+m[1].slice(3);return s}
 
 /* ---------- bottom tabs ---------- */
-function tabsSync(v,p,isHome){if(!(v==='list'&&p[1]==='task'))TSEL=null;const tb=$('#tabs');if(!tb)return;const hide=/^edit/.test(v)||['item','note','verify','qlog'].includes(v);tb.style.display=hide?'none':'';document.body.classList.toggle('hastabs',!hide);
+function tabsSync(v,p,isHome){if(!(v==='list'&&p[1]==='task'))TSEL=null;const tb=$('#tabs');if(!tb)return;const hide=/^edit/.test(v)||['item','note','verify','qlog','share'].includes(v);tb.style.display=hide?'none':'';document.body.classList.toggle('hastabs',!hide);
  const k=v==='list'&&p[1]==='task'?'task':v==='insp'?'insp':isHome?'home':'';tb.querySelectorAll('[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===k))}
 
 /* ================= v65: follow-ups A to Z ================= */
@@ -3152,7 +3174,6 @@ A.tkRb=id=>{const it=get(id);sheet(`<div class="ct">Compliance reported to XEN</
 A.tkRbSave=id=>{const it=get(id);snap();it.rbNo=$('#clRn').value.trim();it.rbD=$('#clRd').value;if(!it.rbNo)delete it.rbNo;save();closeSheet();render();toast('Saved',1)};
 
 /* ---------- ⋯ menu: fewer, grouped entries ---------- */
-A.attachMenu=id=>sheet(`<div class="ct">Attach</div><div class="mt"><label class="mi"><span class="e">📎</span>File or photo<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="closeSheet();A.attachPick('${id}',this)"></label><div class="mi" onclick="closeSheet();A.lkSheet('${id}')"><span class="e">🔗</span>Google Drive link</div></div>`);
 A.letterMenu=id=>sheet(`<div class="ct">Letter</div><div class="mt"><div class="mi" onclick="closeSheet();A.relLetter('${id}')"><span class="e">✉</span>New letter</div><div class="mi" onclick="closeSheet();A.linkDown('${id}','letter')"><span class="e">⤷</span>Link an existing letter</div></div>`);
 
 
@@ -3398,6 +3419,180 @@ function tkForm(src,it){const fv=k=>src[k]==null?'':src[k];const F_=k=>{const f=
  <label class="fld"><span>Later stages (one per line)</span><textarea id="f_plan" rows="2" placeholder="XEN check&#10;SE sanction">${esc((src.plan||[]).map(y=>y.n).join('\n'))}</textarea></label>
  <label class="ck"><input type="checkbox" id="f_pin" ${src.priority==='High'?'checked':''}> Pin to top</label>
  <div class="grid2"><label class="fld"><span>Repeats</span><select id="f_rep"><option value="">Never</option>${Object.entries(REPL).map(([k,l])=>`<option value="${k}" ${src.rep===k?'selected':''}>${l[0].toUpperCase()+l.slice(1)}</option>`).join('')}</select></label><label class="fld"><span>Amount, Rs (optional)</span><input id="f_amt" inputmode="numeric" value="${esc(src.amt||'')}" placeholder="e.g. 100000"></label></div>${persBlock(src)}</details>`}
+
+/* ================= v68: share from WhatsApp, in-app viewer ================= */
+/* ---------- PDF reader: downloads once from cdnjs, then kept on the phone ---------- */
+const PDFB='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+let PDFP=null;
+async function libURL(u){let r=null,c=null;try{c=await caches.open('sdo-lib');r=await c.match(u)}catch(e){}
+ if(!r){r=await fetch(u,{mode:'cors'});if(!r.ok)throw new Error('net');if(c)try{await c.put(u,r.clone())}catch(e){}}
+ return URL.createObjectURL(new Blob([await r.blob()],{type:'text/javascript'}))}
+function pdfLib(){if(window.pdfjsLib&&pdfjsLib.GlobalWorkerOptions.workerSrc)return Promise.resolve(pdfjsLib);if(PDFP)return PDFP;
+ PDFP=(async()=>{if(!window.pdfjsLib){const m=await libURL(PDFB+'pdf.min.js');await new Promise((ok,no)=>{const sc=document.createElement('script');sc.src=m;sc.onload=ok;sc.onerror=()=>no(new Error('load'));document.head.appendChild(sc)})}
+  pdfjsLib.GlobalWorkerOptions.workerSrc=await libURL(PDFB+'pdf.worker.min.js');return pdfjsLib})();PDFP.catch(()=>{PDFP=null});return PDFP}
+const isPdf=r=>/pdf/i.test(r.type||'')||/\.pdf$/i.test(r.name||'');
+const isPic=r=>/^image\//.test(r.type||'');
+const extOf=n=>(((n||'').match(/\.([a-z0-9]{2,5})$/i)||[0,'file'])[1]).toUpperCase();
+async function pdfDoc(blob){const L=await pdfLib();return L.getDocument({data:new Uint8Array(await blob.arrayBuffer()),isEvalSupported:false}).promise}
+async function pdfPage(doc,n,w){const pg=await doc.getPage(n);const v0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:w/v0.width});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:vp}).promise;return c}
+/* ---------- first-page thumbnails ---------- */
+const THC={};
+function thumbOf(fid,w){const k=fid+':'+w;if(THC[k])return THC[k];THC[k]=(async()=>{const r=await fGet(fid);if(!r)return '';
+ if(isPic(r))return URL.createObjectURL(r.blob);
+ if(isPdf(r)){if(r.th&&w<=200)return r.th;const d=await pdfDoc(r.blob);try{const c=await pdfPage(d,1,w);const u=c.toDataURL('image/jpeg',w<=200?.7:.85);c.width=0;if(w<=200){try{r.th=u;await fPut(r)}catch(e){}}return u}finally{d.destroy()}}
+ return ''})();THC[k].catch(()=>{delete THC[k]});return THC[k]}
+const thBox=(fid,name,w,cls)=>`<span class="th${cls?' '+cls:''}" data-th="${fid}" data-w="${w}"><i>${esc(extOf(name))}</i></span>`;
+function hydrateTh(){document.querySelectorAll('[data-th]').forEach(async el=>{if(el.dataset.done)return;el.dataset.done=1;try{const u=await thumbOf(el.dataset.th,+el.dataset.w||160);if(u){const im=new Image();im.alt='';im.src=u;el.innerHTML='';el.appendChild(im);el.classList.add('ok')}}catch(e){}})}
+
+/* ---------- names: CamScanner / IMG- / DOC- names get the record's name ---------- */
+const JUNK=/^(cam ?scanner|cs[ _-]|scanned|scan([ _-]|\d|$)|img[-_ ]?\d|image[-_ ]?\d|doc[-_ ]?\d|document[-_ ]?\d|whatsapp|wa\d|pxl_|screenshot|file[-_ ]?\d|new doc|untitled)/i;
+function isJunk(n){const b=(n||'').replace(/\.[^.]+$/,'').trim();return !b||JUNK.test(b)||/^[\W\d_]+$/.test(b)||/^[0-9a-f-]{16,}$/i.test(b)}
+const dMon=()=>new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+const cutW=(t,n)=>t.length<=n?t:t.slice(0,n).replace(/\s+\S*$/,'');
+function recLabel(it,name){if(!it)return /\.(jpe?g|png|webp|heic)$/i.test(name||'')?'Photo':/\.pdf$/i.test(name||'')?'Scan':'File';const ty=T[it.type]?T[it.type].n:'File';const no=it.refNo||it.letterNo||it.estNo||'';
+ if(it.type==='task')return cutW(it.title||'Follow-up',40);return no?ty+' '+no:cutW(ty+' · '+(it.title||''),44)}
+function smartLabel(it,name){if(!isJunk(name))return (name||'').replace(/\.[^.]+$/,'').trim();return recLabel(it,name)+' · '+dMon()}
+const fileNm=(label,orig)=>{const ext=((orig||'').match(/\.[a-z0-9]{2,5}$/i)||[''])[0];const b=(label||'').replace(/[\\/:*?"<>|]+/g,' ').trim();return b?(ext&&!b.toLowerCase().endsWith(ext.toLowerCase())?b+ext:b):(orig||'file')};
+const shortT=(it,n)=>{const t=it.title||((T[it.type]?T[it.type].n:'')+' '+(it.refNo||''));return t.length>(n||34)?t.slice(0,(n||34)-1)+'…':t};
+const agoTs=ts=>{const m=Math.round((Date.now()-ts)/6e4);return m<2?'just now':m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'};
+
+/* ---------- what you worked on lately (this phone only) ---------- */
+const RKEY='sdodesk.recent';
+function recGet(){try{return JSON.parse(localStorage.getItem(RKEY))||{o:[],a:[]}}catch(e){return {o:[],a:[]}}}
+function recPut(k,id){try{const r=recGet();r[k]=[[id,Date.now()]].concat((r[k]||[]).filter(x=>x[0]!==id)).slice(0,20);localStorage.setItem(RKEY,JSON.stringify(r))}catch(e){}}
+const _vItem68=vItem;vItem=function(id){if(get(id))recPut('o',id);return _vItem68(id)};
+const _up68=A.upload;A.upload=async(id,inp)=>{const n=(get(id)||{links:[]}).links.length;await _up68(id,inp);const it=get(id);if(it&&(it.links||[]).length>n)recPut('a',id)};
+
+/* ---------- shared files tray ---------- */
+let SHLOAD=location.hash==='#share',SHBUSY=false,SHCUR=null,SHSEL=null,SHQ='',SHNM=null,SHALL=true,SHPEND=null;
+const shList=()=>(S.shared||[]).slice().sort((a,b)=>b.ts-a.ts);
+const shCur=()=>(S.shared||[]).find(x=>x.id===SHCUR)||shList()[0]||null;
+const shBatch=e=>(S.shared||[]).filter(x=>x.id===e.id||(e.b&&x.b===e.b));
+async function shStore(f){if(isImg(f))return storeFile(f);if(f.size>25e6)throw new Error('big');const id=uid();const text=await extractText(f);await fPut({id,name:f.name||'file',type:f.type||'application/octet-stream',size:f.size,blob:f,ts:Date.now(),text:text||''});if(text)TEXTS[id]=text;return id}
+async function shIngest(){if(SHBUSY||!('caches' in window))return null;SHBUSY=true;let n=0,txt='';
+ try{const c=await caches.open('sdo-share');const ks=await c.keys();
+  for(const mk of ks.filter(r=>/\/__share\/\d+\.json$/.test(r.url))){let m=null;try{m=await (await c.match(mk)).json()}catch(e){}
+   if(m){let k=0;for(const f of m.files||[]){const r=await c.match(f.k);if(r){const b=await r.blob();const file=new File([b],f.name||'file',{type:f.type||b.type||'application/octet-stream'});
+     try{const fid=await shStore(file);const rec=await fGet(fid);S.shared=S.shared||[];S.shared.push({id:uid(),fid,name:file.name,type:rec?rec.type:file.type,size:rec?rec.size:file.size,ts:Date.now(),b:m.ts});n++;k++}catch(e){toast(e&&e.message==='big'?(f.name+' is over 25 MB. Keep it in Drive and paste the link.'):'Could not store '+(f.name||'a file'))}}
+     try{await c.delete(f.k)}catch(e){}}
+    const t=[m.title,m.text,m.url].filter(Boolean).join(' ').trim();if(t&&!k&&!(m.files||[]).length)txt=t;else if(t&&k)S.shared[S.shared.length-1].tx=t}
+   try{await c.delete(mk)}catch(e){}}
+  if(n)save()}catch(e){}
+ SHBUSY=false;return {n,txt}}
+async function shCheck(){const r=await shIngest();const was=SHLOAD;SHLOAD=false;if(!r)return was&&render();
+ if(r.n){SHCUR=null;SHSEL=null;SHNM=null;if(location.hash!=='#share')location.replace('#share');else render();return}
+ if(r.txt){A.ql(null,r.txt.replace(/\s*\n+\s*/g,' · '));toast('Shared text ready · check and save');return}
+ if(was)render()}
+setTimeout(shCheck,300);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')shCheck()});
+
+/* ---------- where it could go: what you are working on, not the file name ---------- */
+function shSugs(){const out=[],seen=new Set();const add=(it,why)=>{if(!it||seen.has(it.id))return;seen.add(it.id);out.push([it,why])};
+ const rc=recGet(),cut=Date.now()-2*864e5;
+ (rc.o||[]).filter(x=>x[1]>cut).slice(0,4).forEach(([id,ts])=>add(get(id),'Opened '+agoTs(ts)));
+ S.items.filter(it=>it.type==='task'&&inScope(it)&&isOpen(it)&&tkDueNow(it)).sort((a,b)=>(tkOn(a)||'').localeCompare(tkOn(b)||'')).slice(0,4).forEach(it=>add(it,'To check today'));
+ (rc.a||[]).slice(0,2).forEach(([id])=>add(get(id),'Last attached to'));
+ return out.slice(0,8)}
+function shFind(q){const ws=q.toLowerCase().split(/\s+/).filter(Boolean);return S.items.filter(it=>inScope(it)&&ws.every(w=>[it.title,it.refNo,it.letterNo,it.estNo,it.canal,it.party,it.rd,it.details,(T[it.type]||{}).n].join(' ').toLowerCase().includes(w))).sort((a,b)=>(isOpen(b)-isOpen(a))||((b.createdAt||0)-(a.createdAt||0))).slice(0,8).map(it=>[it,isOpen(it)?'Open':'Closed'])}
+function shRows(){const q=SHQ.trim();const rows=q?shFind(q):shSugs();
+ if(!rows.length)return `<p class="meta shnone">${q?'No record matches. Start a new one below.':'Nothing opened in the last 2 days. Search, or start a new record below.'}</p>`;
+ return rows.map(([it,why])=>`<button class="shrow${SHSEL===it.id?' on':''}" onclick="A.shSel('${it.id}')"><span class="shrb"></span><span class="shrt"><b>${esc(shortT(it,70))}</b><span>${esc(T[it.type]?T[it.type].n:'')}${it.refNo?' '+esc(it.refNo):''} · ${esc(why)}</span></span></button>`).join('')}
+function vShare(){const L=shList();
+ const top=`<div class="itop"><a class="back" href="javascript:A.shKeep()">‹ Back</a>${L.length?`<button class="more" onclick="A.shDel()" aria-label="Delete this shared file">🗑</button>`:''}</div>`;
+ if(SHLOAD&&!L.length)return top+'<p class="empty">Opening shared file…</p>';
+ if(!L.length)return top+`<h1>Shared files</h1><p class="empty">Nothing waiting.<br>In WhatsApp: long-press a file → Share → SDO Desk.</p>`;
+ const e=shCur();SHCUR=e.id;const B=shBatch(e);const it=SHSEL&&get(SHSEL);if(SHSEL&&!it)SHSEL=null;
+ const nm=SHNM!==null?SHNM:smartLabel(it,e.name);
+ let h=top+`<h1>${L.length>1?L.length+' shared files':'Attach shared file'}</h1>`;
+ if(L.length>1)h+=`<div class="shstrip">${L.map(x=>`<button class="${x.id===e.id?'on':''}" onclick="A.shPick1('${x.id}')" aria-label="${esc(x.name)}">${thBox(x.fid,x.name,160,'')}</button>`).join('')}</div>`;
+ h+=`<button class="shprev" onclick="A.viewFile('${e.fid}')" aria-label="View full screen">${thBox(e.fid,e.name,720,'lg')}<span class="shzoom">Tap to view</span></button>`;
+ h+=`<div class="meta shorig">${esc(e.name)} · ${fsize(e.size||0)} · ${agoTs(e.ts)}${e.tx?'<br>'+esc(e.tx.slice(0,120)):''}</div>`;
+ h+=`<h2>Attach to</h2><div class="fsrch shq">${ICS}<input id="shQ" type="search" placeholder="Search records, wire No, canal…" value="${esc(SHQ)}" oninput="SHQ=this.value;$('#shR').innerHTML=shRows()" autocomplete="off"></div><div id="shR" class="list">${shRows()}</div>`;
+ h+=`<label class="fld shname"><span>Save it as</span><input id="shN" value="${esc(nm)}" oninput="SHNM=this.value" autocomplete="off"></label>`;
+ if(B.length>1)h+=`<label class="ck"><input type="checkbox" ${SHALL?'checked':''} onchange="SHALL=this.checked"> Attach all ${B.length} files shared together</label>`;
+ h+=`<h2>Or start a new record</h2><div class="shnew">${[['wire','Canal wire'],['estimate','Estimate'],['task','Follow-up'],['letter','Letter']].map(([k,l])=>`<button class="btn" onclick="A.shNew('${k}')">+ ${l}</button>`).join('')}</div>`;
+ h+=`<div class="qlbar shbar" id="qlBar"><button class="btn" onclick="A.shKeep()">Keep for later</button><button class="btn p" ${it?'':'disabled'} onclick="A.shGo()">${it?'Attach':'Choose a record above'}</button></div>`;
+ setTimeout(hydrateTh,0);return h}
+A.shSel=id=>{SHSEL=SHSEL===id?null:id;const n=$('#shN');if(n&&SHNM===null){const e=shCur();n.value=smartLabel(SHSEL&&get(SHSEL),e.name)}$('#shR').innerHTML=shRows();const b=$('#qlBar .btn.p'),it=SHSEL&&get(SHSEL);if(b){b.disabled=!it;b.textContent=it?'Attach':'Choose a record above'}};
+A.shPick1=id=>{SHCUR=id;SHNM=null;render()};
+async function shAttachTo(it,e,label){let r=null;try{r=await fGet(e.fid)}catch(x){}if(!r){toast('That file is no longer on this phone');S.shared=(S.shared||[]).filter(x=>x.id!==e.id);return false}
+ const nm=fileNm(label,r.name);try{r.name=nm;await fPut(r)}catch(x){}
+ (it.links=it.links||[]).push({fileId:e.fid,label,name:nm,size:r.size});if(r.text)TEXTS[e.fid]=r.text;
+ S.shared=(S.shared||[]).filter(x=>x.id!==e.id);recPut('a',it.id);return true}
+async function shAttachIds(it,ids,label){snap();let n=0;const base=(label||'').trim();
+ for(const id of ids){const e=(S.shared||[]).find(x=>x.id===id);if(!e)continue;const lb=(base||smartLabel(it,e.name))+(n&&(base||isJunk(e.name))?' ('+(n+1)+')':'');if(await shAttachTo(it,e,lb))n++}
+ if(n){log('Stage: '+(it.title||T[it.type].n)+': '+n+' file(s) attached',it);save()}return n}
+A.shGo=async()=>{const e=shCur();const it=SHSEL&&get(SHSEL);if(!e||!it)return toast('Choose where it goes');const nm=$('#shN')?$('#shN').value:'';
+ const ids=SHALL?shBatch(e).map(x=>x.id):[e.id];const n=await shAttachIds(it,ids,nm);if(!n)return;SHSEL=null;SHNM=null;SHQ='';SHCUR=null;buzz&&buzz();
+ const left=(S.shared||[]).length;if(left){render();toast('Attached to '+shortT(it)+'. '+left+' more to sort.',1)}else{location.replace('#item/'+it.id);toast((n>1?n+' files':'File')+' attached',1)}};
+A.shKeep=()=>{SHSEL=null;SHNM=null;SHQ='';const n=(S.shared||[]).length;location.replace('#home');if(n)toast('Kept in Shared files. Attach from Home or any record’s Attach menu.')};
+A.shDel=async()=>{const e=shCur();if(!e||!confirm('Delete "'+e.name+'"? It is not attached anywhere.'))return;S.shared=(S.shared||[]).filter(x=>x.id!==e.id);try{await fDel(e.fid)}catch(x){}SHCUR=null;SHNM=null;save();if((S.shared||[]).length)render();else location.replace('#home');toast('Deleted')};
+A.shNew=ty=>{const e=shCur();if(!e)return;const ids=SHALL?shBatch(e).map(x=>x.id):[e.id];SHPEND={ty,ids,label:SHNM!==null?SHNM.trim():'',before:new Set(S.items.map(x=>x.id))};SHSEL=null;SHNM=null;SHQ='';
+ if(ty==='task')A.ql(null,'','','task');else{PREFILL=null;go('edit/'+ty+'/new')}};
+A.shPendX=()=>{SHPEND=null;const b=$('#shPend');if(b)b.remove();toast('Kept in Shared files')};
+/* the file waits on the form; it is attached to the record the moment that record is saved */
+function shAfter(){try{if(!SHPEND)return;const P=SHPEND;const h=location.hash.slice(1);const v=h.split('/')[0];
+ const nw=S.items.filter(x=>!P.before.has(x.id)&&x.type===P.ty);
+ if(nw.length){const cur=v==='item'?get(h.split('/')[1]):null;const it=cur&&nw.includes(cur)?cur:nw[0];SHPEND=null;
+  shAttachIds(it,P.ids,P.label).then(n=>{if(n){render();setTimeout(()=>toast('Saved. '+(n>1?n+' files':'File')+' attached.',1),60)}});return}
+ if(!['edit','qlog'].includes(v)){if(v!=='share')SHPEND=null;return}
+ if($('#shPend'))return;const e=(S.shared||[]).find(x=>x.id===P.ids[0]);if(!e){SHPEND=null;return}
+ const x=`<div class="shpend" id="shPend">${thBox(e.fid,e.name,160,'xs')}<span><b>${esc(P.label||(isJunk(e.name)?'Shared file':e.name))}</b>${P.ids.length>1?' + '+(P.ids.length-1)+' more':''} will be attached when you save</span><button class="btn s" onclick="A.shPendX()">Don't attach</button></div>`;
+ const m=$('#main');const b=m&&m.querySelector(':scope > .back, :scope > .itop');if(b)b.insertAdjacentHTML('afterend',x);else if(m)m.insertAdjacentHTML('afterbegin',x);setTimeout(hydrateTh,0)}catch(e){}}
+const _render68=render;render=function(){_render68();shAfter()};
+window.addEventListener('hashchange',shAfter);
+/* Home: shared files waiting stand out at the top */
+const _vHome68=vHome;vHome=function(){const h=_vHome68();const L=shList();if(!L.length)return h;setTimeout(hydrateTh,0);
+ return `<a class="card shcard" href="#share">${thBox(L[0].fid,L[0].name,160,'xs')}<span><b>${L.length} shared file${L.length>1?'s':''} to attach</b><span class="meta">Tap to choose where ${L.length>1?'they go':'it goes'}</span></span><span class="shgo">›</span></a>`+h};
+/* any record's Attach menu */
+A.attachMenu=id=>{const L=shList();sheet(`<div class="ct">Attach</div><div class="mt">${L.length?`<div class="mi" onclick="closeSheet();A.shPick('${id}')"><span class="e">📥</span><span class="shmi">From shared files (${L.length})</span><span class="shmini">${L.slice(0,3).map(e=>thBox(e.fid,e.name,160,'xs')).join('')}</span></div>`:''}<label class="mi"><span class="e">📎</span>File or photo<input type="file" hidden multiple accept=".pdf,image/*,.xlsx,.xls,.csv,.doc,.docx" onchange="closeSheet();A.attachPick('${id}',this)"></label><div class="mi" onclick="closeSheet();A.lkSheet('${id}')"><span class="e">🔗</span>Google Drive link</div></div><p class="meta shhint">From Google Drive: tap ☰ in the file picker, then Drive.${L.length?'':' From WhatsApp: share the file to SDO Desk.'}</p>`);setTimeout(hydrateTh,0)};
+A.shPick=id=>{const L=shList();sheet(`<div class="ct">Shared files</div><p class="meta">Tap one to attach it here.</p><div class="shgrid">${L.map(e=>`<button onclick="A.shPickGo('${id}','${e.id}')">${thBox(e.fid,e.name,160,'')}<span>${esc(e.name)}</span><em>${esc(agoTs(e.ts))}</em></button>`).join('')}</div><button class="btn wide mt" onclick="closeSheet();go('share')">Rename or delete shared files</button>`);setTimeout(hydrateTh,0)};
+A.shPickGo=async(id,eid)=>{const it=get(id);if(!it)return;closeSheet();const n=await shAttachIds(it,[eid],'');if(n){render();toast('Attached',1)}};
+
+/* ---------- viewer: photos and PDFs open here, nothing downloads unless you ask ---------- */
+let FV=null;
+const ICSH='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
+const ICDL='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>';
+A.viewFile=async(fid,label)=>{let r=null;try{r=await fGet(fid)}catch(e){}if(!r)return toast('File not on this phone. Restore a backup that includes it.');
+ A.fvClose(1);closeSheet();ovPush();const title=label||r.name;
+ const d=document.createElement('div');d.id='fv';d.innerHTML=`<div class="fvtop"><span>${esc(title)}</span><button onclick="A.fvClose()" aria-label="Close">✕</button></div><div class="fvb" id="fvB"></div><div class="fvbar"><button onclick="A.fvShare()">${ICSH}<span>Share</span></button><button onclick="A.fvSave()">${ICDL}<span>Save to phone</span></button><button onclick="A.fvClose()"><b>✕</b><span>Close</span></button></div>`;
+ document.body.appendChild(d);FV={r,nm:fileNm(label,r.name),urls:[],doc:null,io:null};const me=FV;const B=$('#fvB');
+ if(isPic(r)){const u=URL.createObjectURL(r.blob);FV.urls.push(u);B.innerHTML=`<img class="fvimg" src="${u}" alt="" draggable="false">`;zoomImg(B,B.firstChild)}
+ else if(isPdf(r)){B.innerHTML='<div class="fvmsg">Opening PDF…</div>';
+  try{const doc=await pdfDoc(r.blob);if(FV!==me){doc.destroy();return}FV.doc=doc;B.innerHTML=`<div class="fvpages" id="fvP"></div>`;B.classList.add('pdf');await fvPages(doc,$('#fvP'),me);if(FV===me&&doc.numPages>1)d.querySelector('.fvtop span').textContent=title+' · '+doc.numPages+' pages'}
+  catch(e){if(FV===me)B.innerHTML=`<div class="fvmsg"><div class="fvext">PDF</div>Could not show this PDF here.${navigator.onLine?'':'<br>The PDF reader downloads once, the first time you are online.'}<button class="btn p mt" onclick="A.fvOpenWith()">Open with another app</button></div>`}}
+ else B.innerHTML=`<div class="fvmsg"><div class="fvext">${esc(extOf(r.name))}</div><b>${esc(title)}</b><div class="meta">${fsize(r.size||0)}</div><button class="btn p mt" onclick="A.fvOpenWith()">Open with…</button><div class="meta mt">Word and Excel files open in an app on the phone, such as Word, WPS or Google Docs.</div></div>`};
+A.fvClose=fromPop=>{const d=$('#fv');if(FV){try{FV.io&&FV.io.disconnect()}catch(e){}try{FV.doc&&FV.doc.destroy()}catch(e){}(FV.urls||[]).forEach(u=>URL.revokeObjectURL(u));FV=null}if(d)d.remove()};
+const fvFile=()=>new File([FV.r.blob],FV.nm,{type:FV.r.type||'application/octet-stream'});
+A.fvSave=()=>{if(!FV)return;const u=URL.createObjectURL(FV.r.blob);const a=document.createElement('a');a.href=u;a.download=FV.nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);toast('Saving to Downloads')};
+A.fvShare=async()=>{if(!FV)return;const f=fvFile();if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:FV.nm})}catch(e){}return}toast('This file type can’t be shared directly. Use Save to phone, then share it from Downloads.')};
+A.fvOpenWith=async()=>{if(!FV)return;const f=fvFile();if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:FV.nm})}catch(e){}return}A.fvSave();toast('Saved. Tap the download notice to open it in Word, Excel or WPS.')};
+async function fvPages(doc,P,me){const cw=P.clientWidth||360;const W=Math.min(2000,Math.round(cw*Math.min(window.devicePixelRatio||1,2)*1.5));
+ for(let n=1;n<=doc.numPages;n++){const pg=await doc.getPage(n);if(FV!==me)return;const v=pg.getViewport({scale:1});const d=document.createElement('div');d.className='fvpg';d.style.aspectRatio=v.width+' / '+v.height;d.dataset.n=n;P.appendChild(d);if(n===1)fvRender(doc,d,W,me)}
+ const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){io.unobserve(en.target);fvRender(doc,en.target,W,me)}}),{root:P.parentNode,rootMargin:'800px 0px'});
+ P.querySelectorAll('.fvpg').forEach((d,i)=>{if(i)io.observe(d)});me.io=io;zoomPdf(P.parentNode,P)}
+async function fvRender(doc,d,W,me){if(d.dataset.done)return;d.dataset.done=1;try{const c=await pdfPage(doc,+d.dataset.n,W);if(FV!==me)return;const b=await new Promise(ok=>c.toBlob(ok,'image/jpeg',.88));c.width=0;const u=URL.createObjectURL(b);me.urls.push(u);const im=new Image();im.alt='Page '+d.dataset.n;im.src=u;d.appendChild(im)}catch(e){}}
+/* pinch to zoom, drag to move, double-tap to zoom in or out */
+function zoomImg(box,el){let z=1,tx=0,ty=0,s=null,lastTap=0;const W=()=>box.clientWidth,H=()=>box.clientHeight;
+ const clamp=()=>{z=Math.min(5,Math.max(1,z));tx=Math.min(0,Math.max(W()-W()*z,tx));ty=Math.min(0,Math.max(H()-H()*z,ty))};
+ const ap=()=>{clamp();el.style.transform=`translate(${tx}px,${ty}px) scale(${z})`};
+ const pt=(t)=>{const b=box.getBoundingClientRect();return [t.clientX-b.left,t.clientY-b.top]};
+ box.addEventListener('touchstart',e=>{const T0=e.touches;if(T0.length===2){const a=pt(T0[0]),b=pt(T0[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];s={k:2,d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,z,p:[(m[0]-tx)/z,(m[1]-ty)/z]}}
+  else if(T0.length===1){const a=pt(T0[0]);const now=Date.now();if(now-lastTap<300){if(z>1){z=1;tx=0;ty=0}else{const p=[(a[0]-tx)/z,(a[1]-ty)/z];z=2.5;tx=a[0]-z*p[0];ty=a[1]-z*p[1]}el.style.transition='transform .2s';ap();setTimeout(()=>el.style.transition='',220);lastTap=0;s=null;return}lastTap=now;s={k:1,a,tx,ty}}},{passive:true});
+ box.addEventListener('touchmove',e=>{if(!s)return;const T0=e.touches;if(s.k===2&&T0.length===2){e.preventDefault();const a=pt(T0[0]),b=pt(T0[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];z=s.z*Math.hypot(a[0]-b[0],a[1]-b[1])/s.d;z=Math.min(5,Math.max(1,z));tx=m[0]-z*s.p[0];ty=m[1]-z*s.p[1];ap()}
+  else if(s.k===1&&T0.length===1&&z>1){e.preventDefault();const a=pt(T0[0]);tx=s.tx+a[0]-s.a[0];ty=s.ty+a[1]-s.a[1];ap()}},{passive:false});
+ box.addEventListener('touchend',e=>{if(!e.touches.length)s=null;else if(e.touches.length===1){const a=pt(e.touches[0]);s={k:1,a,tx,ty}}});
+ box.addEventListener('wheel',e=>{e.preventDefault();const b=box.getBoundingClientRect();const m=[e.clientX-b.left,e.clientY-b.top];const p=[(m[0]-tx)/z,(m[1]-ty)/z];z*=e.deltaY<0?1.2:1/1.2;z=Math.min(5,Math.max(1,z));tx=m[0]-z*p[0];ty=m[1]-z*p[1];ap()},{passive:false})}
+function zoomPdf(box,P){let z=1,s=null,lastTap=0;const set=(nz,m,p)=>{z=Math.min(4,Math.max(1,nz));P.style.width=(z*100)+'%';box.scrollLeft=p[0]*z-m[0];box.scrollTop=p[1]*z-m[1]};
+ const pt=t=>{const b=box.getBoundingClientRect();return [t.clientX-b.left,t.clientY-b.top]};
+ box.addEventListener('touchstart',e=>{const T0=e.touches;if(T0.length===2){const a=pt(T0[0]),b=pt(T0[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];s={d:Math.hypot(a[0]-b[0],a[1]-b[1])||1,z,p:[(box.scrollLeft+m[0])/z,(box.scrollTop+m[1])/z]}}
+  else if(T0.length===1){const now=Date.now();if(now-lastTap<300){const m=pt(T0[0]);const p=[(box.scrollLeft+m[0])/z,(box.scrollTop+m[1])/z];set(z>1?1:2,m,p);lastTap=0}else lastTap=now}},{passive:true});
+ box.addEventListener('touchmove',e=>{if(!s||e.touches.length!==2)return;e.preventDefault();const a=pt(e.touches[0]),b=pt(e.touches[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];set(s.z*Math.hypot(a[0]-b[0],a[1]-b[1])/s.d,m,s.p)},{passive:false});
+ box.addEventListener('touchend',e=>{if(e.touches.length<2)s=null});
+ box.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();const b=box.getBoundingClientRect();const m=[e.clientX-b.left,e.clientY-b.top];set(z*(e.deltaY<0?1.15:1/1.15),m,[(box.scrollLeft+m[0])/z,(box.scrollTop+m[1])/z])},{passive:false})}
+/* every attachment opens in the viewer */
+A.openDoc=async(id,i)=>{const it=get(id);const l=it&&it.links&&it.links[i];if(!l)return;if(l.url){window.open(l.url,'_blank','noopener');return}A.viewFile(l.fileId,l.label||l.name)};
+A.fView=fid=>A.viewFile(fid);
 
 /* check before sharing, copying or marking uploaded */
 ['ntBoth','ntDocx','ntPdf'].forEach(k=>{const f=A[k];A[k]=()=>ntGuard(f)});{const f=A.ntCopy;A.ntCopy=k=>ntGuard(()=>f(k))}{const f=A.ntSt;A.ntSt=val=>val==='Submitted'?ntGuard(()=>f(val)):f(val)}
